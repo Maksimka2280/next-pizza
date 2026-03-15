@@ -15,7 +15,7 @@ export default function Home() {
           <div className="mt-[35px]">
              <MainFilters/>
           </div>
-         
+
         </div>
       </main>
     </>
