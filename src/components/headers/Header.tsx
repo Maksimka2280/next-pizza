@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { ShoppingCart } from "lucide-react";
 
 export default function Header() {
+    
     return (
         <>
             <header className="flex items-center w-full px-[67px] py-[45px] sticky top-0 z-50 bg-white/70 backdrop-blur-xs">
