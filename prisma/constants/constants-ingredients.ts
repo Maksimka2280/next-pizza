@@ -1,0 +1,17 @@
+export const ingredientsSeedData = [
+  { name: "Mozzarella", price: 25, imageUrl: "https://images.unsplash.com/photo-1579965342575-16428a7c8881?auto=format&fit=crop&w=800&q=80" },
+  { name: "Tomato", price: 12, imageUrl: "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?auto=format&fit=crop&w=800&q=80" },
+  { name: "Pepperoni", price: 22, imageUrl: "https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=800&q=80" },
+  { name: "Bacon", price: 20, imageUrl: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=800&q=80" },
+  { name: "Mushrooms", price: 15, imageUrl: "https://images.unsplash.com/photo-1513036191774-b2badb8fcb76?auto=format&fit=crop&w=800&q=80" },
+  { name: "Olives", price: 10, imageUrl: "https://images.unsplash.com/photo-1517483000871-1dbf64a6e1c6?auto=format&fit=crop&w=800&q=80" },
+  { name: "Bell Pepper", price: 12, imageUrl: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=800&q=80" },
+  { name: "Chicken", price: 18, imageUrl: "https://images.unsplash.com/photo-1518492104633-130d0cc84637?auto=format&fit=crop&w=800&q=80" },
+  { name: "Onion", price: 8, imageUrl: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=800&q=80" },
+  { name: "Pineapple", price: 10, imageUrl: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=800&q=80" },
+  { name: "Cheese", price: 18, imageUrl: "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80" },
+  { name: "Spinach", price: 9, imageUrl: "https://images.unsplash.com/photo-1576045051380-6d8b85c5dcd3?auto=format&fit=crop&w=800&q=80" },
+  { name: "Garlic", price: 7, imageUrl: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=800&q=80" },
+  { name: "Sausage", price: 16, imageUrl: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=800&q=80" },
+  { name: "Ham", price: 14, imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80" },
+];

@@ -26,7 +26,6 @@ export default function MainFilters() {
     const [selected2, setSelected2] = useState("Традиционное")
 
     const handleChange = (val: string) => setSelected2(val)
-    const visibleOptions = showAll ? options : options.slice(0, 6);
 
     const toggleOption = (option: string) => {
         setSelected(prev =>
@@ -68,18 +67,22 @@ export default function MainFilters() {
                 <div className="w-full bg-[#EDEDED] h-[1px] my-[25px]"></div>
                 <div className="flex flex-col gap-4 mt-[25px]">
                     <h2 className="text-[16px] font-[700]">Ингредиенты:</h2>
-                    {visibleOptions.map(option => (
-                        <label key={option} className="flex items-center gap-2 cursor-pointer">
-                            <Checkbox
-                                checked={selected.includes(option)}
-                                onCheckedChange={() => toggleOption(option)}
-                            />
-                            <span>{option}</span>
-                        </label>
-                    ))}
+                    <div className="overflow-hidden transition-all duration-300 ease-in-out">
+                        <div className={`flex flex-col gap-2 transition-all duration-300 ease-in-out ${showAll ? 'max-h-[500px] opacity-100' : 'max-h-[140px] opacity-100'}`}>
+                            {options.slice(0, showAll ? options.length : 6).map(option => (
+                                <label key={option} className="flex items-center gap-2 cursor-pointer">
+                                    <Checkbox
+                                        checked={selected.includes(option)}
+                                        onCheckedChange={() => toggleOption(option)}
+                                    />
+                                    <span>{option}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
                     <div className="flex">
                         <button
-                            className="text-[#FE5F00] text-[16px]"
+                            className="text-[#FE5F00] text-[16px] hover:underline transition-all duration-200"
                             onClick={() => setShowAll(prev => !prev)}
                         >
                             {showAll ? "- Скрыть" : "+ Показать всё"}

@@ -2,6 +2,7 @@
 import Header from "@/components/headers/Header";
 import PizzaPick from "@/components/main-page/filters-pick-pizza/filters-pick-pizza";
 import MainFilters from "@/components/main-page/main-filters/main-filters";
+import CartProducts from "@/components/Products/Cart-products";
 import Image from "next/image";
 
 export default function Home() {
@@ -12,8 +13,9 @@ export default function Home() {
         <div>
           <h1 className="text-[36px] font-black pb-[20px]">Все пиццы</h1>
           <PizzaPick />
-          <div className="mt-[35px]">
-             <MainFilters/>
+          <div className="mt-[35px] flex gap-[50px]">
+            <MainFilters />
+            <CartProducts />
           </div>
 
         </div>
