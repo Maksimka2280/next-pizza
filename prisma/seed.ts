@@ -87,19 +87,53 @@ async function up() {
     });
 
     for (const variant of productData.variants) {
+      const size = "size" in variant ? variant.size ?? null : null;
+      const pizzaType = "pizzaType" in variant ? variant.pizzaType ?? null : null;
+
       await prisma.productItem.create({
         data: {
           price: variant.price,
-          size: variant.size ?? null,
-          pizzaType: variant.pizzaType ?? null,
+          size,
+          pizzaType,
           productId: createdProduct.id,
         },
       });
     }
   }
+
+  const users = await prisma.user.findMany({
+    orderBy: { id: "asc" },
+  });
+
+  const firstProductItem = await prisma.productItem.findFirst({
+    orderBy: { id: "asc" },
+  });
+
+  for (const user of users) {
+    const cart = await prisma.cart.create({
+      data: {
+        userId: user.id,
+        token: `seed-cart-${user.id}`,
+        totalAmount: 0,
+      },
+    });
+
+    if (firstProductItem) {
+      await prisma.cartItem.create({
+        data: {
+          cartId: cart.id,
+          productItemId: firstProductItem.id,
+          quantity: 1,
+        },
+      });
+    }
+  }
+
 }
 
 async function down() {
+  await prisma.$executeRaw`TRUNCATE TABLE "CartItem" RESTART IDENTITY CASCADE`;
+  await prisma.$executeRaw`TRUNCATE TABLE "Cart" RESTART IDENTITY CASCADE`;
   await prisma.$executeRaw`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE`;
   await prisma.$executeRaw`TRUNCATE TABLE "Category" RESTART IDENTITY CASCADE`;
   await prisma.$executeRaw`TRUNCATE TABLE "Ingredient" RESTART IDENTITY CASCADE`;

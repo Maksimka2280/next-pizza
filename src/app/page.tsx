@@ -11,8 +11,10 @@ export default function Home() {
       <Header />
       <main className="px-[67px] pt-[40px]">
         <div>
-          <h1 className="text-[36px] font-black pb-[20px]">Все пиццы</h1>
-          <PizzaPick />
+          <div className="">
+            <h1 className="text-[36px] font-black pb-[20px]">Все пиццы</h1>
+            <PizzaPick />
+          </div>
           <div className="mt-[35px] flex gap-[50px]">
             <MainFilters />
             <CartProducts />
