@@ -1,6 +1,7 @@
 import { Input } from "@base-ui/react/input";
 import { Button } from "../ui/button";
 import { ShoppingCart } from "lucide-react";
+import { SearchInput } from "../SearchInput";
 
 export default function Header() {
     
@@ -16,12 +17,8 @@ export default function Header() {
                 </div>
 
                 <div className="flex-1 flex justify-center px-6">
-                    <div className="flex items-center w-full max-w-[760px] h-[50px] rounded-[15px] bg-[#F9F9F9]/50 px-4">
-                        <img src="/img/header/search-icon.svg" alt="Поиск" className="mr-3" />
-                        <Input
-                            className="flex-1 h-full border-0 bg-transparent text-[#C0C0C0] text-[16px] font-normal focus:outline-none"
-                            placeholder="Поиск пиццы..."
-                        />
+                    <div className="flex items-center w-full max-w-[760px] h-[50px] ">
+                        <SearchInput />
                     </div>
                 </div>
 
