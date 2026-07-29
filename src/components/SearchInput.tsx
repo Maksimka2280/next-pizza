@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Product } from '@prisma/client';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -12,12 +12,12 @@ interface Props {
 }
 
 export const SearchInput: React.FC<Props> = ({ className }) => {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [focused, setFocused] = React.useState(false);
-  const [products, setProducts] = React.useState<Product[]>([]);
-  const ref = React.useRef<HTMLDivElement | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [focused, setFocused] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const ref = useRef<HTMLDivElement | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!focused) {
       setProducts([]);
       return;
@@ -43,7 +43,7 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
     return () => window.clearTimeout(timeoutId);
   }, [focused, searchQuery]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!focused) return;
 
     const handleClickOutside = (event: MouseEvent) => {

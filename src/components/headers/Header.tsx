@@ -8,13 +8,13 @@ export default function Header() {
     return (
         <>
             <header className="flex items-center w-full px-[67px] py-[45px] sticky top-0 z-50 bg-white/70 backdrop-blur-xs">
-                <div className="flex items-center gap-4 flex-shrink-0">
+                <a className="flex items-center gap-4 flex-shrink-0" href="/">
                     <img src="/img/header/pizza-logo.png" alt="Pizza Logo" className="w-13 h-13" />
                     <div className="flex flex-col">
                         <h1 className="text-2xl font-black uppercase">next pizza</h1>
                         <p className="text-[16px] text-[#7B7B7B] leading-none">вкусней уже некуда</p>
                     </div>
-                </div>
+                </a>
 
                 <div className="flex-1 flex justify-center px-6">
                     <div className="flex items-center w-full max-w-[760px] h-[50px] ">

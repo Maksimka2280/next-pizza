@@ -6,7 +6,12 @@ export const runtime = "nodejs";
 
 
 export async function GET() {
-  const products = await prisma.product.findMany({});
+  const products = await prisma.product.findMany({
+    include: {
+      ingredients: true,
+      items: true,
+    },
+  });
 
   return NextResponse.json(products);
 }
