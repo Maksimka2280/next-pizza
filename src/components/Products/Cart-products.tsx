@@ -53,7 +53,7 @@ export default function CartProducts() {
   }, [currentPage, products]);
 
   return (
-    <div className="flex flex-col gap-[30px]">
+    <div className="flex flex-col gap-[30px] cursor-pointer" >
       <div
         className={`flex flex-wrap gap-[50px] transition-all duration-300 ease-in-out ${isTransitioning ? "translate-y-2 opacity-0" : "translate-y-0 opacity-100"
           }`}
