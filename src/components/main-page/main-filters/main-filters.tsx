@@ -1,116 +1,169 @@
 'use client'
+import { CheckboxFiltersGroup } from "@/components/shared/GroupeFilterCheckbox";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import CustomInput from "@/components/ui/CustomInput";
 import { Radio } from "@/components/ui/Radio";
-import { Input } from "@base-ui/react/input";
-import { useState } from "react";
+import { useIngredients } from "@/hooks/useListIngredients";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-const options = [
-    "Сырный соус",
-    "Моцарелла",
-    "Чеснок",
-    "Солённые огурчики",
-    "Красный лук",
-    "Томаты",
-    "Базилик",
-    "Перец",
-    "Оливки",
-];
+const parseNumber = (value: string | null) => {
+  if (value === null || value === "") return "";
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? "" : parsed;
+};
+
+const parseBoolean = (value: string | null) => value === "1" || value === "true";
+
+const parseIngredientIds = (value: string | null) => {
+  if (!value) return new Set<string>();
+  return new Set(value.split(",").filter(Boolean));
+};
+
 export default function MainFilters() {
-    const [value, setValue] = useState("Традиционное")
-    const [minPrice, setMinPrice] = useState<number | "">("")
-    const [maxPrice, setMaxPrice] = useState<number | "">("")
-    const [selected, setSelected] = useState<string[]>([]);
-    const [showAll, setShowAll] = useState(false);
-    const [selected2, setSelected2] = useState("Традиционное")
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+  const { ingredients, loading } = useIngredients();
 
-    const handleChange = (val: string) => setSelected2(val)
+  const [pendingMinPrice, setPendingMinPrice] = useState<number | "">("");
+  const [pendingMaxPrice, setPendingMaxPrice] = useState<number | "">("");
+  const [pendingIngredientIds, setPendingIngredientIds] = useState<Set<string>>(new Set());
+  const [pendingCanBuild, setPendingCanBuild] = useState(false);
+  const [pendingNew, setPendingNew] = useState(false);
+  const [selected2, setSelected2] = useState("Традиционное");
 
-    const toggleOption = (option: string) => {
-        setSelected(prev =>
-            prev.includes(option)
-                ? prev.filter(o => o !== option)
-                : [...prev, option]
-        );
-    };
-    return (
-        <>
-            <div className="w-[250px]">
-                <h1 className="text-[22px] font-[700]">Фильтрация</h1>
-                <div className="flex flex-col gap-2 mt-[25px]">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <Checkbox /> <span>Можно собирать</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <Checkbox /> <span>Новинки</span>
-                    </label>
-                </div>
-                <div className="w-full bg-[#EDEDED] h-[1px] my-[25px]"></div>
-                <h2 className="text-[16px] font-[700]">Цена от и до:</h2>
-                <div className="flex gap-[15px] pt-[15px]">
-                    <CustomInput
-                        type="number"
-                        value={minPrice}
-                        onChange={(v) => setMinPrice(v === "" ? "" : Number(v))}
-                        placeholder="0"
-                        width="90px"
-                    />
-                    <CustomInput
-                        type="number"
-                        value={maxPrice}
-                        onChange={(v) => setMaxPrice(v === "" ? "" : Number(v))}
-                        placeholder="0"
-                        width="90px"
-                    />
-                </div>
-                <div className="w-full bg-[#EDEDED] h-[1px] my-[25px]"></div>
-                <div className="flex flex-col gap-4 mt-[25px]">
-                    <h2 className="text-[16px] font-[700]">Ингредиенты:</h2>
-                    <div className="overflow-hidden transition-all duration-300 ease-in-out">
-                        <div className={`flex flex-col gap-2 transition-all duration-300 ease-in-out ${showAll ? 'max-h-[500px] opacity-100' : 'max-h-[140px] opacity-100'}`}>
-                            {options.slice(0, showAll ? options.length : 6).map(option => (
-                                <label key={option} className="flex items-center gap-2 cursor-pointer">
-                                    <Checkbox
-                                        checked={selected.includes(option)}
-                                        onCheckedChange={() => toggleOption(option)}
-                                    />
-                                    <span>{option}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="flex">
-                        <button
-                            className="text-[#FE5F00] text-[16px] hover:underline transition-all duration-200"
-                            onClick={() => setShowAll(prev => !prev)}
-                        >
-                            {showAll ? "- Скрыть" : "+ Показать всё"}
-                        </button>
-                    </div>
-                    <h2 className="text-[16px] font-[700]">Тип теста:</h2>
-                    <div className="flex flex-col gap-2">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <Radio
-                                value="Традиционное"
-                                checked={selected2 === "Традиционное"}
-                                onCheckedChange={() => handleChange("Традиционное")}
-                            />
-                            <span>Традиционное</span>
-                        </label>
+  useEffect(() => {
+    setPendingMinPrice(parseNumber(searchParams.get("priceFrom")));
+    setPendingMaxPrice(parseNumber(searchParams.get("priceTo")));
+    setPendingIngredientIds(parseIngredientIds(searchParams.get("ingredients")));
+    setPendingCanBuild(parseBoolean(searchParams.get("canBuild")));
+    setPendingNew(parseBoolean(searchParams.get("new")));
 
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <Radio
-                                value="Тонкое"
-                                checked={selected2 === "Тонкое"}
-                                onCheckedChange={() => handleChange("Тонкое")}
-                            />
-                            <span>Тонкое</span>
-                        </label>
-                        <Button className={'h-[50px] rounded-[18px] mt-[35px]'}>Применить</Button>
-                    </div>
-                </div>
-            </div>
-        </>
-    )
+    const doughValue = searchParams.get("dough");
+    setSelected2(doughValue === "Тонкое" ? "Тонкое" : "Традиционное");
+  }, [searchParams]);
+
+  const items = useMemo(
+    () => ingredients.map((item) => ({ value: String(item.id), text: item.name })),
+    [ingredients]
+  );
+
+  const toggleIngredient = (id: string) => {
+    setPendingIngredientIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const applyFilters = () => {
+    const params = new URLSearchParams();
+
+    if (pendingMinPrice !== "") {
+      params.set("priceFrom", String(pendingMinPrice));
+    }
+    if (pendingMaxPrice !== "") {
+      params.set("priceTo", String(pendingMaxPrice));
+    }
+    if (pendingIngredientIds.size > 0) {
+      params.set("ingredients", Array.from(pendingIngredientIds).join(","));
+    }
+    if (pendingCanBuild) {
+      params.set("canBuild", "1");
+    }
+    if (pendingNew) {
+      params.set("new", "1");
+    }
+    if (selected2) {
+      params.set("dough", selected2);
+    }
+
+    const query = params.toString();
+    const url = query ? `${pathname}?${query}` : pathname;
+    router.push(url);
+  };
+
+  return (
+    <div className="w-[250px]">
+      <h1 className="text-[22px] font-[700]">Фильтрация</h1>
+      <div className="flex flex-col gap-2 mt-[25px]">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <Checkbox
+            checked={pendingCanBuild}
+            onCheckedChange={(checked) => setPendingCanBuild(Boolean(checked))}
+          />
+          <span>Можно собирать</span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <Checkbox
+            checked={pendingNew}
+            onCheckedChange={(checked) => setPendingNew(Boolean(checked))}
+          />
+          <span>Новинки</span>
+        </label>
+      </div>
+      <div className="w-full bg-[#EDEDED] h-[1px] my-[25px]"></div>
+      <h2 className="text-[16px] font-[700]">Цена от и до:</h2>
+      <div className="flex flex-col gap-4 pt-[15px]">
+        <div className="flex gap-[15px]">
+          <CustomInput
+            type="number"
+            value={pendingMinPrice}
+            onChange={(v) => setPendingMinPrice(v === "" ? "" : Number(v))}
+            placeholder="0"
+            width="90px"
+          />
+          <CustomInput
+            type="number"
+            value={pendingMaxPrice}
+            onChange={(v) => setPendingMaxPrice(v === "" ? "" : Number(v))}
+            placeholder="0"
+            width="90px"
+          />
+        </div>
+      </div>
+      <div className="w-full bg-[#EDEDED] h-[1px] my-[25px]"></div>
+      <div className="flex flex-col gap-4 mt-[25px]">
+        <CheckboxFiltersGroup
+          title="Ингредиенты"
+          name="ingredients"
+          className="mt-5"
+          limit={6}
+          defaultItems={items.slice(0, 6)}
+          items={items}
+          loading={loading}
+          onClickCheckbox={toggleIngredient}
+          selected={pendingIngredientIds}
+        />
+
+        <h2 className="text-[16px] font-[700]">Тип теста:</h2>
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <Radio
+              value="Традиционное"
+              checked={selected2 === "Традиционное"}
+              onCheckedChange={() => setSelected2("Традиционное")}
+            />
+            <span>Традиционное</span>
+          </label>
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <Radio
+              value="Тонкое"
+              checked={selected2 === "Тонкое"}
+              onCheckedChange={() => setSelected2("Тонкое")}
+            />
+            <span>Тонкое</span>
+          </label>
+          <Button onClick={applyFilters} className={'h-[50px] rounded-[18px] mt-[35px]'}>Применить</Button>
+        </div>
+      </div>
+    </div>
+  );
 }

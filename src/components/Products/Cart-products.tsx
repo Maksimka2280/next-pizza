@@ -3,16 +3,36 @@
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import ReactPaginate from "react-paginate";
-
+import { Skeleton } from "../ui/skeleton";
+import { useSearchParams } from "next/navigation";
 type ProductResponse = {
   id?: number;
   name?: string;
   imageUrl?: string;
   items?: Array<{ price?: number }>;
-  ingredients?: Array<{ name?: string }>;
+  ingredients?: Array<{ id?: number; name?: string }>;
 };
 
+
+
 export default function CartProducts() {
+  const searchParams = useSearchParams();
+  const minPriceQuery = searchParams.get("priceFrom")?.trim();
+  const maxPriceQuery = searchParams.get("priceTo")?.trim();
+  const ingredientQuery = searchParams.get("ingredients")?.trim() ?? "";
+
+  const hasMinPrice = minPriceQuery !== null && minPriceQuery !== "";
+  const hasMaxPrice = maxPriceQuery !== null && maxPriceQuery !== "";
+  const hasIngredientFilter = ingredientQuery !== "";
+
+  const minPrice = hasMinPrice ? Number(minPriceQuery) : undefined;
+  const maxPrice = hasMaxPrice ? Number(maxPriceQuery) : undefined;
+  const selectedIngredientIds = new Set(
+    ingredientQuery
+      .split(",")
+      .filter(Boolean)
+  );
+  const hasFilters = hasMinPrice || hasMaxPrice || hasIngredientFilter;
   const [products, setProducts] = useState<ProductResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
@@ -38,6 +58,37 @@ export default function CartProducts() {
     setCurrentPage(0);
   }, [products.length]);
 
+  const filteredProducts = useMemo(() => {
+    if (!hasFilters) {
+      return products;
+    }
+
+    return products.filter((product) => {
+      const price = product.items?.[0]?.price ?? 0;
+
+      if (minPrice !== undefined && !Number.isNaN(minPrice) && price < minPrice) {
+        return false;
+      }
+
+      if (maxPrice !== undefined && !Number.isNaN(maxPrice) && price > maxPrice) {
+        return false;
+      }
+
+      if (hasIngredientFilter) {
+        const ingredientIds = product.ingredients?.map((ingredient) => String(ingredient.id)) ?? [];
+        if (!ingredientIds.some((id) => selectedIngredientIds.has(id))) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [products, hasFilters, hasIngredientFilter, minPrice, maxPrice, selectedIngredientIds]);
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [filteredProducts.length]);
+
   useEffect(() => {
     if (!isTransitioning) return;
 
@@ -45,35 +96,44 @@ export default function CartProducts() {
     return () => window.clearTimeout(timer);
   }, [isTransitioning]);
 
-  const pageCount = Math.ceil(products.length / itemsPerPage);
+  const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
 
   const visibleProducts = useMemo(() => {
     const startIndex = currentPage * itemsPerPage;
-    return products.slice(startIndex, startIndex + itemsPerPage);
-  }, [currentPage, products]);
+    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+  }, [currentPage, filteredProducts]);
 
+  const clearFilters = () => {
+    const params = new URLSearchParams();
+    window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+  }
   return (
     <div className="flex flex-col gap-[30px] cursor-pointer" >
       <div
-        className={`flex flex-wrap gap-[50px] transition-all duration-300 ease-in-out ${isTransitioning ? "translate-y-2 opacity-0" : "translate-y-0 opacity-100"
+        className={`flex flex-wrap   gap-[50px] transition-all duration-300 ease-in-out ${isTransitioning ? "translate-y-2 opacity-0" : "translate-y-0 opacity-100"
           }`}
       >
         {loading ? (
           Array.from({ length: 8 }).map((_, index) => (
             <div key={`skeleton-${index}`} className="max-w-[285px] w-full animate-pulse">
               <div className="flex flex-col">
-                <div className="flex h-[260px] w-[285px] items-center justify-center overflow-hidden rounded-[15px] bg-[#F4ECE4]" />
-                <div className="mt-[15px] h-[24px] w-[70%] rounded-[8px] bg-[#F4ECE4]" />
-                <div className="mt-[10px] h-[14px] w-full rounded-[8px] bg-[#F4ECE4]" />
-                <div className="mt-[8px] h-[14px] w-[80%] rounded-[8px] bg-[#F4ECE4]" />
+                <Skeleton className="h-[260px] w-[285px] rounded-[15px]" />
+
+                <Skeleton className="mt-[15px] h-[24px] w-[70%] rounded-[8px]" />
+
+                <Skeleton className="mt-[10px] h-[14px] w-full rounded-[8px]" />
+
+                <Skeleton className="mt-[8px] h-[14px] w-[80%] rounded-[8px]" />
+
                 <div className="mt-[18px] flex items-center justify-between">
-                  <div className="h-[20px] w-[35%] rounded-[8px] bg-[#F4ECE4]" />
-                  <div className="h-[40px] w-[125px] rounded-[15px] bg-[#F4ECE4]" />
+                  <Skeleton className="h-[20px] w-[35%] rounded-[8px]" />
+
+                  <Skeleton className="h-[40px] w-[125px] rounded-[15px]" />
                 </div>
               </div>
             </div>
           ))
-        ) : (
+        ) : visibleProducts.length > 0 ? (
           visibleProducts.map((product) => {
             const productName = product.name ?? "Вкусная пицца";
             const price = product.items?.[0]?.price ?? 449;
@@ -119,9 +179,31 @@ export default function CartProducts() {
               </div>
             );
           })
+        ) : (
+          <div className=" w-full flex items-center justify-center">
+            <div className="flex max-w-[500px] w-full  flex-col items-center justify-center rounded-[20px] border border-dashed border-[#FE5F00] px-8 py-10 text-center">
+              <div className="mb-3 text-4xl">🍕</div>
+
+              <h3 className="text-xl font-bold text-[#1F1F1F]">
+                Пицца спряталась 😔
+              </h3>
+
+              <p className="mt-2 max-w-[320px] text-sm leading-5 text-[#7A7A7A]">
+                Не нашли подходящих вариантов. Попробуйте изменить фильтры — вдруг найдём ту самую!
+              </p>
+
+              <button 
+                className="mt-5 rounded-full bg-[#FF6900] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#e85f00]" 
+                onClick={clearFilters}
+              >
+                Сбросить фильтры
+              </button>
+            </div>
+          </div>
+
+
+
         )}
-
-
       </div>
       <div className="flex justify-start items-center my-[50px]">
         {!loading && pageCount > 1 && (
@@ -149,7 +231,6 @@ export default function CartProducts() {
           />
         )}
       </div>
-
     </div>
   );
 }
