@@ -10,6 +10,7 @@ export async function GET() {
     include: {
       ingredients: true,
       items: true,
+      category: true,
     },
   });
 

@@ -1,8 +1,10 @@
 import { SegmentedControl } from "@/components/ui/SegmentControl";
-import { prisma } from "../../../../prisma/prisma-client";
+
 import CardIngredient from "@/components/Products/cart-ingridietns";
 import CartProducts from "@/components/Products/Cart-products";
 import RecommendationProducts from "@/components/Products/cart-products-recomend";
+import { prisma } from "../../../../../prisma/prisma-client";
+import Link from "next/link";
 
 
 
@@ -46,14 +48,38 @@ export default async function ProductPage({
     });
     return (
         <>
-            <div className="flex justify-center items-center mt-[100px] gap-20">
-                <div className="w-[570px] h-[570px] rounded-[20px] p-[40px] bg-[#FFF7EE] flex items-center justify-center overflow-hidden">
-                    <img
-                        src={product?.imageUrl}
-                        alt={product?.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 rounded-[20px]"
-                    />
+
+            <div className="flex justify-center items-center mt-[50px] gap-20">
+
+                <div className="flex flex-col gap-5 ">
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-[#777777] mb-[20px]">
+                        <Link href="/" className="hover:text-[#FE5F00]">
+                            Главная
+                        </Link>
+
+                        <span>/</span>
+
+                        <span className="font-semibold hover:text-[#FE5F00]">
+                            {product?.category?.name || "Категория"}
+                        </span>
+
+                        <span>/</span>
+
+                        <span className="font-bold text-[#1F1F1F]">
+                            {product?.name}
+                        </span>
+                    </div>
+
+                    {/* картинка */}
+                    <div className="w-[570px] h-[570px] rounded-[20px] p-[40px] bg-[#FFF7EE] flex items-center justify-center overflow-hidden">
+                        <img
+                            src={product?.imageUrl}
+                            alt={product?.name}
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 rounded-[20px]"
+                        />
+                    </div>
                 </div>
+
 
                 <div className="flex flex-col gap-6">
                     <div>
@@ -68,14 +94,17 @@ export default async function ProductPage({
 
                     <SegmentedControl
                         id="size"
-                        items={["Маленька", "Середня", "Велика",]}
+                        items={["Маленька", "Середня", "Велика"]}
                     />
 
                     <SegmentedControl
                         id="dough"
                         items={["Традиційне", "Тонке"]}
                     />
-                    <h2 className="text-[18px] font-bold">Ингредиенты</h2>
+
+                    <h2 className="text-[18px] font-bold">
+                        Ингредиенты
+                    </h2>
 
                     <div className="flex gap-4">
                         {product?.ingredients.map((ingredient) => (
@@ -88,6 +117,7 @@ export default async function ProductPage({
                         ))}
                     </div>
                 </div>
+
             </div>
             <div className="mt-20 flex justify-center">
                 <div className="">

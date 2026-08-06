@@ -8,6 +8,8 @@ interface CardIngredientProps {
     name: string;
     price: number;
     loading?: boolean;
+    titlesize?: "sm" | "md" | "lg";
+    pricesize?: "sm" | "md" | "lg";
 }
 
 export default function CardIngredient({
@@ -15,6 +17,8 @@ export default function CardIngredient({
     name,
     price,
     loading = false,
+    titlesize = "md",
+    pricesize = "md"
 }: CardIngredientProps) {
     const [active, setActive] = useState(false);
 
@@ -45,11 +49,11 @@ export default function CardIngredient({
                     className="h-[120px] w-[120px] object-contain"
                 />
 
-                <h1 className="mt-3 text-center text-[18px] leading-6">
+                <h1 className={cn("mt-3 text-center", titlesize === "sm" ? "text-[14px]" : titlesize === "md" ? "text-[16px]" : "text-[18px]")}>
                     {name}
                 </h1>
 
-                <p className="mt-2 text-[24px] font-bold">
+                <p className={cn("mt-2", pricesize === "sm" ? "text-[20px]" : pricesize === "md" ? "text-[24px]" : "text-[28px]")}>
                     {price} ₽
                 </p>
             </div>

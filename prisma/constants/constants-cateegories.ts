@@ -1,10 +1,7 @@
 export const categoriesSeedData = [
-  "Pizza",
-  "Dessert",
-  "Drinks",
-  "Snacks",
-  "Salads",
-  "Sauces",
-  "Sides",
-  "Combos",
+  'Пицца',
+  'Завтрак',
+  'Закуски',
+  'Коктейли',
+  'Напитки',
 ] as const;

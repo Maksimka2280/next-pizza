@@ -9,6 +9,9 @@ export async function GET(req: NextRequest) {
                 contains: query ,
                 mode: "insensitive"
             }
+        },
+        include: {
+            category: true,
         }
     })
 
