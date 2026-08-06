@@ -10,7 +10,9 @@ export default function Dashboard() {
     <main className="px-[67px] pt-[40px]">
       <div>
         <h1 className="text-[36px] font-black pb-[20px]">Все пиццы</h1>
-        <PizzaPick />
+        <Suspense>
+          <PizzaPick />
+        </Suspense>
         <div className="mt-[35px] grid grid-cols-[280px_minmax(0,1fr)] gap-[50px]">
           <div className="w-full">
             <Suspense>
