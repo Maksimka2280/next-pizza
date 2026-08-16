@@ -55,11 +55,11 @@ export default async function ProductPage({
 
                 <div className="flex flex-col gap-5 ">
                     <ProductForm
-                        name={product?.name ?? "Unnamed product"}
-                        imageUrl={product?.imageUrl ?? "Unnamed product"}
-                        ingredients={product?.ingredients ?? "Unnamed product"}
-                        items={product?.items ?? "Unnamed product"}
-                        categoryName={product?.category.name ?? "Unnamed category"}
+                        name={product.name}
+                        imageUrl={product.imageUrl}
+                        ingredients={product.ingredients}
+                        items={product.items}
+                        categoryName={product.category.name}
                         pizzaTypes={pizzaTypes}
                         recommendations={recommendations}
                         price={productPrice}
