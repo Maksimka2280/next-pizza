@@ -1,9 +1,10 @@
 'use client'
 
-import PizzaPick from "@/components/main-page/filters-pick-pizza/filters-pick-pizza";
-import MainFilters from "@/components/main-page/main-filters/main-filters";
-import CartProducts from "@/components/Products/Cart-products";
+
 import { Suspense } from "react";
+import PizzaPick from "../../../shared/components/main-page/filters-pick-pizza/filters-pick-pizza";
+import MainFilters from "../../../shared/components/main-page/main-filters/main-filters";
+import CartProducts from "../../../shared/components/Products/Cart-products";
 
 export default function Dashboard() {
   return (

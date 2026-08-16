@@ -1,11 +1,11 @@
 'use client'
-import { CheckboxFiltersGroup } from "@/components/shared/GroupeFilterCheckbox";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import CustomInput from "@/components/ui/CustomInput";
-import { Radio } from "@/components/ui/Radio";
-import { useIngredients } from "@/hooks/use-ingredients";
-import { useProductFilters } from "@/hooks/use-product-filters";
+import { CheckboxFiltersGroup } from "../../../components/shared/GroupeFilterCheckbox";
+import { Button } from "../../../components/ui/button";
+import { Checkbox } from "../../../components/ui/checkbox";
+import CustomInput from "../../../components/ui/CustomInput";
+import { Radio } from "../../../components/ui/Radio";
+import { useIngredients } from "../../../hooks/use-ingredients";
+import { useProductFilters } from "../../../hooks/use-product-filters";
 
 export default function MainFilters() {
   const { ingredients, loading } = useIngredients();

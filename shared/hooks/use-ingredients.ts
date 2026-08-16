@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Api } from "../../service/api-clients";
 import { Ingredient } from "@prisma/client";
+import { Api } from "../service/api-clients";
 
 interface UseIngredientsResult {
     ingredients: Ingredient[];

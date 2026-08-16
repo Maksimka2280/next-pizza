@@ -1,4 +1,5 @@
-import Header from "@/components/headers/Header";
+import Header from "../../../shared/components/headers/Header";
+
 
 export const metadata = {
   title: "Next Pizza",

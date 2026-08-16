@@ -1,10 +1,7 @@
-import { SegmentedControl } from "@/components/ui/SegmentControl";
 
-import CardIngredient from "@/components/Products/cart-ingridietns";
-import CartProducts from "@/components/Products/Cart-products";
-import RecommendationProducts from "@/components/Products/cart-products-recomend";
 import { prisma } from "../../../../../prisma/prisma-client";
-import Link from "next/link";
+import { ProductForm } from "../../../../../shared/components/shared/ProductForm";
+import { pizzaTypes } from "../../../../../shared/constants/Pizza";
 
 
 
@@ -25,6 +22,10 @@ export default async function ProductPage({
             category: true,
         },
     });
+
+    if (!product) {
+        return null;
+    }
     const ingredientIds = product?.ingredients.map((ingredient) => ingredient.id);
     let recommendations = await prisma.product.findMany({
         where: {
@@ -46,86 +47,23 @@ export default async function ProductPage({
         },
         take: 4,
     });
+    const productPrice = product.items[0]?.price ?? 0;
     return (
         <>
 
             <div className="flex justify-center items-center mt-[50px] gap-20">
 
                 <div className="flex flex-col gap-5 ">
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-[#777777] mb-[20px]">
-                        <Link href="/" className="hover:text-[#FE5F00]">
-                            Главная
-                        </Link>
-
-                        <span>/</span>
-
-                        <span className="font-semibold hover:text-[#FE5F00]">
-                            {product?.category?.name || "Категория"}
-                        </span>
-
-                        <span>/</span>
-
-                        <span className="font-bold text-[#1F1F1F]">
-                            {product?.name}
-                        </span>
-                    </div>
-
-                    {/* картинка */}
-                    <div className="w-[570px] h-[570px] rounded-[20px] p-[40px] bg-[#FFF7EE] flex items-center justify-center overflow-hidden">
-                        <img
-                            src={product?.imageUrl}
-                            alt={product?.name}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 rounded-[20px]"
-                        />
-                    </div>
-                </div>
-
-
-                <div className="flex flex-col gap-6">
-                    <div>
-                        <h1 className="text-[34px] font-black">
-                            {product?.name}
-                        </h1>
-
-                        <p className="text-[#777777] mt-2">
-                            25 см, традиційне тісто, 380 г
-                        </p>
-                    </div>
-
-                    <SegmentedControl
-                        id="size"
-                        items={["Маленька", "Середня", "Велика"]}
+                    <ProductForm
+                        name={product?.name ?? "Unnamed product"}
+                        imageUrl={product?.imageUrl ?? "Unnamed product"}
+                        ingredients={product?.ingredients ?? "Unnamed product"}
+                        items={product?.items ?? "Unnamed product"}
+                        categoryName={product?.category.name ?? "Unnamed category"}
+                        pizzaTypes={pizzaTypes}
+                        recommendations={recommendations}
+                        price={productPrice}
                     />
-
-                    <SegmentedControl
-                        id="dough"
-                        items={["Традиційне", "Тонке"]}
-                    />
-
-                    <h2 className="text-[18px] font-bold">
-                        Ингредиенты
-                    </h2>
-
-                    <div className="flex gap-4">
-                        {product?.ingredients.map((ingredient) => (
-                            <CardIngredient
-                                key={ingredient.id}
-                                img={ingredient.imageUrl}
-                                name={ingredient.name}
-                                price={ingredient.price}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-            </div>
-            <div className="mt-20 flex justify-center">
-                <div className="">
-                    <h2 className="mb-8 text-[28px] font-bold">
-                        Рекомендації
-                    </h2>
-
-                    <RecommendationProducts products={recommendations} />
                 </div>
             </div>
         </>
