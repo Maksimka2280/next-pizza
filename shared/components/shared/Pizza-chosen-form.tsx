@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Ingredient, ProductItem } from '@prisma/client';
 
 import { PizzaImage } from './PizzaImage';
@@ -19,9 +19,9 @@ interface Props {
   ingredients: Ingredient[];
   items: ProductItem[];
   loading?: boolean;
-  onSubmit?: (itemId: number, ingredients: number[]) => void;
   className?: string;
   price: number;
+  onClickAddCart?: VoidFunction;
 }
 
 
@@ -32,16 +32,16 @@ export const ChoosePizzaForm: React.FC<Props> = ({
   imageUrl,
   ingredients,
   loading,
-  onSubmit,
   className,
-  price
+  price,
+  onClickAddCart
 }) => {
   const {
     size,
     type,
     selectedIngredients,
     availableSizes,
-    currentItemId,
+    availablePizzaSizes,
     setSize,
     setType,
     addIngredient,
@@ -55,11 +55,15 @@ export const ChoosePizzaForm: React.FC<Props> = ({
     selectedIngredients,
   );
 
-  const handleClickAdd = () => {
-    if (currentItemId) {
-      onSubmit?.(currentItemId, Array.from(selectedIngredients));
-    }
-  };
+
+  const onclickAdd = () => {
+    // onClickAddCart?.()
+    // console.log(
+    //   size,
+    //   type,
+    //   selectedIngredients
+    // );
+  }
   const finalPrice = price + totalPrice;
   return (
     <div className={cn(className, 'flex flex-1')}>
@@ -69,13 +73,11 @@ export const ChoosePizzaForm: React.FC<Props> = ({
 
       <div className="w-1/2 bg-[#F4F1EE] p-7">
         <Title text={name} size="md" className="font-extrabold mb-1" />
-
         <p className="text-gray-400">{textDetaills}</p>
-
         <div className="flex flex-col gap-4 mt-5">
           {availableSizes?.length > 0 && (
             <GroupVariants
-              items={availableSizes}
+              items={availablePizzaSizes}
               value={String(size)}
               onClick={(value) => setSize(Number(value) as PizzaSize)}
             />
@@ -88,7 +90,7 @@ export const ChoosePizzaForm: React.FC<Props> = ({
           />
         </div>
 
-        <div className="p-5 rounded-md h-auto overflow-auto scrollbar mt-5">
+        <div className="p-5 rounded-md max-h-[250px] overflow-y-auto scrollbar mt-5">
           <div className="grid grid-cols-3 gap-3">
             {ingredients.map((ingredient) => (
               <IngredientItem
@@ -105,8 +107,8 @@ export const ChoosePizzaForm: React.FC<Props> = ({
 
         <Button
           disabled={loading}
-          onClick={handleClickAdd}
-          className="h-13.75 px-10 text-base rounded-[18px] w-full mt-10"
+          onClick={onclickAdd}
+          className="h-13.75 px-10 text-base rounded-[18px] w-full mt-8"
         >
           {loading ? 'Добавление...' : `Добавить в корзину за ${finalPrice} ₽`}
         </Button>

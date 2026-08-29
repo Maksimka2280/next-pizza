@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ProductItem } from '@prisma/client';
-import { Mapsize, Maptype, type PizzaSize, type PizzaType } from '../constants/Pizza';
+import { Mapsize, pizzasize, type PizzaSize, type PizzaType } from '../constants/Pizza';
 
 interface Variant {
   name: string;
@@ -26,6 +26,7 @@ export const usePizzaOptions = (items: ProductItem[]) => {
       name: Mapsize[size] ?? `${size} см`,
       value: String(size),
     }));
+
   }, [items]);
 
   const availableTypes = useMemo<PizzaType[]>(() => {
@@ -66,7 +67,29 @@ export const usePizzaOptions = (items: ProductItem[]) => {
       return next;
     });
   };
+  const availablePizzaTypes = items.filter((item) => item.pizzaType === type);
+  const availablePizzaSizes = pizzasize.map((item) => ({
+    name: item.name,
+    value: item.value,
+    disabled: !availablePizzaTypes.some(
+      (pizza) => pizza.size === Number(item.value),
+    ),
+  }));
+  useEffect(() => {
+    const currentSize = availablePizzaSizes.find(
+      (item) => Number(item.value) === size,
+    );
 
+    if (currentSize?.disabled) {
+      const firstAvailableSize = availablePizzaSizes.find(
+        (item) => !item.disabled,
+      );
+
+      if (firstAvailableSize) {
+        setSize(Number(firstAvailableSize.value) as PizzaSize);
+      }
+    }
+  }, [type, availablePizzaSizes]);
   return {
     size,
     type,
@@ -76,5 +99,6 @@ export const usePizzaOptions = (items: ProductItem[]) => {
     setSize,
     setType,
     addIngredient,
+    availablePizzaSizes
   };
 };

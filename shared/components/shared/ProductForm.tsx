@@ -11,7 +11,8 @@ import { Title } from "./Title";
 import { getPizzaDetails } from "../../lib/getPizzaDetails";
 import { IngredientItem } from "./IngredientItem";
 import { Button } from "../ui/button";
-import {  useRouter } from "next/navigation";
+
+
 
 
 interface Props {
@@ -51,6 +52,7 @@ export const ProductForm: React.FC<Props> = ({
     setSize,
     setType,
     addIngredient,
+    availablePizzaSizes
   } = usePizzaOptions(items);
 
   const { totalPrice, textDetaills } = getPizzaDetails(
@@ -112,7 +114,7 @@ export const ProductForm: React.FC<Props> = ({
           <div className="flex flex-col gap-4 mt-5">
             {availableSizes?.length > 0 && (
               <GroupVariants
-                items={availableSizes}
+                items={availablePizzaSizes}
                 value={String(size)}
                 onClick={(value) => setSize(Number(value) as PizzaSize)}
               />

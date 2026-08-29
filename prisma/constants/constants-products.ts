@@ -232,8 +232,15 @@
       'Сливочная моцарелла',
     ],
     variants: [
+      // Маленькая 20 см
+      { price: 269, size: 20, pizzaType: 1 },
+
+      // Средняя 30 см
       { price: 319, size: 30, pizzaType: 1 },
-      { price: 479, size: 40, pizzaType: 2 },
+      { price: 339, size: 30, pizzaType: 2 },
+
+      // Большая 40 см
+      { price: 499, size: 40, pizzaType: 2 },
     ],
   },
 ];

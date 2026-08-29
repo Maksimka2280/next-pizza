@@ -12,12 +12,12 @@ export const Maptype: Record<PizzaType, string> = {
     2: 'Тонкое',
 };
 
-export const pizzasize = Object.entries(Mapsize).map(([name, value]) => ({
+export const pizzasize = Object.entries(Mapsize).map(([value, name]) => ({
     value,
     name,
 }));
 
-export const pizzaTypes = Object.entries(Maptype).map(([name, value]) => ({
+export const pizzaTypes = Object.entries(Maptype).map(([value, name]) => ({
     value,
     name,
 }));

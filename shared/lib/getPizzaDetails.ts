@@ -24,7 +24,7 @@ export const getPizzaDetails = (
   const basePrice = currentItem?.price ?? 0;
   const totalPrice = basePrice + ingredientsTotal;
 
-  const sizeLabel = Mapsize[size] ?? `${size} см`;
+  const sizeLabel = size;
   const typeLabel = Maptype[type] ?? 'Традиционное';
   const ingredientCount = selectedIngredients.size;
 
@@ -34,6 +34,6 @@ export const getPizzaDetails = (
 
   return {
     totalPrice,
-    textDetaills: `${sizeLabel}, ${typeLabel} — ${ingredientText}`,
+    textDetaills: `${sizeLabel} см, ${typeLabel} пицца, ингредиенты: ${ingredientText}`,
   };
 };
