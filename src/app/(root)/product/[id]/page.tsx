@@ -54,7 +54,6 @@ export default async function ProductPage({
             <div className="flex justify-center items-center mt-[50px] gap-20">
 
                 <div className="flex flex-col gap-5 ">
-                    {void console.log(product)}
                     <ProductForm
                         name={product.name}
                         imageUrl={product.imageUrl}

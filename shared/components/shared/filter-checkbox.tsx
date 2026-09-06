@@ -19,7 +19,7 @@ export const FilterCheckbox: React.FC<FilterChecboxProps> = ({
   name,
 }) => {
   return (
-    <div className="flex items-center space-x-2">
+    <main className="flex items-center space-x-2">
       <Checkbox
         onCheckedChange={onCheckedChange}
         checked={checked}
@@ -33,6 +33,6 @@ export const FilterCheckbox: React.FC<FilterChecboxProps> = ({
         {text}
       </label>
       {endAdornment}
-    </div>
+    </main>
   );
 };

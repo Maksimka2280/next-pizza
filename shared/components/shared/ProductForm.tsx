@@ -6,11 +6,12 @@ import RecommendationProducts from "../Products/cart-products-recomend";
 import Link from "next/link";
 import { PizzaSize, PizzaType } from "../../constants/Pizza";
 import { GroupVariants } from "../GroupVariants";
-import CardIngredient from "../Products/cart-ingridietns";
 import { Title } from "./Title";
 import { getPizzaDetails } from "../../lib/getPizzaDetails";
 import { IngredientItem } from "./IngredientItem";
 import { Button } from "../ui/button";
+import { useState } from 'react';
+import { useCart } from '../../hooks/useCart';
 
 
 
@@ -43,17 +44,17 @@ export const ProductForm: React.FC<Props> = ({
   price
 }) => {
 
-  const {
-    size,
-    type,
-    selectedIngredients,
-    availableSizes,
-    currentItemId,
-    setSize,
-    setType,
-    addIngredient,
-    availablePizzaSizes
-  } = usePizzaOptions(items);
+const {
+  size,
+  type,
+  selectedIngredients,
+  availableSizes,
+  currentItemId,
+  setSize,
+  setType,
+  addIngredient,
+  availablePizzaSizes,
+} = usePizzaOptions(items);
 
   const { totalPrice, textDetaills } = getPizzaDetails(
     type,
@@ -62,15 +63,23 @@ export const ProductForm: React.FC<Props> = ({
     ingredients,
     selectedIngredients,
   );
-  const handleClickAdd = () => {
-    if (currentItemId) {
-      onSubmit?.(currentItemId, Array.from(selectedIngredients));
+  const { addOrIncrement } = useCart();
+  const [adding, setAdding] = useState(false);
+
+  const handleClickAdd = async () => {
+    const itemIdToAdd = currentItemId ?? items?.[0]?.id ?? null;
+    if (!itemIdToAdd) return;
+    onSubmit?.(itemIdToAdd, Array.from(selectedIngredients));
+
+    setAdding(true);
+    try {
+      await addOrIncrement({ productItemId: itemIdToAdd, quantity: 1, ingredients: Array.from(selectedIngredients) });
+    } catch (e) {
+      console.error('addOrIncrement failed', e);
+    } finally {
+      setAdding(false);
     }
   };
-  // const router = useRouter();
-  // const handleCategoryClick = () => {
-  //   router.push(`/?category=${categoryName}`);
-  // };
   const finalPrice = price + totalPrice;
   return (
     <div className={className}>
@@ -145,11 +154,11 @@ export const ProductForm: React.FC<Props> = ({
             ))}
           </div>
           <Button
-            disabled={loading}
+            disabled={loading || adding}
             onClick={handleClickAdd}
             className="h-13.75 px-10 text-base rounded-[18px] w-full mt-10"
           >
-            {loading ? 'Добавление...' : `Добавить в корзину за ${finalPrice} ₽`}
+            {loading || adding ? 'Добавление...' : `Добавить в корзину за ${finalPrice} ₽`}
           </Button>
         </div>
 

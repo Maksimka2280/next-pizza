@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Ingredient, ProductItem } from '@prisma/client';
 
 import { PizzaImage } from './PizzaImage';
@@ -12,6 +12,7 @@ import { IngredientItem } from './IngredientItem';
 import { cn } from '../../lib/utils';
 import { getPizzaDetails } from '../../lib/getPizzaDetails';
 import { usePizzaOptions } from '../../hooks/usePizzaOptions';
+import { useCart } from '../../hooks/useCart';
 
 interface Props {
   imageUrl: string;
@@ -45,6 +46,7 @@ export const ChoosePizzaForm: React.FC<Props> = ({
     setSize,
     setType,
     addIngredient,
+    currentItemId,
   } = usePizzaOptions(items);
 
   const { totalPrice, textDetaills } = getPizzaDetails(
@@ -56,14 +58,21 @@ export const ChoosePizzaForm: React.FC<Props> = ({
   );
 
 
-  const onclickAdd = () => {
-    // onClickAddCart?.()
-    // console.log(
-    //   size,
-    //   type,
-    //   selectedIngredients
-    // );
-  }
+  const { addOrIncrement } = useCart();
+  const [adding, setAdding] = useState(false);
+  const handleClickAdd = async () => {
+    const itemIdToAdd = currentItemId ?? items?.[0]?.id ?? null;
+    if (!itemIdToAdd) return;
+    onClickAddCart?.();
+    setAdding(true);
+    try {
+      await addOrIncrement({ productItemId: itemIdToAdd, quantity: 1, ingredients: Array.from(selectedIngredients) });
+    } catch (e) {
+      console.error('addOrIncrement failed', e);
+    } finally {
+      setAdding(false);
+    }
+  };
   const finalPrice = price + totalPrice;
   return (
     <div className={cn(className, 'flex flex-1')}>
@@ -105,13 +114,13 @@ export const ChoosePizzaForm: React.FC<Props> = ({
           </div>
         </div>
 
-        <Button
-          disabled={loading}
-          onClick={onclickAdd}
-          className="h-13.75 px-10 text-base rounded-[18px] w-full mt-8"
-        >
-          {loading ? 'Добавление...' : `Добавить в корзину за ${finalPrice} ₽`}
-        </Button>
+            <Button
+              disabled={loading || adding}
+              onClick={handleClickAdd}
+              className="h-13.75 px-10 text-base rounded-[18px] w-full mt-8"
+            >
+              {loading || adding ? 'Добавление...' : `Добавить в корзину за ${finalPrice} ₽`}
+            </Button>
       </div>
     </div>
   );

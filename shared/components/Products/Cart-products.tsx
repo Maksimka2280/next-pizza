@@ -6,49 +6,23 @@ import ReactPaginate from "react-paginate";
 import { Skeleton } from "../ui/skeleton";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-
-type ProductResponse = {
-  id?: number;
-  name?: string;
-  imageUrl?: string;
-  items?: Array<{ price?: number }>;
-  ingredients?: Array<{ id?: number; name?: string }>;
-  category?: {
-    id?: number;
-    name?: string;
-  };
-};
+import { Button } from "../ui/button";
+import { useCart } from "../../hooks/useCart";
+import {
+  filterProducts,
+  parseProductFilters,
+  type ProductResponse,
+} from "./productFilters";
 
 export default function CartProducts() {
   const searchParams = useSearchParams();
-  const minPriceQuery = searchParams.get("priceFrom")?.trim();
-  const maxPriceQuery = searchParams.get("priceTo")?.trim();
-  const ingredientQuery = searchParams.get("ingredients")?.trim() ?? "";
-  const categoryQuery = searchParams.get("category")?.trim() ?? "";
-
-  const hasMinPrice = minPriceQuery !== null && minPriceQuery !== "";
-  const hasMaxPrice = maxPriceQuery !== null && maxPriceQuery !== "";
-  const hasIngredientFilter = ingredientQuery !== "";
-  const hasCategoryFilter = categoryQuery !== "";
-
-  const minPrice = hasMinPrice ? Number(minPriceQuery) : undefined;
-  const maxPrice = hasMaxPrice ? Number(maxPriceQuery) : undefined;
-  const selectedIngredientIds = useMemo(
-    () =>
-      new Set(
-        ingredientQuery
-          .split(",")
-          .filter(Boolean)
-      ),
-    [ingredientQuery]
-  );
-  const hasFilters = hasMinPrice || hasMaxPrice || hasIngredientFilter || hasCategoryFilter;
+  const filters = useMemo(() => parseProductFilters(searchParams), [searchParams]);
   const [products, setProducts] = useState<ProductResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const itemsPerPage = 8;
-
+  const { cart, updateItem, addOrIncrement } = useCart();
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -68,39 +42,7 @@ export default function CartProducts() {
     setCurrentPage(0);
   }, [products.length]);
 
-  const filteredProducts = useMemo(() => {
-    if (!hasFilters) {
-      return products;
-    }
-
-    return products.filter((product) => {
-      const price = product.items?.[0]?.price ?? 0;
-
-      if (minPrice !== undefined && !Number.isNaN(minPrice) && price < minPrice) {
-        return false;
-      }
-
-      if (maxPrice !== undefined && !Number.isNaN(maxPrice) && price > maxPrice) {
-        return false;
-      }
-
-      if (hasIngredientFilter) {
-        const ingredientIds = product.ingredients?.map((ingredient) => String(ingredient.id)) ?? [];
-        if (!ingredientIds.some((id) => selectedIngredientIds.has(id))) {
-          return false;
-        }
-      }
-
-      if (hasCategoryFilter) {
-        const productCategory = product.category?.name?.trim() ?? "";
-        if (productCategory.toLowerCase() !== categoryQuery.toLowerCase()) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  }, [products, hasFilters, hasIngredientFilter, minPrice, maxPrice, selectedIngredientIds, hasCategoryFilter, categoryQuery]);
+  const filteredProducts = useMemo(() => filterProducts(products, filters), [products, filters]);
 
   useEffect(() => {
     setCurrentPage(0);
@@ -137,7 +79,6 @@ export default function CartProducts() {
     const params = new URLSearchParams();
     window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
   };
-
   return (
     <div className="flex flex-col gap-[30px] cursor-pointer">
       {loading ? (
@@ -159,73 +100,129 @@ export default function CartProducts() {
         </div>
       ) : groupedVisibleProducts.length > 0 ? (
         groupedVisibleProducts.map(([categoryName, products]) => (
-            <div key={categoryName} className="flex flex-col gap-5">
+          <div key={categoryName} className="flex flex-col gap-5">
 
-              <h2 className="text-[28px] font-bold">{categoryName}</h2>
-              <div className={`flex flex-wrap gap-[50px] transition-all duration-300 ease-in-out ${isTransitioning ? "translate-y-2 opacity-0" : "translate-y-0 opacity-100"}`}>
-                {products.map((product) => {
-                  const productName = product.name ?? "Вкусная пицца";
-                  const price = product.items?.[0]?.price ?? 449;
-                  const ingredients = product.ingredients
-                    ?.map((ingredient) => ingredient.name)
-                    .filter(Boolean)
-                    .join(", ");
+            <h2 className="text-[28px] font-bold">{categoryName}</h2>
+            <div className={`flex flex-wrap gap-[50px] transition-all duration-300 ease-in-out ${isTransitioning ? "translate-y-2 opacity-0" : "translate-y-0 opacity-100"}`}>
+              {products.map((product) => {
+                const productName = product.name ?? "Вкусная пицца";
+                const price = product.items?.[0]?.price ?? 449;
+                const ingredients = product.ingredients
+                  ?.map((ingredient) => ingredient.name)
+                  .filter(Boolean)
+                  .join(", ");
 
-                 return (
-    <Link 
-        key={product.id ?? productName}
-        href={`/product/${product.id}`}
-    >
-        <div className="max-w-[285px] w-full">
-            <div className="flex flex-col">
-                <div className="flex h-[260px] w-[285px] items-center justify-center overflow-hidden rounded-[15px] bg-[#FFF7EE]">
-                    <div className="h-[210px] w-[210px]">
-                        {product.imageUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                const productItemId = product.items?.[0]?.id;
+                const cartItem = cart?.items?.find(
+                  (it) => it.productItem?.product?.id === product.id
+                );
+                const quantity = cartItem?.quantity ?? 0;
+
+                return (
+                  <Link
+                    key={product.id ?? productName}
+                    href={`/product/${product.id}`}
+                  >
+                    <div className="max-w-[285px] w-full">
+                      <div className="flex flex-col">
+                        <div className="flex h-[260px] w-[285px] items-center justify-center overflow-hidden rounded-[15px] bg-[#FFF7EE]">
+                          <div className="h-[210px] w-[210px]">
+                            {product.imageUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
                                 src={product.imageUrl}
                                 alt={productName}
                                 className="h-full w-full rounded-[30px] object-cover"
-                            />
-                        ) : (
-                            <div className="flex h-full items-center justify-center text-sm text-[#B1B1B1]">
+                              />
+                            ) : (
+                              <div className="flex h-full items-center justify-center text-sm text-[#B1B1B1]">
                                 Немає зображення
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <h1 className="mt-[15px] mb-[7px] text-[22px] font-bold">
+                          {productName}
+                        </h1>
+
+                        <p className="max-w-full break-words text-[14px] text-[#B1B1B1]">
+                          {ingredients || "Опис буде доступний після отримання даних"}
+                        </p>
+
+                        <div className="mt-3 flex items-center justify-between">
+                          <p className="text-[20px]">
+                            от <span className="text-[20px] font-bold">{price} ₽</span>
+                          </p>
+                          {!cartItem ? (
+                            <button
+                              className="h-[40px] w-[125px] rounded-[15px] bg-[#FFFAF4] text-[15px] font-bold text-[#FE5F00]"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!productItemId) return;
+                                void addOrIncrement({ productItemId, quantity: 1 });
+                              }}
+                            >
+                              + добавить
+                            </button>
+                          ) : null}
+
+
+                          {cartItem ? (
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                className="h-8 w-8 p-0 text-[#FF6900]"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+
+                                  if (!cartItem || cartItem.id === undefined) return;
+
+                                  const newQty = Math.max(1, (cartItem.quantity || 1) - 1);
+                                  void updateItem({ cartItemId: cartItem.id, quantity: newQty });
+                                }}
+                              >
+                                -
+                              </Button>
+
+                              <span className="w-5 text-center text-sm">{quantity}</span>
+                              <Button
+                                variant="outline"
+                                className="h-8 w-8 p-0 text-[#FF6900]"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+
+                                  if (!cartItem || cartItem.id === undefined) return;
+                                  void updateItem({
+                                    cartItemId: cartItem.id,
+                                    quantity: (cartItem.quantity || 0) + 1,
+                                  });
+                                }}
+                              >
+                                +
+                              </Button>
                             </div>
-                        )}
+                          ) : null}
+
+
+                        </div>
+                      </div>
                     </div>
-                </div>
-
-                <h1 className="mt-[15px] mb-[7px] text-[22px] font-bold">
-                    {productName}
-                </h1>
-
-                <p className="max-w-full break-words text-[14px] text-[#B1B1B1]">
-                    {ingredients || "Опис буде доступний після отримання даних"}
-                </p>
-
-                <div className="mt-3 flex items-center justify-between">
-                    <p className="text-[20px]">
-                        от <span className="text-[20px] font-bold">{price} ₽</span>
-                    </p>
-
-                    <button className="h-[40px] w-[125px] rounded-[15px] bg-[#FFFAF4] text-[15px] font-bold text-[#FE5F00]">
-                        + добавить
-                    </button>
-                </div>
+                  </Link>
+                );
+              })}
             </div>
-        </div>
-    </Link>
-);
-                })}
-              </div>
-            </div>
-          
+          </div>
+
         ))
       ) : (
         <div className="w-full flex items-center justify-center">
           <div className="flex max-w-[500px] w-full flex-col items-center justify-center rounded-[20px] border border-dashed border-[#FE5F00] px-8 py-10 text-center">
             <div className="mb-3 text-4xl">🍕</div>
-            <h3 className="text-xl font-bold text-[#1F1F1F]">{categoryQuery || "Пицца"} спряталась 😔</h3>
+            <h3 className="text-xl font-bold text-[#1F1F1F]">{filters.categoryQuery || "Пицца"} спряталась 😔</h3>
             <p className="mt-2 max-w-[320px] text-sm leading-5 text-[#7A7A7A]">
               Мы не нашли подходящих вариантов. Попробуйте изменить фильтры — вдруг найдём ту самую!
             </p>
