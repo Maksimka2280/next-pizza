@@ -2,6 +2,7 @@
 import { ArrowDownUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Api } from "../../../service/api-clients";
 
 export default function PizzaPick() {
     const searchParams = useSearchParams();
@@ -15,9 +16,7 @@ export default function PizzaPick() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch("/api/categories");
-                if (!response.ok) return;
-                const data = await response.json();
+                const data = await Api.categories.getAll();
                 if (Array.isArray(data)) {
                     setCategories(["Все", ...data]);
                 }

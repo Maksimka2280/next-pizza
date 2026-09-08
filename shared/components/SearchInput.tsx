@@ -1,11 +1,11 @@
 'use client';
 
-import axios from 'axios';
 import { Product } from '@prisma/client';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
+import { Api } from '../service/api-clients';
 
 
 interface Props {
@@ -31,8 +31,8 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
       }
 
       try {
-        const { data } = await axios.get<Product[]>('/api/products');
-        const filtered = data.filter((product) =>
+        const data = await Api.products.search(searchQuery);
+        const filtered = data.filter((product: Product) =>
           product.name?.toLowerCase().includes(searchQuery.toLowerCase()),
         );
         setProducts(filtered);

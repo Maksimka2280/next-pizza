@@ -1,6 +1,5 @@
 "use client";
 
-import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { Skeleton } from "../ui/skeleton";
@@ -13,6 +12,9 @@ import {
   parseProductFilters,
   type ProductResponse,
 } from "./productFilters";
+import { Toaster } from "react-hot-toast";
+import { Api } from "../../service/api-clients";
+import ProductCartAction from "./ProductCartAction";
 
 export default function CartProducts() {
   const searchParams = useSearchParams();
@@ -26,7 +28,7 @@ export default function CartProducts() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await axios.get<ProductResponse[]>("/api/products");
+        const data = await Api.products.getAll();
         setProducts(data);
       } catch (error) {
         console.error(error);
@@ -113,10 +115,6 @@ export default function CartProducts() {
                   .join(", ");
 
                 const productItemId = product.items?.[0]?.id;
-                const cartItem = cart?.items?.find(
-                  (it) => it.productItem?.product?.id === product.id
-                );
-                const quantity = cartItem?.quantity ?? 0;
 
                 return (
                   <Link
@@ -152,62 +150,12 @@ export default function CartProducts() {
 
                         <div className="mt-3 flex items-center justify-between">
                           <p className="text-[20px]">
-                            от <span className="text-[20px] font-bold">{price} ₽</span>
+                            от <span className="text-[20px] font-bold">{price} ₴</span>
                           </p>
-                          {!cartItem ? (
-                            <button
-                              className="h-[40px] w-[125px] rounded-[15px] bg-[#FFFAF4] text-[15px] font-bold text-[#FE5F00]"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                if (!productItemId) return;
-                                void addOrIncrement({ productItemId, quantity: 1 });
-                              }}
-                            >
-                              + добавить
-                            </button>
-                          ) : null}
-
-
-                          {cartItem ? (
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="outline"
-                                className="h-8 w-8 p-0 text-[#FF6900]"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-
-                                  if (!cartItem || cartItem.id === undefined) return;
-
-                                  const newQty = Math.max(1, (cartItem.quantity || 1) - 1);
-                                  void updateItem({ cartItemId: cartItem.id, quantity: newQty });
-                                }}
-                              >
-                                -
-                              </Button>
-
-                              <span className="w-5 text-center text-sm">{quantity}</span>
-                              <Button
-                                variant="outline"
-                                className="h-8 w-8 p-0 text-[#FF6900]"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-
-                                  if (!cartItem || cartItem.id === undefined) return;
-                                  void updateItem({
-                                    cartItemId: cartItem.id,
-                                    quantity: (cartItem.quantity || 0) + 1,
-                                  });
-                                }}
-                              >
-                                +
-                              </Button>
-                            </div>
-                          ) : null}
-
-
+                          <ProductCartAction
+                            productId={product.id}
+                            productItemId={productItemId}
+                          />
                         </div>
                       </div>
                     </div>
@@ -260,6 +208,7 @@ export default function CartProducts() {
             breakClassName="flex h-[45px] w-[45px] items-center justify-center text-sm text-[#B1B1B1]"
           />
         )}
+        <Toaster />
       </div>
     </div>
   );

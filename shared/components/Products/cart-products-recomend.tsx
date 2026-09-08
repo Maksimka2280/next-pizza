@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import ReactPaginate from "react-paginate";
+import ProductCartAction from "./ProductCartAction";
 
 type ProductResponse = {
     id: number;
     name: string;
     imageUrl: string;
-    items: Array<{ price: number }>;
-    ingredients: Array<{ name: string }>;
+    items?: Array<{ id?: number; price?: number; product?: { id?: number } }>;
+    ingredients?: Array<{ name?: string }>;
 };
 
 interface RecommendationProductsProps {
@@ -35,9 +36,11 @@ export default function RecommendationProducts({
             <div className="flex flex-wrap justify-center gap-[50px]">
                 {visibleProducts.map((product) => {
                     const price = product.items?.[0]?.price ?? 0;
+                    const productItemId = product.items?.[0]?.id;
 
                     const ingredients = product.ingredients
                         ?.map((ingredient) => ingredient.name)
+                        .filter(Boolean)
                         .join(", ");
 
                     return (
@@ -62,25 +65,21 @@ export default function RecommendationProducts({
                                 </h2>
 
                                 <p className="text-[14px] text-[#B1B1B1]">
-                                    {ingredients}
+                                    {ingredients || "Опис буде доступний після отримання даних"}
                                 </p>
 
                                 <div className="mt-3 flex items-center justify-between">
                                     <p className="text-[20px]">
                                         від{" "}
                                         <span className="font-bold">
-                                            {price} ₽
+                                            {price} ₴
                                         </span>
                                     </p>
 
-                                    <button
-                                        onClick={(e) =>
-                                            e.preventDefault()
-                                        }
-                                        className="h-[40px] w-[125px] rounded-[15px] bg-[#FFFAF4] text-[15px] font-bold text-[#FE5F00] transition hover:bg-[#FE5F00] hover:text-white"
-                                    >
-                                        + додати
-                                    </button>
+                                    <ProductCartAction
+                                        productId={product.id}
+                                        productItemId={productItemId}
+                                    />
                                 </div>
                             </div>
                         </Link>

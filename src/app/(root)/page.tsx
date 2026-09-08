@@ -8,12 +8,16 @@ import CartProducts from "../../../shared/components/Products/Cart-products";
 
 export default function Dashboard() {
   return (
-    <main className="px-[67px] pt-[40px]">
-      <div>
-        <h1 className="text-[36px] font-black pb-[20px]">Все пиццы</h1>
+    <main className="w-full flex justify-center">
+      <div className="w-full max-w-[1440px] py-[40px]">
+        <h1 className="text-[36px] font-black pb-[20px]">
+          Все пиццы
+        </h1>
+
         <Suspense>
           <PizzaPick />
         </Suspense>
+
         <div className="mt-[35px] grid grid-cols-[280px_minmax(0,1fr)] gap-[50px]">
           <div className="w-full">
             <Suspense>
@@ -21,13 +25,13 @@ export default function Dashboard() {
             </Suspense>
           </div>
 
-          <div className="flex w-full items-center justify-center">
+           <div className="flex w-full items-center justify-center">
             <div className="w-full ">
               <Suspense>
                 <CartProducts />
               </Suspense>
             </div>
-          </div>
+            </div>
         </div>
       </div>
     </main>

@@ -111,6 +111,13 @@
     ingredients: [],
     variants: [{ price: 89 }],
   },
+   {
+    name: 'Фраголіно',
+    category: 'Напитки',
+    imageUrl: 'https://src.zakaz.atbmarket.com/cache/photos/82831/catalog_product_main_82831.jpg',
+    ingredients: [],
+    variants: [{ price: 60 }],
+  },
   {
     name: 'Кофе Латте',
     category: 'Напитки',

@@ -1,6 +1,7 @@
 
 "use client";
 
+import { Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import React from "react";
 
@@ -82,9 +83,9 @@ export const CartProductCardInner: React.FC<CartItemProps> = ({
                         </Button>
                     </div>
                     <div className="flex items-center gap-4">
-                        <span className="text-[16px] font-bold">{totalPrice} ₽</span>
+                        <span className="text-[16px] font-bold">{totalPrice} ₴</span>
                         <Button variant="ghost" className="text-sm" onClick={() => onRemove?.(id)}>
-                            Удалить
+                            <Trash color="#A1A1A1"/>
                         </Button>
                     </div>
                 </div>

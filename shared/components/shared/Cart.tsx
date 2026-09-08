@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import Image from "next/image";
 import { ArrowLeft, MoveRight, X } from "lucide-react";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 import { useCart } from "../../hooks/useCart";
 import { CartProductCard } from "./CartProductCard";
 
@@ -40,13 +41,13 @@ export const Cart = ({ onClose }: Props) => {
 
           <div className="flex flex-1 flex-col gap-3 px-5 py-2">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="animate-pulse rounded-[18px] bg-white p-3 shadow-sm">
+              <div key={index} className="rounded-[18px] bg-white p-3 shadow-sm">
                 <div className="flex gap-3">
-                  <div className="h-[80px] w-[80px] rounded-[16px] bg-[#E7E0DA]" />
+                  <Skeleton className="h-[80px] w-[80px] rounded-[16px] bg-[#E7E0DA]" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 w-2/3 rounded-full bg-[#E7E0DA]" />
-                    <div className="h-3 w-full rounded-full bg-[#E7E0DA]" />
-                    <div className="h-3 w-3/4 rounded-full bg-[#E7E0DA]" />
+                    <Skeleton className="h-4 w-2/3 rounded-full bg-[#E7E0DA]" />
+                    <Skeleton className="h-3 w-full rounded-full bg-[#E7E0DA]" />
+                    <Skeleton className="h-3 w-3/4 rounded-full bg-[#E7E0DA]" />
                   </div>
                 </div>
               </div>
@@ -99,12 +100,12 @@ export const Cart = ({ onClose }: Props) => {
                 <div className="flex items-end ">
                   <span className="text-[16px]">Итого:</span>
                   <div className="mx-2 flex-1 mb-[6px] border-t-2 border-dotted border-[#D9D9D9]" />
-                  <span className="text-[18px] font-bold">{total} ₽</span>
+                  <span className="text-[18px] font-bold">{total} ₴</span>
                 </div>
                 <div className="mt-5 flex items-end">
                   <span className="text-[16px]">Налог 5%:</span>
                   <div className="mx-2 flex-1 mb-[6px] border-t-2 border-dotted border-[#D9D9D9]" />
-                  <span className="text-[18px] font-bold">{Math.round(totalSum * 0.05)} ₽</span>
+                  <span className="text-[18px] font-bold">{Math.round(totalSum * 0.05)} ₴</span>
                 </div>
               </div>
               <div className="flex justify-center items-center mt-[21px] ">

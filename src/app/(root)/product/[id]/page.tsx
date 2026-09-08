@@ -33,19 +33,21 @@ export default async function ProductPage({
                 not: product?.id,
             },
             categoryId: product?.categoryId,
-            ingredients: {
-                some: {
-                    id: {
-                        in: ingredientIds,
-                    },
-                },
-            },
+            // ...(ingredientIds.length > 0 && {
+            //     ingredients: {
+            //         some: {
+            //             id: {
+            //                 in: ingredientIds,
+            //             },
+            //         },
+            //     },
+            // }),
         },
         include: {
             ingredients: true,
             items: true,
         },
-        take: 4,
+        take: 10,
     });
     const productPrice = product.items[0]?.price ?? 0;
     return (

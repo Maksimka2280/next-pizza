@@ -12,6 +12,9 @@ import { IngredientItem } from "./IngredientItem";
 import { Button } from "../ui/button";
 import { useState } from 'react';
 import { useCart } from '../../hooks/useCart';
+import { toast, Toaster } from "react-hot-toast";
+import { Toast } from "@base-ui/react";
+import { LoaderCircle } from "lucide-react";
 
 
 
@@ -44,17 +47,17 @@ export const ProductForm: React.FC<Props> = ({
   price
 }) => {
 
-const {
-  size,
-  type,
-  selectedIngredients,
-  availableSizes,
-  currentItemId,
-  setSize,
-  setType,
-  addIngredient,
-  availablePizzaSizes,
-} = usePizzaOptions(items);
+  const {
+    size,
+    type,
+    selectedIngredients,
+    availableSizes,
+    currentItemId,
+    setSize,
+    setType,
+    addIngredient,
+    availablePizzaSizes,
+  } = usePizzaOptions(items);
 
   const { totalPrice, textDetaills } = getPizzaDetails(
     type,
@@ -70,12 +73,22 @@ const {
     const itemIdToAdd = currentItemId ?? items?.[0]?.id ?? null;
     if (!itemIdToAdd) return;
     onSubmit?.(itemIdToAdd, Array.from(selectedIngredients));
-
     setAdding(true);
     try {
-      await addOrIncrement({ productItemId: itemIdToAdd, quantity: 1, ingredients: Array.from(selectedIngredients) });
+      await toast.promise(
+        addOrIncrement({
+          productItemId: itemIdToAdd,
+          quantity: 1,
+          ingredients: Array.from(selectedIngredients),
+        }),
+        {
+          loading: "Добавление...",
+          success: "Заказ успешно добавлен в корзину",
+          error: "Не удалось добавить товар в корзину",
+        }
+      );
     } catch (e) {
-      console.error('addOrIncrement failed', e);
+      console.error("addOrIncrement failed", e);
     } finally {
       setAdding(false);
     }
@@ -91,7 +104,7 @@ const {
 
         <span>/</span>
 
-        <button  className="font-semibold hover:text-[#FE5F00]">
+        <button className="font-semibold hover:text-[#FE5F00]">
           {categoryName || "Категория"}
         </button>
 
@@ -156,9 +169,15 @@ const {
           <Button
             disabled={loading || adding}
             onClick={handleClickAdd}
-            className="h-13.75 px-10 text-base rounded-[18px] w-full mt-10"
+            className="h-13.75 px-10 text-base rounded-[18px] w-full mt-8
+             disabled:bg-gray-300 disabled:text-gray-500
+             disabled:cursor-not-allowed"
           >
-            {loading || adding ? 'Добавление...' : `Добавить в корзину за ${finalPrice} ₽`}
+            {loading || adding ? (
+              <LoaderCircle className="h-5 w-5 animate-spin" />
+            ) : (
+              `Добавить в корзину за ${finalPrice} ₴`
+            )}
           </Button>
         </div>
 
@@ -166,15 +185,15 @@ const {
 
 
       {recommendations.length > 0 && (
-        <div className="mt-20">
+        <div className="mt-20 pb-20">
           <h2 className="mb-8 text-[28px] font-bold">
-            Рекомендації
+            Рекомендации
           </h2>
 
           <RecommendationProducts products={recommendations} />
         </div>
       )}
-
+      <Toaster />
     </div>
   );
 };

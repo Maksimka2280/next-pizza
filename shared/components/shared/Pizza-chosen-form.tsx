@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Ingredient, ProductItem } from '@prisma/client';
-
+import toast, { Toaster } from 'react-hot-toast';
 import { PizzaImage } from './PizzaImage';
 import { Title } from './Title';
 import { Button } from '../ui/button';
@@ -13,6 +13,7 @@ import { cn } from '../../lib/utils';
 import { getPizzaDetails } from '../../lib/getPizzaDetails';
 import { usePizzaOptions } from '../../hooks/usePizzaOptions';
 import { useCart } from '../../hooks/useCart';
+import { LoaderCircle } from 'lucide-react';
 
 interface Props {
   imageUrl: string;
@@ -47,8 +48,9 @@ export const ChoosePizzaForm: React.FC<Props> = ({
     setType,
     addIngredient,
     currentItemId,
-  } = usePizzaOptions(items);
-
+  } = usePizzaOptions(items)
+  const { addOrIncrement } = useCart();
+  const [adding, setAdding] = useState(false);
   const { totalPrice, textDetaills } = getPizzaDetails(
     type,
     size,
@@ -57,23 +59,32 @@ export const ChoosePizzaForm: React.FC<Props> = ({
     selectedIngredients,
   );
 
-
-  const { addOrIncrement } = useCart();
-  const [adding, setAdding] = useState(false);
-  const handleClickAdd = async () => {
-    const itemIdToAdd = currentItemId ?? items?.[0]?.id ?? null;
-    if (!itemIdToAdd) return;
-    onClickAddCart?.();
-    setAdding(true);
-    try {
-      await addOrIncrement({ productItemId: itemIdToAdd, quantity: 1, ingredients: Array.from(selectedIngredients) });
-    } catch (e) {
-      console.error('addOrIncrement failed', e);
-    } finally {
-      setAdding(false);
-    }
-  };
+const handleClickAdd = async () => {
+  const itemIdToAdd = currentItemId ?? items?.[0]?.id ?? null;
+  if (!itemIdToAdd) return;
+  onClickAddCart?.();
+  setAdding(true);
+  try {
+    await toast.promise(
+      addOrIncrement({
+        productItemId: itemIdToAdd,
+        quantity: 1,
+        ingredients: Array.from(selectedIngredients),
+      }),
+      {
+        loading: "Добавление...",
+        success: "Заказ успешно добавлен в корзину",
+        error: "Не удалось добавить товар в корзину",
+      }
+    );
+  } catch (e) {
+    console.error("addOrIncrement failed", e);
+  } finally {
+    setAdding(false);
+  }
+};
   const finalPrice = price + totalPrice;
+
   return (
     <div className={cn(className, 'flex flex-1')}>
       <div className="w-1/2 flex items-center justify-center bg-white ">
@@ -114,13 +125,21 @@ export const ChoosePizzaForm: React.FC<Props> = ({
           </div>
         </div>
 
-            <Button
-              disabled={loading || adding}
-              onClick={handleClickAdd}
-              className="h-13.75 px-10 text-base rounded-[18px] w-full mt-8"
-            >
-              {loading || adding ? 'Добавление...' : `Добавить в корзину за ${finalPrice} ₽`}
-            </Button>
+        <Button
+          disabled={loading || adding}
+          onClick={handleClickAdd}
+          className="h-13.75 px-10 text-base rounded-[18px] w-full mt-8
+             disabled:bg-gray-300 disabled:text-gray-500
+             disabled:cursor-not-allowed"
+        >
+          {loading || adding ? (
+            <LoaderCircle className="h-5 w-5 animate-spin" />
+          ) : (
+            `Добавить в корзину за ${finalPrice} ₴`
+          )}
+        </Button>
+
+        <Toaster />
       </div>
     </div>
   );

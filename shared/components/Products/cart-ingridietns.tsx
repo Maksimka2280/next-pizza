@@ -54,7 +54,7 @@ export default function CardIngredient({
                 </h1>
 
                 <p className={cn("mt-2", pricesize === "sm" ? "text-[20px]" : pricesize === "md" ? "text-[24px]" : "text-[28px]")}>
-                    {price} ₽
+                    {price} ₴
                 </p>
             </div>
           
