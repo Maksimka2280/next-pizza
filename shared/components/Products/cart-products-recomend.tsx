@@ -64,7 +64,7 @@ export default function RecommendationProducts({
                                     {product.name}
                                 </h2>
 
-                                <p className="text-[14px] text-[#B1B1B1]">
+                                <p className="text-[14px] h-[60px] text-[#B1B1B1]">
                                     {ingredients || "Опис буде доступний після отримання даних"}
                                 </p>
 

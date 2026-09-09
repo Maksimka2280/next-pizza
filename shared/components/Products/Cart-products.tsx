@@ -140,11 +140,11 @@ export default function CartProducts() {
                           </div>
                         </div>
 
-                        <h1 className="mt-[15px] mb-[7px] text-[22px] font-bold">
+                        <h1 className="mt-[15px] mb-[7px] text-[22px] font-bold truncate">
                           {productName}
                         </h1>
 
-                        <p className="max-w-full break-words text-[14px] text-[#B1B1B1]">
+                        <p className="max-w-full h-[60px] break-words text-[14px] text-[#B1B1B1]">
                           {ingredients || "Опис буде доступний після отримання даних"}
                         </p>
 
