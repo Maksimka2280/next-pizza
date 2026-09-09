@@ -28,7 +28,6 @@ interface Props {
   pizzaTypes: any[];
   recommendations?: any[];
   loading?: boolean;
-  className?: string;
   onSubmit?: (itemId: number, ingredients: number[]) => void;
   price: number;
 }
@@ -41,7 +40,6 @@ export const ProductForm: React.FC<Props> = ({
   categoryName,
   pizzaTypes,
   recommendations = [],
-  className,
   onSubmit,
   loading,
   price
@@ -95,7 +93,7 @@ export const ProductForm: React.FC<Props> = ({
   };
   const finalPrice = price + totalPrice;
   return (
-    <div className={className}>
+    <div className='w-full max-w-[1300px] mx-auto'>
 
       <div className="flex flex-wrap items-center gap-2 text-sm text-[#777777] mb-[20px]">
         <Link href="/" className="hover:text-[#FE5F00]">
@@ -116,7 +114,7 @@ export const ProductForm: React.FC<Props> = ({
       </div>
 
 
-      <div className="grid grid-cols-2 gap-10">
+      <div className="grid grid-cols-2 gap-10 max-w-[1300px] w-full">
         <div className="w-full aspect-square rounded-[20px] p-[40px] bg-[#FFF7EE] flex items-center justify-center overflow-hidden">
           <img
             src={imageUrl}

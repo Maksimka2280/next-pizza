@@ -53,9 +53,8 @@ export default async function ProductPage({
     return (
         <>
 
-            <div className="flex justify-center items-center mt-[50px] gap-20">
-
-                <div className="flex flex-col gap-5 ">
+            <div className=" w-full mt-[50px]">
+                <div className="flex gap-5 w-full justify-center items-center">
                     <ProductForm
                         name={product.name}
                         imageUrl={product.imageUrl}
