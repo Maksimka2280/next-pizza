@@ -103,3 +103,30 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Internal' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const url = new URL(req.url);
+    const token = url.searchParams.get('token');
+    const userId = url.searchParams.get('userId');
+
+    let cart = null;
+    if (userId) {
+      cart = await prisma.cart.findFirst({ where: { userId: Number(userId) } });
+    } else if (token) {
+      cart = await prisma.cart.findFirst({ where: { token } });
+    }
+
+    if (!cart) {
+      return NextResponse.json({ ok: true, cart: null }, { status: 200 });
+    }
+
+    await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
+    await prisma.cart.delete({ where: { id: cart.id } });
+
+    return NextResponse.json({ ok: true, cart: null }, { status: 200 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Internal' }, { status: 500 });
+  }
+}

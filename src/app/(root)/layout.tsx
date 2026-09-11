@@ -1,4 +1,5 @@
-import Header from "../../../shared/components/headers/Header";
+import MainHeader from "../../../shared/components/headers/main-header";
+
 
 
 export const metadata = {
@@ -14,7 +15,7 @@ export default function HomeLayout({
 }>) {
   return (
     <>
-      <Header />
+      <MainHeader    />
       {children}
       {modal}
     </>

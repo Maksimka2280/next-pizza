@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getOrCreateGuestCartToken } from "../lib/guestCart";
 import type { AddToCartDto, UpdateCartItemDto, CartDto, MergeCartDto } from "../types/cart.dto";
-import { fetchCartApi, addToCartApi, updateCartItemApi, deleteCartItemApi, mergeCartApi } from "../service/cart.client";
+import { fetchCartApi, addToCartApi, updateCartItemApi, deleteCartItemApi, mergeCartApi, cleanCartApi } from "../service/cart.client";
 
 type Maybe<T> = T | null;
 const CART_CACHE_KEY = "guest_cart_cache";
@@ -135,33 +135,56 @@ export function useCart() {
       setCart(next);
       writeCachedCart(next);
 
-      await fetchCart(token);
       return cartItem;
     } catch (e) {
       console.error(e);
       return null;
     }
-  }, [cart, fetchCart]);
+  }, [cart]);
 
   const updateItem = useCallback(async (dto: UpdateCartItemDto) => {
+    const safeQuantity = Math.max(1, dto.quantity || 1);
+
+    setCart((prev) => {
+      if (!prev) return prev;
+
+      const next = {
+        ...prev,
+        items: prev.items.map((it) =>
+          it.id === dto.cartItemId ? { ...it, quantity: safeQuantity } : it
+        ),
+      } as CartDto;
+
+      writeCachedCart(next);
+      return next;
+    });
+
     try {
-      const json = await updateCartItemApi(dto);
+      const json = await updateCartItemApi({ ...dto, quantity: safeQuantity });
       const updated = json.updated;
+
       setCart((prev) => {
         if (!prev) return prev;
         const next = {
           ...prev,
-          items: prev.items.map((it) => (it.id === updated.id ? { ...it, quantity: updated.quantity } : it)),
+          items: prev.items.map((it) =>
+            it.id === updated.id ? { ...it, quantity: updated.quantity } : it
+          ),
         } as CartDto;
         writeCachedCart(next);
         return next;
       });
+
       return updated;
     } catch (e) {
       console.error(e);
+      const token = tokenRef.current ?? getOrCreateGuestCartToken();
+      if (token) {
+        await fetchCart(token);
+      }
       return null;
     }
-  }, []);
+  }, [fetchCart]);
 
   const addOrIncrement = useCallback(async (dto: AddToCartDto) => {
     const token = dto.token ?? tokenRef.current ?? getOrCreateGuestCartToken();
@@ -195,17 +218,12 @@ export function useCart() {
         return next;
       });
 
-      const token = tokenRef.current ?? getOrCreateGuestCartToken();
-      if (token) {
-        await fetchCart(token);
-      }
-
       return true;
     } catch (e) {
       console.error(e);
       return false;
     }
-  }, [fetchCart]);
+  }, []);
 
   const mergeCart = useCallback(async (dto: MergeCartDto) => {
     try {
@@ -217,7 +235,22 @@ export function useCart() {
       return false;
     }
   }, [fetchCart]);
+  const clearCart = useCallback(async () => {
+    const token = tokenRef.current ?? getOrCreateGuestCartToken();
+    if (!token) return false;
 
+    tokenRef.current = token;
+
+    try {
+      await cleanCartApi(token);
+      setCart(null);
+      writeCachedCart(null);
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }, []);
   const total = useMemo(() => {
     if (!cart) return 0;
     return cart.items.reduce((s, it) => {
@@ -236,5 +269,6 @@ export function useCart() {
     updateItem,
     removeItem,
     mergeCart,
+    clearCart
   } as const;
 }

@@ -60,7 +60,7 @@ export default function RecommendationProducts({
                                     </div>
                                 </div>
 
-                                <h2 className="mb-[7px] mt-[15px] text-[22px] font-bold">
+                                <h2 className="mb-[7px] mt-[15px] text-[22px] font-bold truncate">
                                     {product.name}
                                 </h2>
 

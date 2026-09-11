@@ -110,7 +110,7 @@ const handleClickAdd = async () => {
           />
         </div>
 
-        <div className="p-5 rounded-md max-h-[250px] overflow-y-auto scrollbar mt-5">
+        <div className="p-5 rounded-md max-h-[250px] overflow-y-auto  mt-5">
           <div className="grid grid-cols-3 gap-3">
             {ingredients.map((ingredient) => (
               <IngredientItem

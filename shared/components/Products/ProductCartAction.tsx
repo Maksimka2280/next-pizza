@@ -20,6 +20,14 @@ export default function ProductCartAction({
   );
 
   const quantity = cartItem?.quantity ?? 0;
+  const handleQuantityChange = (delta: number) => {
+    if (!cartItem || cartItem.id === undefined) return;
+
+    const nextQty = (cartItem.quantity || 0) + delta;
+    if (nextQty < 1) return;
+
+    void updateItem({ cartItemId: cartItem.id, quantity: nextQty });
+  };
 
   if (!cartItem) {
     return (
@@ -57,11 +65,7 @@ export default function ProductCartAction({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-
-          if (!cartItem || cartItem.id === undefined) return;
-
-          const newQty = Math.max(1, (cartItem.quantity || 1) - 1);
-          void updateItem({ cartItemId: cartItem.id, quantity: newQty });
+          handleQuantityChange(-1);
         }}
       >
         -
@@ -75,13 +79,7 @@ export default function ProductCartAction({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-
-          if (!cartItem || cartItem.id === undefined) return;
-
-          void updateItem({
-            cartItemId: cartItem.id,
-            quantity: (cartItem.quantity || 0) + 1,
-          });
+          handleQuantityChange(1);
         }}
       >
         +

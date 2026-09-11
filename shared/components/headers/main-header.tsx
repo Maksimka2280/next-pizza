@@ -6,7 +6,7 @@ import { SearchInput } from "../SearchInput";
 import { Cart } from "../shared/Cart";
 import { useState } from "react";
 
-export default function Header() {
+export default function MainHeader() {
 
     const [open, setOpen] = useState(false)
     const openCart = () => {

@@ -2,11 +2,12 @@
 
 import { useCallback } from "react";
 import Image from "next/image";
-import { ArrowLeft, MoveRight, X } from "lucide-react";
+import { ArrowLeft,  MoveRight, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import { useCart } from "../../hooks/useCart";
-import { CartProductCard } from "./CartProductCard";
+import Link from "next/link";
+import { CartProductCard } from "../Products/CartProductCard";
 
 interface Props {
   onClose: () => void;
@@ -109,7 +110,9 @@ export const Cart = ({ onClose }: Props) => {
                 </div>
               </div>
               <div className="flex justify-center items-center mt-[21px] ">
+                <Link href="/checkout" className="w-full">
                 <Button className={'w-full h-[55px] text-[16px] rounded-[18px]'}>Оформить заказ <MoveRight /></Button>
+                </Link>
               </div>
             </div>
           </>

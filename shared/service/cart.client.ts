@@ -23,6 +23,11 @@ export async function deleteCartItemApi(cartItemId: number) {
   return res.data;
 }
 
+export async function cleanCartApi(token: string) {
+  const res = await axios.delete(`${BASE}/cart`, { params: { token } });
+  return res.data;
+}
+
 export async function mergeCartApi(dto: MergeCartDto) {
   const res = await axios.post(`${BASE}/cart/merge`, dto);
   return res.data;

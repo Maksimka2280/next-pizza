@@ -66,23 +66,7 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
-.scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
 
-.scrollbar::-webkit-scrollbar-track {
-  border-radius: 6px;
-  background: #fff;
-}
-
-.scrollbar::-webkit-scrollbar-thumb {
-  background: #dbdadd;
-  border-radius: 6px;
-}
-
-.scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #dbdadd;
-}
 
 :root {
   --background: oklch(1 0 0);
@@ -167,28 +151,31 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #f97316 transparent;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: #f97316;
   border-radius: 9999px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
   background: #ea580c;
 }
 
-.custom-scrollbar::-webkit-scrollbar-button {
+::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
   display: none;
-}
-
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #f97316 transparent;
 }
