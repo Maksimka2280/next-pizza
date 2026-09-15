@@ -98,7 +98,7 @@ export default function MainFilters() {
             />
             <span>Тонкое</span>
           </label>
-          <Button onClick={applyFilters} className={'h-[50px] rounded-[18px] mt-[35px]'}>Применить</Button>
+          <Button onClick={applyFilters} className={'h-[50px] rounded-[18px] mt-[35px] font-bold'}>Применить</Button>
         </div>
       </div>
     </div>

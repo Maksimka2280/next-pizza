@@ -10,13 +10,16 @@ export default function Dashboard() {
   return (
     <main className="w-full flex justify-center">
       <div className="w-full max-w-[1440px] py-[40px]">
-        <h1 className="text-[36px] font-black pb-[20px]">
+        <div >
+           <h1 className="text-[36px] font-black pb-[20px]">
           Все пиццы
         </h1>
 
         <Suspense>
           <PizzaPick />
         </Suspense>
+        </div>
+       
 
         <div className="mt-[35px] grid grid-cols-[280px_minmax(0,1fr)] gap-[50px]">
           <div className="w-full">

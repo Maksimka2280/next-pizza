@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito } from "next/font/google";
 import "./globals.css";
+import CookieConsent from "../../shared/components/shared/CookieConsent";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function DashboardLayout({
                 className={`${geistSans.variable} ${geistMono.variable} ${nunito.variable} antialiased`}
             >
                 {children}
+                <CookieConsent />
             </body>
         </html>
     );
