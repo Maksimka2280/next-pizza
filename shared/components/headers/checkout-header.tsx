@@ -1,10 +1,7 @@
-'use client'
-import { Input } from "@base-ui/react/input";
+
+import { User } from "lucide-react";
 import { Button } from "../ui/button";
-import { ShoppingCart, User } from "lucide-react";
-import { SearchInput } from "../SearchInput";
-import { Cart } from "../shared/Cart";
-import { useState } from "react";
+
 
 export default function CheckOutHeader() {
 

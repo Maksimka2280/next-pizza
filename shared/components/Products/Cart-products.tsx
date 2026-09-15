@@ -24,7 +24,6 @@ export default function CartProducts() {
   const [currentPage, setCurrentPage] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const itemsPerPage = 8;
-  const { cart, updateItem, addOrIncrement } = useCart();
   useEffect(() => {
     const fetchProducts = async () => {
       try {
