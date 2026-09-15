@@ -2,13 +2,10 @@ import { Button } from "../ui/button";
 
 type Props = {
     sum: number;
-    onPay: any;
+    onPay: () => void;
 };
 
-export const CheckoutPayment = ({
-    sum ,
-    onPay
-}: Props) => {
+export const CheckoutPayment = ({ sum, onPay }: Props) => {
 
     const delivery = 120;
     const tax = 5;
@@ -48,7 +45,7 @@ export const CheckoutPayment = ({
                     </div>
                     <div className="flex flex-col !text-[18px] gap-[25px] mt-[10px]">
                         <span className="text-[#777777] ">У меня есть промокод</span>
-                        <Button onClick={onPay} className='rounded-[15px] h-[60px] text-[18px] font-extrabold'>Перейти к оплате</Button>
+                        <Button type="button" onClick={onPay} className='rounded-[15px] h-[60px] text-[18px] font-extrabold'>Перейти к оплате</Button>
                     </div>
                 </div>
             </div>

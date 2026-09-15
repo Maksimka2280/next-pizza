@@ -50,7 +50,7 @@ export const Checkout = () => {
                       </div>
 
                       <div className="max-w-[640px] w-full shrink-0">
-                          <CheckoutPayment sum={total}  onPay={() => void methods.handleSubmit(onSubmit)()} />
+                          <CheckoutPayment sum={total} onPay={methods.handleSubmit(onSubmit)} />
                       </div>
                   </div>
               </div>

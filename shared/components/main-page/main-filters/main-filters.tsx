@@ -6,6 +6,7 @@ import CustomInput from "../../../components/ui/CustomInput";
 import { Radio } from "../../../components/ui/Radio";
 import { useIngredients } from "../../../hooks/use-ingredients";
 import { useProductFilters } from "../../../hooks/use-product-filters";
+import { usePathname, useRouter } from 'next/navigation'
 
 export default function MainFilters() {
   const { ingredients, loading } = useIngredients();
@@ -25,6 +26,18 @@ export default function MainFilters() {
     toggleIngredient,
     applyFilters,
   } = useProductFilters(ingredients);
+  const router = useRouter()
+  const pathname = usePathname()
+
+  function resetFilters() {
+    setPendingMinPrice("")
+    setPendingMaxPrice("")
+    // setPendingIngredientIds(new Set())
+    setPendingCanBuild(false)
+    setPendingNew(false)
+    setSelected2("Традиционное")
+    router.push(pathname)
+  }
 
   return (
     <div className="w-[250px]">
@@ -98,7 +111,10 @@ export default function MainFilters() {
             />
             <span>Тонкое</span>
           </label>
-          <Button onClick={applyFilters} className={'h-[50px] rounded-[18px] mt-[35px] font-bold'}>Применить</Button>
+          <div className="flex flex-col gap-3">
+            <Button onClick={applyFilters} className={'h-[50px] rounded-[18px] mt-[35px] font-bold'}>Применить</Button>
+            <Button variant="outline" onClick={resetFilters} className={'h-[50px] rounded-[18px] text-[#FE5F00]  font-bold'}>Сбросить</Button>
+          </div>
         </div>
       </div>
     </div>
