@@ -4,6 +4,7 @@ import { CheckoutAddressForm } from "./CheckoutAdressForm"
 import { CheckoutCart } from "./CheckoutCart"
 import { CheckoutPayment } from "./CheckoutPayment"
 import { CheckoutPersonalInfoForm } from "./CheckoutPersonalInfoForm"
+import { CheckoutSkeleton } from "./CheckoutSkeleton"
 import { Title } from "./Title"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -11,7 +12,7 @@ import { checkoutPersonalInfoSchema, type CheckoutPersonalInfoFormValues } from 
 import { toast } from "react-hot-toast"
 
 export const Checkout = () => {
-    const { cart, total,  updateItem, removeItem, clearCart } = useCart();
+    const { cart, total, updateItem, removeItem, clearCart, loading } = useCart();
 
     const methods = useForm<CheckoutPersonalInfoFormValues>({
       resolver: zodResolver(checkoutPersonalInfoSchema),
@@ -27,9 +28,16 @@ export const Checkout = () => {
       },
     })
 
+    if (loading) {
+      return (
+        <FormProvider {...methods}>
+          <CheckoutSkeleton />
+        </FormProvider>
+      );
+    }
+
     const onSubmit = (values: CheckoutPersonalInfoFormValues) => {
       console.log('Checkout submit', values)
-      toast.success('Данные формы отправлены')
     }
 
     return (

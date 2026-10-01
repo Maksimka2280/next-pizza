@@ -139,7 +139,7 @@ const handleClickAdd = async () => {
           )}
         </Button>
 
-        <Toaster />
+        <Toaster position="top-center" />
       </div>
     </div>
   );

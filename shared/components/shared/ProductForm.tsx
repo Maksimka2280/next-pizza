@@ -15,6 +15,7 @@ import { useCart } from '../../hooks/useCart';
 import { toast, Toaster } from "react-hot-toast";
 import { Toast } from "@base-ui/react";
 import { LoaderCircle } from "lucide-react";
+import { sendEmail } from "@/actions/EmailActions";
 
 
 
@@ -191,7 +192,7 @@ export const ProductForm: React.FC<Props> = ({
           <RecommendationProducts products={recommendations} />
         </div>
       )}
-      <Toaster />
+      <Toaster position="top-center" />
     </div>
   );
 };

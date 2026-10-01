@@ -207,7 +207,7 @@ export default function CartProducts() {
             breakClassName="flex h-[45px] w-[45px] items-center justify-center text-sm text-[#B1B1B1]"
           />
         )}
-        <Toaster />
+        <Toaster position="top-center" />
       </div>
     </div>
   );

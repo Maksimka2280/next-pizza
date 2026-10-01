@@ -145,7 +145,7 @@ export const CheckoutAddressForm = () => {
                 </div>
             </div>
 
-            <Toaster position="top-right" />
+            <Toaster position="top-center" />
         </div>
     );
 };
