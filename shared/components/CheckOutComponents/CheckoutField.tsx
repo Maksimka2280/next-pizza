@@ -1,7 +1,7 @@
 
 import { useFormContext } from "react-hook-form";
 
-import { CheckoutPersonalInfoFormValues } from "./checkoutPersonalInfoSchema";
+import { CheckoutPersonalInfoFormValues } from "./CheckoutValidate";
 
 type FieldProps = {
     name: keyof CheckoutPersonalInfoFormValues;

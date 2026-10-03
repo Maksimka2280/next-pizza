@@ -8,8 +8,10 @@ import { CheckoutSkeleton } from "./CheckoutSkeleton"
 import { Title } from "./Title"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { checkoutPersonalInfoSchema, type CheckoutPersonalInfoFormValues } from "../CheckOutComponents/checkoutPersonalInfoSchema"
-import { toast } from "react-hot-toast"
+import { checkoutPersonalInfoSchema, type CheckoutPersonalInfoFormValues } from "../CheckOutComponents/CheckoutValidate"
+import { getOrCreateGuestCartToken } from "../../lib/guestCart"
+import { guestId } from "../../lib/guestId"
+import { createOrder } from "../../service/orders"
 
 export const Checkout = () => {
     const { cart, total, updateItem, removeItem, clearCart, loading } = useCart();
@@ -36,8 +38,36 @@ export const Checkout = () => {
       );
     }
 
-    const onSubmit = (values: CheckoutPersonalInfoFormValues) => {
-      console.log('Checkout submit', values)
+      const onSubmit = async (values: CheckoutPersonalInfoFormValues, totalAmount: number) => {
+      if (!cart?.items.length) {
+      throw new Error("Нельзя оформить заказ с пустой корзиной")
+      }
+
+      const token = cart.token ?? getOrCreateGuestCartToken() ?? guestId()
+      if (!token) {
+       throw new Error("Не удалось получить токен гостевой корзины")
+      }
+
+      await createOrder({
+        token,
+        userId: null,
+        totalAmount,
+        items: cart.items,
+        fullName: `${values.firstName} ${values.lastName}`.trim(),
+        email: values.email,
+        phone: values.phone,
+        address: values.address,
+        comment: values.comment || null,
+      })
+    }
+
+    const handlePayment = async (totalAmount: number) => {
+      let isValid = false
+      await methods.handleSubmit(async (values) => {
+        await onSubmit(values, totalAmount)
+        isValid = true
+      })()
+      return isValid
     }
 
     return (
@@ -58,7 +88,7 @@ export const Checkout = () => {
                       </div>
 
                       <div className="max-w-[640px] w-full shrink-0">
-                          <CheckoutPayment sum={total} onPay={methods.handleSubmit(onSubmit)} />
+                          <CheckoutPayment sum={total} onPay={handlePayment} />
                       </div>
                   </div>
               </div>

@@ -5,7 +5,7 @@ import CheckOutHeader from "../../../shared/components/headers/checkout-header";
 
 
 export const metadata: Metadata = {
-    title: "checkout",
+    title: "Create Next App",
 };
 
 export default function DashboardLayout({

@@ -8,12 +8,14 @@ import { CheckoutPrice } from "./CheckoutPrice";
 
 type CheckoutCardProps = {
   item: CartItemDto;
+  readOnly?: boolean;
   onRemove?: (cartItemId: number) => void;
   onQuantityChange?: (cartItemId: number, quantity: number) => void;
 };
 
 export const CheckoutCard = ({
   item,
+  readOnly = false,
   onRemove,
   onQuantityChange,
 }: CheckoutCardProps) => {
@@ -39,19 +41,25 @@ export const CheckoutCard = ({
 
         <CheckoutPrice value={item.productItem.price} />
 
-        <div className="flex items-center gap-[10px]">
-          <CheckoutCountButton
-            quantity={item.quantity}
-            onChange={handleQuantityChange}
-          />
-          <Button
-            variant="ghost"
-            className="text-sm"
-            onClick={() => onRemove?.(item.id)}
-          >
-            <X color="#A1A1A1" />
-          </Button>
-        </div>
+        {readOnly ? (
+          <span className="min-w-[48px] text-center text-sm text-[#777777]">
+            {item.quantity} шт.
+          </span>
+        ) : (
+          <div className="flex items-center gap-[10px]">
+            <CheckoutCountButton
+              quantity={item.quantity}
+              onChange={handleQuantityChange}
+            />
+            <Button
+              variant="ghost"
+              className="text-sm"
+              onClick={() => onRemove?.(item.id)}
+            >
+              <X color="#A1A1A1" />
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );

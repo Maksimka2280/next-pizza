@@ -15,7 +15,7 @@ export function CheckoutSkeleton() {
               </div>
 
               <div className="mt-[22px] space-y-[18px]">
-                {[0, 1, 2].map((item) => (
+                {[0, 1].map((item) => (
                   <div key={item} className="flex items-center gap-[16px] rounded-[16px] border border-[#F1EEE9] p-[12px]">
                     <Skeleton className="h-[72px] w-[72px] rounded-[16px] bg-[#F2EEE9]" />
                     <div className="flex-1 space-y-[10px]">

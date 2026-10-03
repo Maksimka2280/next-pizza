@@ -51,6 +51,44 @@ export const checkoutPersonalInfoSchema = z.object({
 
   deliveryTime: z.string().min(1, "Выберите время доставки"),
 });
+const isValidCardNumber = (value: string) => {
+  const digits = value.replace(/\D/g, '');
+  if (digits.length !== 16) return false;
+
+  let sum = 0;
+  for (let index = digits.length - 1; index >= 0; index -= 1) {
+    let digit = Number(digits[index]);
+    if ((digits.length - 1 - index) % 2 === 1) {
+      digit *= 2;
+      if (digit > 9) digit -= 9;
+    }
+    sum += digit;
+  }
+  return sum % 10 === 0;
+};
+const isValidExpiry = (value: string) => {
+  const match = /^(0[1-9]|1[0-2])\/(\d{2})$/.exec(value);
+  if (!match) return false;
+
+  const month = Number(match[1]);
+  const year = 2000 + Number(match[2]);
+  const now = new Date();
+  return year > now.getFullYear() || (year === now.getFullYear() && month >= now.getMonth() + 1);
+};
+export const checkoutPaymentSchema = z.object({
+  cardNumber: z.string()
+    .regex(/^\d{4}( \d{4}){3}$/, 'Введите номер из 16 цифр')
+    .refine(isValidCardNumber, 'Проверьте номер карты'),
+  cardholder: z.string()
+    .trim()
+    .min(2, 'Введите имя владельца карты')
+    .max(64, 'Имя слишком длинное')
+    .regex(/^[a-zA-Zа-яА-ЯёЁіІїЇєЄ' -]+$/, 'Используйте только буквы, пробелы и дефисы'),
+  expiry: z.string()
+    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Введите срок в формате ММ/ГГ')
+    .refine(isValidExpiry, 'Срок действия карты истёк'),
+  cvv: z.string().regex(/^\d{3,4}$/, 'CVV должен содержать 3 или 4 цифры'),
+});
 
 export type CheckoutPersonalInfoFormValues = z.infer<
   typeof checkoutPersonalInfoSchema

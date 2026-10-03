@@ -44,3 +44,23 @@ export interface CartDto {
   items: CartItemDto[];
   totalAmount?: number;
 }
+
+export interface CreateOrderDto {
+  token: string;
+  userId: number | null;
+  totalAmount: number;
+  items: CartItemDto[];
+  fullName: string;
+  email: string;
+  phone: string;
+  address: string;
+  comment: string | null;
+}
+
+export interface OrderDto extends CreateOrderDto {
+  id: number;
+  status: string;
+  paymentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
