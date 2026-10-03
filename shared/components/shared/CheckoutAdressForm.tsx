@@ -5,38 +5,24 @@ import { useFormContext } from "react-hook-form";
 import { Toaster } from "react-hot-toast";
 import { Title } from "./Title";
 import { CheckoutField } from "../CheckOutComponents/CheckoutField";
-import { ChevronDown, Timer } from "lucide-react";
+import { Timer } from "lucide-react";
 
 export const CheckoutAddressForm = () => {
     const methods = useFormContext();
 
+    const formatTimeValue = (value: string) => {
+        const digits = value.replace(/\D/g, "").slice(0, 4);
+
+        if (digits.length <= 2) return digits;
+        return `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
+    };
+
     const [query, setQuery] = useState("");
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [showTimeOptions, setShowTimeOptions] = useState(false);
     const addressRef = useRef<HTMLUListElement | null>(null);
     const addressContainerRef = useRef<HTMLDivElement | null>(null);
-    const timeRef = useRef<HTMLDivElement | null>(null);
 
-    const suggestions = [
-        "Москва, ул. Мира 12",
-        "Москва, ул. Мира 12A",
-        "Москва, ул. Мира 10",
-    ];
-
-    const timeOptions = [
-        "Доставка в 10:30",
-        "Доставка в 11:00",
-        "Доставка в 12:00",
-        "Доставка в 13:00",
-    ];
-
-    const addressValue = methods.watch("address") || "";
-
-    useEffect(() => {
-        setQuery(addressValue);
-    }, [addressValue]);
-
-    const filteredSuggestions = suggestions.filter((s) => s.toLowerCase().includes(query.toLowerCase()));
+    const filteredSuggestions = query.trim() ? [query.trim()] : [];
 
     useEffect(() => {
         const handleDocClick = (e: MouseEvent) => {
@@ -44,15 +30,11 @@ export const CheckoutAddressForm = () => {
             if (showSuggestions && addressContainerRef.current && !addressContainerRef.current.contains(target)) {
                 setShowSuggestions(false);
             }
-
-            if (showTimeOptions && timeRef.current && !timeRef.current.contains(target)) {
-                setShowTimeOptions(false);
-            }
         };
 
         document.addEventListener("mousedown", handleDocClick);
         return () => document.removeEventListener("mousedown", handleDocClick);
-    }, [showSuggestions, showTimeOptions]);
+    }, [showSuggestions]);
 
     return (
         <div className="w-full max-w-[750px] rounded-[30px] bg-white px-[30px] py-[30px]">
@@ -93,7 +75,6 @@ export const CheckoutAddressForm = () => {
                                 onMouseDown={(ev) => {
                                     ev.preventDefault();
                                     methods.setValue("address", s);
-                                    methods.clearErrors("address");
                                     setQuery(s);
                                     setShowSuggestions(false);
                                 }}
@@ -109,38 +90,29 @@ export const CheckoutAddressForm = () => {
                 </div>
                 <div className="mt-[20px]">
                     <label className="text-[14px] font-bold text-[#212121]">Время доставки</label>
-                    <div ref={timeRef} className="relative mt-[8px]">
-                        <button type="button" onClick={() => setShowTimeOptions((s) => !s)} className="flex items-center justify-between w-60 h-[48px] rounded-[10px] px-[18px] text-[16px] bg-transparent border-0">
-                            <span className="flex items-center gap-2">
-                                <Timer size={20} />
-                                <span>{methods.getValues("deliveryTime") || "Доставка в 11:00"}</span>
-                                <ChevronDown size={20} />
-                            </span>
-                        </button>
+                    <div className="relative mt-[8px]">
+                        <div className="flex items-center gap-[10px] h-[48px] w-full rounded-[10px] border border-[#E7E7E7] bg-transparent px-[18px] transition-all focus-within:border-[#FF7A00]">
+                            <Timer size={20} className="text-[#212121]" />
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                maxLength={5}
+                                placeholder="Например: 18:30"
+                                className="h-full w-full border-0 bg-transparent text-[16px] text-[#1F1F1F] outline-none placeholder:text-[#A7A7A7]"
+                                {...methods.register("deliveryTime", {
+                                    setValueAs: (value: string) => formatTimeValue(value),
+                                    onChange: (event) => {
+                                        const nextValue = formatTimeValue(event.target.value);
+                                        event.target.value = nextValue;
+                                    },
+                                })}
+                            />
+                        </div>
                         {methods.formState.errors.deliveryTime && (
                             <span id="deliveryTime-error" className="text-[14px] font-medium text-[#FF4D4F] mt-[8px] block">
                                 {String(methods.formState.errors.deliveryTime.message)}
                             </span>
                         )}
-                        <ul
-                            className={`w-[200px] absolute left-4 right-0 top-[66px] z-20 rounded-[10px] border bg-white shadow-lg transform origin-top transition-transform transition-opacity duration-300 ease-in-out ${showTimeOptions ? "scale-y-100 opacity-100 translate-y-0" : "scale-y-0 opacity-0 -translate-y-1 pointer-events-none"
-                                }`}
-                        >
-                            {timeOptions.map((t) => (
-                                <li
-                                    key={t}
-                                    onMouseDown={(ev) => {
-                                        ev.preventDefault();
-                                        methods.setValue("deliveryTime", t);
-                                        methods.clearErrors("deliveryTime");
-                                        setShowTimeOptions(false);
-                                    }}
-                                    className="px-[16px] py-[12px] hover:text-[#FE5F1E] hover:bg-[#FFFAF6] cursor-pointer"
-                                >
-                                    {t}
-                                </li>
-                            ))}
-                        </ul>
                     </div>
                 </div>
             </div>

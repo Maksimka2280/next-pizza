@@ -21,6 +21,7 @@ export default function CheckoutCountButton({
   return (
     <div className="flex items-center gap-2">
       <Button
+        type="button"
         variant="outline"
         className="h-8 w-8 p-0 text-[#FF6900]"
         onClick={(e) => {
@@ -35,6 +36,7 @@ export default function CheckoutCountButton({
       <span className="w-5 text-center text-sm">{quantity}</span>
 
       <Button
+        type="button"
         variant="outline"
         className="h-8 w-8 p-0 text-[#FF6900]"
         onClick={(e) => {

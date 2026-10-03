@@ -49,7 +49,16 @@ export const checkoutPersonalInfoSchema = z.object({
     .max(500, "Комментарий слишком длинный")
     .optional(),
 
-  deliveryTime: z.string().min(1, "Выберите время доставки"),
+  deliveryTime: z
+    .string()
+    .trim()
+    .regex(/^\d{2}:\d{2}$/, "Введите время в формате ЧЧ:ММ")
+    .refine((value) => {
+      const [hours, minutes] = value.split(":").map(Number);
+
+      return hours >= 0 && hours <= 23 &&
+        minutes >= 0 && minutes <= 59;
+    }, "Введите реальное время"),
 });
 const isValidCardNumber = (value: string) => {
   const digits = value.replace(/\D/g, '');

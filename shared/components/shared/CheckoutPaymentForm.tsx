@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@base-ui/react/input';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { Button } from '../ui/button';
@@ -12,13 +12,13 @@ import { useCart } from '../../hooks/useCart';
 
 type CheckoutPaymentFormProps = {
     total: number;
-    onPay: (totalAmount: number) => Promise<boolean>;
+    onConfirm: () => Promise<void>;
     onClose: () => void;
 };
 
 type CheckoutPaymentFormValues = z.infer<typeof checkoutPaymentSchema>;
 
-export const CheckoutPaymentForm = ({ total, onPay, onClose }: CheckoutPaymentFormProps) => {
+export const CheckoutPaymentForm = ({ total, onConfirm, onClose }: CheckoutPaymentFormProps) => {
     const router = useRouter();
     const fallback = useCart();
     const effectiveClear = fallback.clearCart
@@ -33,15 +33,10 @@ export const CheckoutPaymentForm = ({ total, onPay, onClose }: CheckoutPaymentFo
     });
     const submitPayment = async () => {
         try {
-            const isCheckoutValid = await onPay(total);
-            if (!isCheckoutValid) {
-                onClose();
-                toast.error('Проверьте данные заказа');
-                return;
-            }
+            await onConfirm();
             onClose();
             router.push('/orders');
-            effectiveClear()
+            effectiveClear();
             toast.success('Заказ оформлен. Это тестовая оплата.');
         } catch {
             toast.error('Не удалось оформить заказ');

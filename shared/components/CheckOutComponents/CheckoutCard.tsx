@@ -52,6 +52,7 @@ export const CheckoutCard = ({
               onChange={handleQuantityChange}
             />
             <Button
+              type="button"
               variant="ghost"
               className="text-sm"
               onClick={() => onRemove?.(item.id)}

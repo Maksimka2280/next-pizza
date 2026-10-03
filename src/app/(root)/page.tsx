@@ -5,15 +5,17 @@ import { Suspense } from "react";
 import PizzaPick from "../../../shared/components/main-page/filters-pick-pizza/filters-pick-pizza";
 import MainFilters from "../../../shared/components/main-page/main-filters/main-filters";
 import CartProducts from "../../../shared/components/Products/Cart-products";
+import { Title } from "../../../shared/components/shared/Title";
 
 export default function Dashboard() {
   return (
     <main className="w-full flex justify-center">
       <div className="w-full max-w-[1440px] py-[40px]">
         <div >
-           <h1 className="text-[36px] font-black pb-[20px]">
-          Все пиццы
-        </h1>
+           <div className="flex items-center gap-[12px] pb-[45px]">
+            <span className="block h-[40px] w-[7px] rounded-full bg-[#FE5F00]" />
+            <Title text="Все пиццы" size="lg" className="font-black" />
+          </div>
 
         <Suspense>
           <PizzaPick />

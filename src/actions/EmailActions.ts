@@ -79,8 +79,6 @@ export async function sendEmail(email: string) {
       }
     );
 
-    console.log('Email sent:', response);
-
     return { success: true, code };
   } catch (error) {
     console.error('AgentMail error:', error);

@@ -14,85 +14,85 @@ import { guestId } from "../../lib/guestId"
 import { createOrder } from "../../service/orders"
 
 export const Checkout = () => {
-    const { cart, total, updateItem, removeItem, clearCart, loading } = useCart();
+  const { cart, total, updateItem, removeItem, clearCart, loading } = useCart();
 
-    const methods = useForm<CheckoutPersonalInfoFormValues>({
-      resolver: zodResolver(checkoutPersonalInfoSchema),
-      mode: 'onSubmit',
-      defaultValues: {
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        address: '',
-        comment: '',
-        deliveryTime: '',
-      },
-    })
+  const methods = useForm<CheckoutPersonalInfoFormValues>({
+    resolver: zodResolver(checkoutPersonalInfoSchema),
+    mode: 'onSubmit',
+    shouldFocusError: true,
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      address: '',
+      comment: '',
+      deliveryTime: '',
+    },
+  })
 
-    if (loading) {
-      return (
-        <FormProvider {...methods}>
-          <CheckoutSkeleton />
-        </FormProvider>
-      );
-    }
-
-      const onSubmit = async (values: CheckoutPersonalInfoFormValues, totalAmount: number) => {
-      if (!cart?.items.length) {
-      throw new Error("Нельзя оформить заказ с пустой корзиной")
-      }
-
-      const token = cart.token ?? getOrCreateGuestCartToken() ?? guestId()
-      if (!token) {
-       throw new Error("Не удалось получить токен гостевой корзины")
-      }
-
-      await createOrder({
-        token,
-        userId: null,
-        totalAmount,
-        items: cart.items,
-        fullName: `${values.firstName} ${values.lastName}`.trim(),
-        email: values.email,
-        phone: values.phone,
-        address: values.address,
-        comment: values.comment || null,
-      })
-    }
-
-    const handlePayment = async (totalAmount: number) => {
-      let isValid = false
-      await methods.handleSubmit(async (values) => {
-        await onSubmit(values, totalAmount)
-        isValid = true
-      })()
-      return isValid
-    }
-
+  if (loading) {
     return (
-        <FormProvider {...methods}>
-          <main className="flex justify-center py-[50px]">
-              <div className="w-full max-w-[1440px]">
-                  <Title
-                      text="Оформление заказа"
-                      size="lg"
-                      className="font-bold"
-                  />
+      <FormProvider {...methods}>
+        <CheckoutSkeleton />
+      </FormProvider>
+    );
+  }
 
-                  <div className="mt-[50px] flex flex-wrap w-full ">
-                      <div className="flex flex-col flex-1 gap-[40px]">
-                          <CheckoutCart cart={cart} clearCart={clearCart} removeItem={removeItem} updateItem={updateItem}/>
-                          <CheckoutPersonalInfoForm />
-                          <CheckoutAddressForm />
-                      </div>
+  const onSubmit = async (values: CheckoutPersonalInfoFormValues, totalAmount: number) => {
+    if (!cart?.items.length) {
+      throw new Error("Нельзя оформить заказ с пустой корзиной")
+    }
 
-                      <div className="max-w-[640px] w-full shrink-0">
-                          <CheckoutPayment sum={total} onPay={handlePayment} />
-                      </div>
-                  </div>
-              </div>
-          </main>
-        </FormProvider>
-    )
+    const token = cart.token ?? getOrCreateGuestCartToken() ?? guestId()
+    if (!token) {
+      throw new Error("Не удалось получить токен гостевой корзины")
+    }
+
+    await createOrder({
+      token,
+      userId: null,
+      totalAmount,
+      items: cart.items,
+      fullName: `${values.firstName} ${values.lastName}`.trim(),
+      email: values.email,
+      phone: values.phone,
+      address: values.address,
+      comment: values.comment || null,
+    })
+  }
+
+  const validateOrder = async () => {
+    return methods.trigger()
+  }
+
+  const submitOrder = async () => {
+    const values = methods.getValues()
+    await onSubmit(values, total)
+  }
+
+  return (
+    <FormProvider {...methods}>
+      <main className="flex justify-center py-[50px]">
+        <div className="w-full max-w-[1440px]">
+          <div className="flex items-center gap-[12px] pb-[45px]">
+            <span className="block h-[40px] w-[7px] rounded-full bg-[#FE5F00]" />
+            <Title text="Оформление заказа" size="lg" className="font-black" />
+          </div>
+
+          <div className="mt-[50px] flex flex-wrap w-full ">
+            <div className="flex flex-col flex-1 gap-[40px]">
+              <CheckoutCart cart={cart} clearCart={clearCart} removeItem={removeItem} updateItem={updateItem} />
+              <CheckoutPersonalInfoForm />
+              <CheckoutAddressForm />
+            </div>
+
+            <div className="max-w-[640px] w-full shrink-0">
+              <CheckoutPayment sum={total} validateOrder={validateOrder} onSubmit={submitOrder} />
+            </div>
+          </div>
+        </div>
+      </main>
+    </FormProvider>
+  )
 }

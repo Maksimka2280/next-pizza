@@ -4,16 +4,24 @@ import { Button } from '../ui/button';
 import { CheckoutPaymentForm } from './CheckoutPaymentForm';
 
 type Props = {
-  sum: number;
-    onPay: (totalAmount: number) => Promise<boolean>;
+    sum: number;
+    validateOrder: () => Promise<boolean>;
+    onSubmit: () => Promise<void>;
 };
 
-export const CheckoutPayment = ({ sum, onPay }: Props) => {
+export const CheckoutPayment = ({ sum, validateOrder, onSubmit }: Props) => {
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-
     const delivery = 120;
     const tax = 5;
     const totalsum = Math.round(sum + delivery + (sum * tax) / 100);
+
+    const submit = async () => {
+        const isValid = await validateOrder();
+
+        if (isValid) {
+            setIsPaymentModalOpen(true);
+        }
+    };
 
     return (
         <>
@@ -51,8 +59,8 @@ export const CheckoutPayment = ({ sum, onPay }: Props) => {
                     <div className="flex flex-col !text-[18px] gap-[25px] mt-[10px]">
                         <span className="text-[#777777]">У меня есть промокод</span>
 
-                        <Button type="button" onClick={() => setIsPaymentModalOpen(true)} className="rounded-[15px] h-[60px] text-[18px] font-extrabold">
-                             Оплатить {totalsum} ₴
+                        <Button type="button" onClick={submit} className="rounded-[15px] h-[60px] text-[18px] font-extrabold">
+                            Оплатить {totalsum} ₴
                         </Button>
                     </div>
                 </div>
@@ -60,11 +68,11 @@ export const CheckoutPayment = ({ sum, onPay }: Props) => {
             {isPaymentModalOpen && (
                 <CheckoutPaymentForm
                     total={totalsum}
-                    onPay={onPay}
+                    onConfirm={onSubmit}
                     onClose={() => setIsPaymentModalOpen(false)}
                 />
             )}
-            
+
         </>
     );
 };

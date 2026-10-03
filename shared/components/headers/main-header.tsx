@@ -1,10 +1,11 @@
 'use client'
 import { Input } from "@base-ui/react/input";
 import { Button } from "../ui/button";
-import { ShoppingCart, User } from "lucide-react";
+import { ListOrdered, ShoppingCart, User } from "lucide-react";
 import { SearchInput } from "../SearchInput";
 import { Cart } from "../shared/Cart";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function MainHeader() {
 
@@ -41,6 +42,11 @@ export default function MainHeader() {
                         <Button variant="outline" className="w-[50px] h-[50px] rounded-[15px] text-[#FE5F00]" onClick={openCart}>
                             <ShoppingCart strokeWidth={3} />
                         </Button>
+                        <Link href='/orders'>
+                            <Button variant="outline" className="w-[50px] h-[50px] rounded-[15px] text-[#FE5F00]" >
+                                <ListOrdered strokeWidth={3} />
+                            </Button>
+                        </Link>
                     </div>
                 </div>
             </header>
