@@ -155,7 +155,7 @@ export function useCart() {
         ),
       } as CartDto;
 
-      writeCachedCart(next);
+      queueMicrotask(() => writeCachedCart(next));
       return next;
     });
 
@@ -171,7 +171,7 @@ export function useCart() {
             it.id === updated.id ? { ...it, quantity: updated.quantity } : it
           ),
         } as CartDto;
-        writeCachedCart(next);
+        queueMicrotask(() => writeCachedCart(next));
         return next;
       });
 
@@ -214,7 +214,7 @@ export function useCart() {
       setCart((prev) => {
         if (!prev) return prev;
         const next = { ...prev, items: prev.items.filter((it) => it.id !== cartItemId) } as CartDto;
-        writeCachedCart(next);
+        queueMicrotask(() => writeCachedCart(next));
         return next;
       });
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { Toaster } from "react-hot-toast";
 import { Title } from "./Title";
 import { CheckoutField } from "../CheckOutComponents/CheckoutField";
@@ -17,12 +17,13 @@ export const CheckoutAddressForm = () => {
         return `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
     };
 
-    const [query, setQuery] = useState("");
     const [showSuggestions, setShowSuggestions] = useState(false);
     const addressRef = useRef<HTMLUListElement | null>(null);
     const addressContainerRef = useRef<HTMLDivElement | null>(null);
+    const addressValue = (methods.watch("address") ?? "") as string;
+    const deliveryTimeValue = (methods.watch("deliveryTime") ?? "") as string;
 
-    const filteredSuggestions = query.trim() ? [query.trim()] : [];
+    const filteredSuggestions = addressValue.trim() ? [addressValue.trim()] : [];
 
     useEffect(() => {
         const handleDocClick = (e: MouseEvent) => {
@@ -43,20 +44,23 @@ export const CheckoutAddressForm = () => {
             <div className="">
                 <div ref={addressContainerRef} className="flex w-full flex-col gap-[8px] relative">
                     <label className="text-[14px] font-bold text-[#212121]">Введите адрес</label>
-                    <input
-                        {...methods.register("address")}
-                        value={query}
-                        placeholder="Например: Москва, ул. Мира 12"
-                        aria-invalid={Boolean(methods.formState.errors.address)}
-                        aria-describedby={methods.formState.errors.address ? "address-error" : undefined}
-                        className={`h-[48px] w-full rounded-[10px] border bg-transparent px-[18px] text-[16px] text-[#1F1F1F] outline-none transition-all ${methods.formState.errors.address ? "border-[#FF4D4F] shadow-[0_0_0_1px_rgba(255,77,79,0.35)]" : "border-[#E7E7E7] focus:border-[#FF7A00]"
-                            }`}
-                        onFocus={() => setShowSuggestions(true)}
-                        onClick={() => setShowSuggestions(true)}
-                        onChange={(e) => {
-                            setQuery(e.target.value);
-                            methods.setValue("address", e.target.value);
-                        }}
+                    <Controller
+                        control={methods.control}
+                        name="address"
+                        render={({ field }) => (
+                            <input
+                                {...field}
+                                value={field.value ?? ""}
+                                placeholder="Например: Москва, ул. Мира 12"
+                                aria-invalid={Boolean(methods.formState.errors.address)}
+                                aria-describedby={methods.formState.errors.address ? "address-error" : undefined}
+                                className={`h-[48px] w-full rounded-[10px] border bg-transparent px-[18px] text-[16px] text-[#1F1F1F] outline-none transition-all ${methods.formState.errors.address ? "border-[#FF4D4F] shadow-[0_0_0_1px_rgba(255,77,79,0.35)]" : "border-[#E7E7E7] focus:border-[#FF7A00]"
+                                    }`}
+                                onFocus={() => setShowSuggestions(true)}
+                                onClick={() => setShowSuggestions(true)}
+                                onChange={(event) => field.onChange(event.target.value)}
+                            />
+                        )}
                     />
                     {methods.formState.errors.address && (
                         <span id="address-error" className="text-[14px] font-medium text-[#FF4D4F] mt-[8px] block">
@@ -74,8 +78,10 @@ export const CheckoutAddressForm = () => {
                                 key={s}
                                 onMouseDown={(ev) => {
                                     ev.preventDefault();
-                                    methods.setValue("address", s);
-                                    setQuery(s);
+                                    methods.setValue("address", s, {
+                                        shouldValidate: true,
+                                        shouldDirty: true,
+                                    });
                                     setShowSuggestions(false);
                                 }}
                                 className="px-[16px] py-[12px] hover:text-[#FE5F1E] hover:bg-[#FFFAF6] cursor-pointer"
@@ -93,19 +99,21 @@ export const CheckoutAddressForm = () => {
                     <div className="relative mt-[8px]">
                         <div className="flex items-center gap-[10px] h-[48px] w-full rounded-[10px] border border-[#E7E7E7] bg-transparent px-[18px] transition-all focus-within:border-[#FF7A00]">
                             <Timer size={20} className="text-[#212121]" />
-                            <input
-                                type="text"
-                                inputMode="numeric"
-                                maxLength={5}
-                                placeholder="Например: 18:30"
-                                className="h-full w-full border-0 bg-transparent text-[16px] text-[#1F1F1F] outline-none placeholder:text-[#A7A7A7]"
-                                {...methods.register("deliveryTime", {
-                                    setValueAs: (value: string) => formatTimeValue(value),
-                                    onChange: (event) => {
-                                        const nextValue = formatTimeValue(event.target.value);
-                                        event.target.value = nextValue;
-                                    },
-                                })}
+                            <Controller
+                                control={methods.control}
+                                name="deliveryTime"
+                                render={({ field }) => (
+                                    <input
+                                        {...field}
+                                        type="text"
+                                        inputMode="numeric"
+                                        maxLength={5}
+                                        placeholder="Например: 18:30"
+                                        value={field.value ?? ""}
+                                        onChange={(event) => field.onChange(formatTimeValue(event.target.value))}
+                                        className="h-full w-full border-0 bg-transparent text-[16px] text-[#1F1F1F] outline-none placeholder:text-[#A7A7A7]"
+                                    />
+                                )}
                             />
                         </div>
                         {methods.formState.errors.deliveryTime && (

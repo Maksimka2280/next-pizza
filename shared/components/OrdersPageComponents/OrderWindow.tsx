@@ -103,11 +103,15 @@ export function OrdersWindow() {
                 const status = orderStatusLabels[order.status] ?? order.status;
 
                 return (
-                    <section key={order.id} className="rounded-[30px] bg-white p-[30px] mt-[45px]">
+                    <section key={order.id} className="mt-[45px] rounded-[30px] bg-white p-[30px]">
                         <div className="flex items-center justify-between gap-5">
                             <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                                 <h2 className="text-[24px] font-bold">Заказ #{order.id}</h2>
-                                <time className="text-[16px] text-[#AEAEAE]" dateTime={order.createdAt}>
+
+                                <time
+                                    className="text-[16px] text-[#AEAEAE]"
+                                    dateTime={order.createdAt}
+                                >
                                     {new Date(order.createdAt).toLocaleString("ru-RU")}
                                 </time>
                             </div>
@@ -116,6 +120,7 @@ export function OrdersWindow() {
                                 <span className="rounded-[30px] bg-[#EAF8F4] px-4 py-2 text-[14px] font-medium text-[#1BB486]">
                                     {status}
                                 </span>
+
                                 <button
                                     type="button"
                                     aria-label={`${isExpanded ? "Скрыть" : "Показать"} товары заказа ${order.id}`}
@@ -123,32 +128,51 @@ export function OrdersWindow() {
                                     onClick={() => {
                                         setExpandedOrders((current) => {
                                             const next = new Set(current);
-                                            if (next.has(order.id)) next.delete(order.id);
-                                            else next.add(order.id);
+
+                                            if (next.has(order.id)) {
+                                                next.delete(order.id);
+                                            } else {
+                                                next.add(order.id);
+                                            }
+
                                             return next;
                                         });
                                     }}
                                 >
                                     <ChevronDown
                                         color="#AEAEAE"
-                                        className={`transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                                        className={`transition-transform duration-300 ease-in-out ${isExpanded ? "rotate-180" : ""
+                                            }`}
                                     />
                                 </button>
                             </div>
                         </div>
 
-                        {isExpanded && (
-                            <div className="mt-5 max-h-[300px] overflow-y-auto">
-                                {order.items.map((item) => (
-                                    <CheckoutCard key={item.id} item={item} readOnly />
-                                ))}
-                                <div className="mt-5 flex justify-between border-t border-[#EDEDED] pt-4 font-bold">
-                                    <span>Итого</span>
-                                    <span>{order.totalAmount} ₴</span>
+                        <div
+                            className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isExpanded
+                                    ? "grid-rows-[1fr] opacity-100"
+                                    : "grid-rows-[0fr] opacity-0"
+                                }`}
+                        >
+                            <div className="min-h-0 overflow-hidden">
+                                <div className="mt-5 max-h-[300px] overflow-y-auto">
+                                    {order.items.map((item) => (
+                                        <CheckoutCard
+                                            key={item.id}
+                                            item={item}
+                                            readOnly
+                                        />
+                                    ))}
+
+                                    <div className="mt-5 flex justify-between border-t border-[#EDEDED] pt-4 font-bold">
+                                        <span>Итого</span>
+                                        <span>{order.totalAmount} ₴</span>
+                                    </div>
                                 </div>
                             </div>
-                        )}
+                        </div>
                     </section>
+
                 );
             })}
         </div>

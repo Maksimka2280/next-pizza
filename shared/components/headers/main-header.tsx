@@ -6,10 +6,18 @@ import { SearchInput } from "../SearchInput";
 import { Cart } from "../shared/Cart";
 import { useState } from "react";
 import Link from "next/link";
+import { LoginWindow } from "../Auth/Login";
 
 export default function MainHeader() {
 
     const [open, setOpen] = useState(false)
+    const [openLogin, setOpenLogin] = useState(false)
+    const openLoginFunction = () => {
+        setOpenLogin(true);
+    } 
+     const closeLoginFunction = () => {
+        setOpenLogin(false);
+    } 
     const openCart = () => {
         setOpen(true);
     };
@@ -36,7 +44,7 @@ export default function MainHeader() {
                     </div>
 
                     <div className="flex items-center gap-4 flex-shrink-0">
-                        <Button className="text-[#FE5F00] w-[110px] h-[50px] rounded-[15px] text-[16px] font-semibold" variant="outline">
+                        <Button className="text-[#FE5F00] w-[110px] h-[50px] rounded-[15px] text-[16px] font-semibold" variant="outline" onClick={openLoginFunction}>
                             <User strokeWidth={3} /> Войти
                         </Button>
                         <Button variant="outline" className="w-[50px] h-[50px] rounded-[15px] text-[#FE5F00]" onClick={openCart}>
@@ -51,6 +59,7 @@ export default function MainHeader() {
                 </div>
             </header>
             {open && <Cart onClose={closeCart} />}
+            {openLogin && <LoginWindow onClose={closeLoginFunction}/>}
             <div className="w-full bg-[#EDEDED] h-[1px]"></div>
 
         </>
