@@ -7,16 +7,17 @@ import { Cart } from "../shared/Cart";
 import { useState } from "react";
 import Link from "next/link";
 import { LoginWindow } from "../Auth/Login";
+import { RegisterWindow } from "../Auth/Register";
 
 export default function MainHeader() {
 
     const [open, setOpen] = useState(false)
-    const [openLogin, setOpenLogin] = useState(false)
+    const [openAuth, setOpenAuth] = useState<"login" | "register" | null>(null)
     const openLoginFunction = () => {
-        setOpenLogin(true);
+        setOpenAuth("login");
     } 
      const closeLoginFunction = () => {
-        setOpenLogin(false);
+        setOpenAuth(null);
     } 
     const openCart = () => {
         setOpen(true);
@@ -59,7 +60,13 @@ export default function MainHeader() {
                 </div>
             </header>
             {open && <Cart onClose={closeCart} />}
-            {openLogin && <LoginWindow onClose={closeLoginFunction}/>}
+            {openAuth === "login" && (
+                <LoginWindow
+                    onRegister={() => setOpenAuth("register")}
+                    onClose={closeLoginFunction}
+                />
+            )}
+            {openAuth === "register" && <RegisterWindow onClose={closeLoginFunction} />}
             <div className="w-full bg-[#EDEDED] h-[1px]"></div>
 
         </>

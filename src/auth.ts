@@ -1,6 +1,6 @@
+import bcrypt from 'bcryptjs';
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import bcrypt from 'bcryptjs';
 
 import { prisma } from '../prisma/prisma-client';
 
@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
           where: { email },
         });
 
-        if (!user || !user.password) {
+        if (!user?.password || !user.verified) {
           return null;
         }
 
@@ -51,7 +51,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.sub = String(user.id ?? token.sub ?? '');
+        token.sub = String(user.id);
       }
 
       return token;
@@ -59,7 +59,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         const sessionUser = session.user as typeof session.user & { id?: string | null };
-        sessionUser.id = String(token.sub ?? sessionUser.id ?? '');
+        sessionUser.id = token.sub ?? '';
       }
 
       return session;

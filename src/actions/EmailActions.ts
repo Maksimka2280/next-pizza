@@ -2,6 +2,7 @@
 'use server';
 
 import { AgentMailClient } from 'agentmail';
+import { hash } from 'bcryptjs';
 
 import { prisma } from '../../prisma/prisma-client';
 
@@ -28,11 +29,101 @@ async function getOrCreateUser(email: string) {
         fullName: nameFromEmail,
         email: normalizedEmail,
         password: Math.random().toString(36).slice(2) + Date.now().toString(36),
+        role: 'USER',
       },
     });
   }
 
   return user;
+}
+
+export async function sendRegistrationCode(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    throw new Error('Введіть коректну адресу електронної пошти');
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+  });
+
+  if (existingUser?.verified) {
+    throw new Error('Користувач із цією адресою вже зареєстрований');
+  }
+
+  await sendEmail(normalizedEmail);
+  return { success: true };
+}
+
+export async function verifyRegistrationCode(email: string, code: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const user = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+    include: { verificationCode: true },
+  });
+
+  return Boolean(
+    user &&
+      !user.verified &&
+      user.verificationCode &&
+      user.verificationCode.code === code.trim(),
+  );
+}
+
+export async function registerUser(
+  fullName: string,
+  email: string,
+  password: string,
+  code: string,
+) {
+  const normalizedName = fullName.trim();
+  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedCode = code.trim();
+
+  if (
+    normalizedName.length < 2 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) ||
+    password.length < 8 ||
+    !/^\d{4}$/.test(normalizedCode)
+  ) {
+    return false;
+  }
+
+  const hashedPassword = await hash(password, 10);
+
+  return prisma.$transaction(async (transaction) => {
+    const user = await transaction.user.findUnique({
+      where: { email: normalizedEmail },
+      include: { verificationCode: true },
+    });
+
+    if (
+      !user ||
+      user.verified ||
+      user.role !== 'USER' ||
+      user.verificationCode?.code !== normalizedCode
+    ) {
+      return false;
+    }
+
+    await transaction.user.update({
+      where: { id: user.id },
+      data: {
+        fullName: normalizedName,
+        password: hashedPassword,
+        verified: new Date(),
+        role: 'USER',
+      },
+    });
+
+    await transaction.verificationCode.delete({
+      where: { userId: user.id },
+    });
+
+    return true;
+  });
 }
 
 export async function sendEmail(email: string) {
@@ -139,4 +230,3 @@ export async function verifyEmailCode(email: string, code: string) {
 
   return true;
 }
-
