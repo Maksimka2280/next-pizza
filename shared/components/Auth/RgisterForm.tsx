@@ -23,6 +23,7 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
         handleRegister,
     } = useRegisterForm(onClose)
     const canEnterCode = isCodeSent && !isEmailVerified;
+    const canSendCode = !isCodeSent && !isEmailVerified;
 
     return (
         <>
@@ -53,7 +54,7 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
                     placeholder="example@example.com"
                     className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 aria-invalid:border-red-500"
                 />
-                 {errors.Email && <p className='mt-1 text-sm text-red-500'>{errors.Email.message}</p>}
+                {errors.Email && <p className='mt-1 text-sm text-red-500'>{errors.Email.message}</p>}
                 <Input
                     {...register("Password")}
                     autoComplete="current-password"
@@ -70,14 +71,17 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
                         </p>
                     )
                 }
-                <Button
-                    type="button"
-                    onClick={handleSendCode}
-                    disabled={isSendingCode}
-                    className="rounded-[18px] py-[25px] text-[16px] font-extrabold disabled:opacity-70"
-                >
-                    {isSendingCode ? 'Надсилаємо код...' : 'Получить код'}
-                </Button>
+                {canSendCode && (
+                    <Button
+                        type="button"
+                        onClick={handleSendCode}
+                        disabled={isSendingCode}
+                        className="rounded-[18px] py-[25px] text-[16px] font-extrabold disabled:opacity-70"
+                    >
+                        {isSendingCode ? 'Надсилаємо код...' : 'Получить код'}
+                    </Button>
+                )}
+
                 {canEnterCode && (
                     <>
 
@@ -123,7 +127,7 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
                         disabled={isRegistering}
                         className="rounded-[18px] py-[25px] text-[16px] font-extrabold disabled:opacity-70"
                     >
-                        {isRegistering ? 'Реєструємо...'  : 'Зарегистрироваться'}
+                        {isRegistering ? 'Реєструємо...' : 'Зарегистрироваться'}
                     </Button>
                 )}
             </form>

@@ -30,7 +30,7 @@ export const RegisterWindow = ({ onClose }: Props) => {
                 >
                     <X />
                 </button>
-               <RegisterForm />
+               <RegisterForm onClose={onClose} />
             </div>
 
         </div>
