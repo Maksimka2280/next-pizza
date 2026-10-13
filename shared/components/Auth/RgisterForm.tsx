@@ -23,7 +23,6 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
         handleRegister,
     } = useRegisterForm(onClose)
     const canEnterCode = isCodeSent && !isEmailVerified;
-    const canSendCode = !isCodeSent && !isEmailVerified;
 
     return (
         <>
@@ -71,14 +70,14 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
                         </p>
                     )
                 }
-                {canSendCode && (
+                {!canEnterCode && (
                     <Button
                         type="button"
                         onClick={handleSendCode}
                         disabled={isSendingCode}
                         className="rounded-[18px] py-[25px] text-[16px] font-extrabold disabled:opacity-70"
                     >
-                        {isSendingCode ? 'Надсилаємо код...' : 'Получить код'}
+                        {isSendingCode ? 'Надсилаємо код...' : 'Надіслати код'}
                     </Button>
                 )}
 
@@ -99,7 +98,7 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
                             type="text"
                             maxLength={4}
                             aria-invalid={!!errors.CodeConfirm}
-                            placeholder="Код із листа"
+                            placeholder="Код з листа"
                             className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 aria-invalid:border-red-500"
                         />
 
@@ -116,7 +115,7 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
                             disabled={isVerifyingCode}
                             className="rounded-[18px] py-[25px] text-[16px] font-extrabold disabled:opacity-70"
                         >
-                            {isVerifyingCode ? 'Перевіряємо...' : 'Підтвердити код'}
+                            {isVerifyingCode ? 'Проверяем...' : 'Подтвердить код'}
                         </Button>
                     </>
                 )}
@@ -127,7 +126,7 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
                         disabled={isRegistering}
                         className="rounded-[18px] py-[25px] text-[16px] font-extrabold disabled:opacity-70"
                     >
-                        {isRegistering ? 'Реєструємо...' : 'Зарегистрироваться'}
+                        {isRegistering ? 'Реєструємо...' : 'Зареєструватися'}
                     </Button>
                 )}
             </form>

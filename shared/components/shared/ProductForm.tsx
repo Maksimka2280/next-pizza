@@ -17,9 +17,6 @@ import { Toast } from "@base-ui/react";
 import { LoaderCircle } from "lucide-react";
 import { sendEmail } from "@/actions/EmailActions";
 
-
-
-
 interface Props {
   imageUrl: string;
   name: string;
@@ -56,6 +53,8 @@ export const ProductForm: React.FC<Props> = ({
     setType,
     addIngredient,
     availablePizzaSizes,
+    availableTypeOptions,
+    hasTypeSelector,
   } = usePizzaOptions(items);
 
   const { totalPrice, textDetaills } = getPizzaDetails(
@@ -81,7 +80,7 @@ export const ProductForm: React.FC<Props> = ({
           ingredients: Array.from(selectedIngredients),
         }),
         {
-          loading: "Добавление...",
+          loading: "Добавляем...",
           success: "Заказ успешно добавлен в корзину",
           error: "Не удалось добавить товар в корзину",
         }
@@ -98,13 +97,13 @@ export const ProductForm: React.FC<Props> = ({
 
       <div className="flex flex-wrap items-center gap-2 text-sm text-[#777777] mb-[20px]">
         <Link href="/" className="hover:text-[#FE5F00]">
-          Главная
+          Головна
         </Link>
 
         <span>/</span>
 
         <button className="font-semibold hover:text-[#FE5F00]">
-          {categoryName || "Категория"}
+          {categoryName || "Категорія"}
         </button>
 
         <span>/</span>
@@ -133,7 +132,7 @@ export const ProductForm: React.FC<Props> = ({
           </div>
 
           <div className="flex flex-col gap-4 mt-5">
-            {availableSizes?.length > 0 && (
+            {availablePizzaSizes?.length > 0 && (
               <GroupVariants
                 items={availablePizzaSizes}
                 value={String(size)}
@@ -141,18 +140,18 @@ export const ProductForm: React.FC<Props> = ({
               />
             )}
 
-            <GroupVariants
-              items={pizzaTypes}
-              value={String(type)}
-              onClick={(value) => setType(Number(value) as PizzaType)}
-            />
+            {hasTypeSelector && (
+              <GroupVariants
+                items={availableTypeOptions}
+                value={String(type)}
+                onClick={(value) => setType(Number(value) as PizzaType)}
+              />
+            )}
           </div>
 
           <h2 className="text-[18px] font-bold">
             Ингредиенты
           </h2>
-
-
           <div className="flex gap-10">
             {ingredients.map((ingredient) => (
               <IngredientItem
@@ -181,8 +180,6 @@ export const ProductForm: React.FC<Props> = ({
         </div>
 
       </div>
-
-
       {recommendations.length > 0 && (
         <div className="mt-20 pb-20">
           <h2 className="mb-8 text-[28px] font-bold">

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { ProductItem } from '@prisma/client';
-import { Mapsize, pizzasize, type PizzaSize, type PizzaType } from '../constants/Pizza';
+import { getVariantLabel, pizzaTypes, type PizzaSize, type PizzaType } from '../constants/Pizza';
 
 interface Variant {
   name: string;
@@ -20,13 +20,12 @@ export const usePizzaOptions = (items: ProductItem[]) => {
           .filter((item): item is ProductItem & { size: number } => normalizeNumber(item.size))
           .map((item) => item.size),
       ),
-    ).sort((a, b) => a - b) as PizzaSize[];
+    ).sort((a, b) => a - b);
 
     return sizeValues.map((size) => ({
-      name: Mapsize[size] ?? `${size} см`,
+      name: getVariantLabel(size),
       value: String(size),
     }));
-
   }, [items]);
 
   const availableTypes = useMemo<PizzaType[]>(() => {
@@ -41,7 +40,12 @@ export const usePizzaOptions = (items: ProductItem[]) => {
     return typeValues;
   }, [items]);
 
-  const defaultSize = (availableSizes[0]?.value ? (Number(availableSizes[0].value) as PizzaSize) : 20) as PizzaSize;
+  const availableTypeOptions = useMemo(
+    () => pizzaTypes.filter((item) => availableTypes.includes(Number(item.value) as PizzaType)),
+    [availableTypes],
+  );
+
+  const defaultSize = (availableSizes[0]?.value ? Number(availableSizes[0].value) : 20) as PizzaSize;
   const defaultType = (availableTypes[0] ?? 1) as PizzaType;
 
   const [size, setSize] = useState<PizzaSize>(defaultSize);
@@ -49,11 +53,15 @@ export const usePizzaOptions = (items: ProductItem[]) => {
   const [selectedIngredients, setSelectedIngredients] = useState<Set<number>>(new Set());
 
   const currentItemId = useMemo<number | null>(() => {
-    const item = items.find(
-      (item) => normalizeNumber(item.size) && normalizeNumber(item.pizzaType) && item.size === size && item.pizzaType === type,
-    );
+    const matchingItem = items.find((item) => {
+      if (normalizeNumber(item.pizzaType)) {
+        return item.size === size && item.pizzaType === type;
+      }
 
-    return item?.id ?? null;
+      return normalizeNumber(item.size) && item.size === size;
+    });
+
+    return matchingItem?.id ?? null;
   }, [items, size, type]);
 
   const addIngredient = (ingredientId: number) => {
@@ -67,29 +75,33 @@ export const usePizzaOptions = (items: ProductItem[]) => {
       return next;
     });
   };
-  const availablePizzaTypes = items.filter((item) => item.pizzaType === type);
-  const availablePizzaSizes = pizzasize.map((item) => ({
+
+  const availablePizzaSizes = availableSizes.map((item) => ({
     name: item.name,
     value: item.value,
-    disabled: !availablePizzaTypes.some(
-      (pizza) => pizza.size === Number(item.value),
-    ),
+    disabled: availableTypes.length > 0
+      ? !items.some(
+          (variant) => variant.size === Number(item.value) && variant.pizzaType === type,
+        )
+      : false,
   }));
+
   useEffect(() => {
-    const currentSize = availablePizzaSizes.find(
-      (item) => Number(item.value) === size,
-    );
+    if (!availableTypes.length) {
+      return;
+    }
+
+    const currentSize = availablePizzaSizes.find((item) => Number(item.value) === size);
 
     if (currentSize?.disabled) {
-      const firstAvailableSize = availablePizzaSizes.find(
-        (item) => !item.disabled,
-      );
+      const firstAvailableSize = availablePizzaSizes.find((item) => !item.disabled);
 
       if (firstAvailableSize) {
         setSize(Number(firstAvailableSize.value) as PizzaSize);
       }
     }
-  }, [type, availablePizzaSizes]);
+  }, [type, availablePizzaSizes, availableTypes.length, size]);
+
   return {
     size,
     type,
@@ -99,6 +111,8 @@ export const usePizzaOptions = (items: ProductItem[]) => {
     setSize,
     setType,
     addIngredient,
-    availablePizzaSizes
+    availablePizzaSizes,
+    availableTypeOptions,
+    hasTypeSelector: availableTypeOptions.length > 0,
   };
 };

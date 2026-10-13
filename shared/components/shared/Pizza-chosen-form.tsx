@@ -72,9 +72,9 @@ const handleClickAdd = async () => {
         ingredients: Array.from(selectedIngredients),
       }),
       {
-        loading: "Добавление...",
-        success: "Заказ успешно добавлен в корзину",
-        error: "Не удалось добавить товар в корзину",
+        loading: "Додаємо...",
+        success: "Замовлення успішно додано до кошика",
+        error: "Не вдалося додати товар до кошика",
       }
     );
   } catch (e) {

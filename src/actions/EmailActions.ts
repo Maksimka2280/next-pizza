@@ -47,7 +47,7 @@ export async function sendRegistrationCode(email: string) {
   try {
     await client.inboxes.messages.send(process.env.AGENTMAIL_INBOX_ID!, {
       to: [normalizedEmail],
-      subject: 'Підтвердження реєстрації — Next pizza',
+      subject: 'Подтверждение регистрации — Next pizza',
       html: `
         <div style="margin:0;padding:0;background:#fff7f0;font-family:Arial,Helvetica,sans-serif;color:#22130d;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff7f0; margin:0; padding:0;">
@@ -221,7 +221,7 @@ export async function sendEmail(email: string) {
   try {
     await client.inboxes.messages.send(process.env.AGENTMAIL_INBOX_ID!, {
       to: [normalizedEmail],
-      subject: 'Підтвердження входу — Next pizza',
+      subject: 'Подтверждение входа — Next pizza',
       html: `
         <div style="margin:0;padding:0;background:#fff7f0;font-family:Arial,Helvetica,sans-serif;color:#22130d;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff7f0; margin:0; padding:0;">

@@ -103,10 +103,10 @@ export const useRegisterForm = (onClose?: () => void) => {
             }
 
             setIsEmailVerified(true);
-            toast.success("Email подтверджжено ");
+            toast.success("Email подтверждён");
         } catch (error) {
             console.error(error);
-            toast.error("Не удалость подтвердить код");
+            toast.error("Не удалось подтвердить код");
         } finally {
             setIsVerifyingCode(false);
         }
@@ -156,7 +156,7 @@ export const useRegisterForm = (onClose?: () => void) => {
             onClose?.();
         } catch (error) {
             console.error(error);
-            toast.error("Не удалось завершить регистрацию");
+            toast.error("Не вдалося завершити реєстрацію");
         } finally {
             setIsRegistering(false);
         }

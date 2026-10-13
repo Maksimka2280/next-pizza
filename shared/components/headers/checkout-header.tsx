@@ -1,11 +1,18 @@
-
+'use client'
 import { User } from "lucide-react";
 import { Button } from "../ui/button";
+import { LoginWindow } from "../Auth/Login";
+import { useState } from "react";
 
 
 export default function CheckOutHeader() {
-
-  
+    const [openAuth, setOpenAuth] = useState<"login" | "register" | null>(null)
+    const openLoginFunction = () => {
+        setOpenAuth("login");
+    }
+    const closeLoginFunction = () => {
+        setOpenAuth(null);
+    }
     return (
         <>
             <header className="flex items-center  justify-center w-full px-[67px] py-[25px] sticky top-0 z-50  backdrop-blur-xs">
@@ -18,14 +25,19 @@ export default function CheckOutHeader() {
                         </div>
                     </a>
                     <div className=" flex items-center gap-4 ">
-                        <Button className="text-[#FE5F00] w-[110px] h-[50px] rounded-[15px] text-[16px] font-semibold" variant="outline">
+                        <Button className="text-[#FE5F00] w-[110px] h-[50px] rounded-[15px] text-[16px] font-semibold" variant="outline" onClick={openLoginFunction}>
                             <User strokeWidth={3} /> Войти
                         </Button>
                     </div>
                 </div>
             </header>
             <div className="w-full  bg-[#EDEDED] h-[2px]"></div>
-
+            {openAuth === "login" && (
+                <LoginWindow
+                    onRegister={() => setOpenAuth("register")}
+                    onClose={closeLoginFunction}
+                />
+            )}
         </>
 
     )

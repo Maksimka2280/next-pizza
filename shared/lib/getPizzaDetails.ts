@@ -1,10 +1,12 @@
 import type { Ingredient, ProductItem } from '@prisma/client';
-import { Mapsize, Maptype, type PizzaSize, type PizzaType } from '../constants/Pizza';
+import { getVariantLabel, Maptype, type PizzaSize, type PizzaType } from '../constants/Pizza';
 
 export interface PizzaDetailsResult {
   totalPrice: number;
   textDetaills: string;
 }
+
+const normalizeNumber = (value: number | null | undefined): value is number => typeof value === 'number';
 
 export const getPizzaDetails = (
   type: PizzaType,
@@ -13,9 +15,13 @@ export const getPizzaDetails = (
   ingredients: Ingredient[],
   selectedIngredients: Set<number>,
 ): PizzaDetailsResult => {
-  const currentItem = items.find(
-    (item) => item.size === size && item.pizzaType === type,
-  );
+  const currentItem = items.find((item) => {
+    if (normalizeNumber(item.pizzaType)) {
+      return item.size === size && item.pizzaType === type;
+    }
+
+    return normalizeNumber(item.size) && item.size === size;
+  });
 
   const ingredientsTotal = ingredients
     .filter((ingredient) => selectedIngredients.has(ingredient.id))
@@ -24,16 +30,21 @@ export const getPizzaDetails = (
   const basePrice = currentItem?.price ?? 0;
   const totalPrice = basePrice + ingredientsTotal;
 
-  const sizeLabel = size;
-  const typeLabel = Maptype[type] ?? 'Традиционное';
+  const sizeLabel = getVariantLabel(size);
+  const hasPizzaType = items.some((item) => normalizeNumber(item.pizzaType));
+  const typeLabel = hasPizzaType ? (Maptype[type] ?? 'Традиционное') : '';
   const ingredientCount = selectedIngredients.size;
 
   const ingredientText = ingredientCount
-    ? `${ingredientCount} ${ingredientCount === 1 ? 'ингредиент' : 'ингредиента'}`
+    ? `${ingredientCount} ${ingredientCount === 1 ? 'ингредиент' : ingredientCount < 5 ? 'ингредиента' : 'ингредиентов'}`
     : 'без добавок';
+
+  const summary = hasPizzaType
+    ? `${sizeLabel}, ${typeLabel} пицца, ингредиенты: ${ingredientText}`
+    : `${sizeLabel}, ингредиенты: ${ingredientText}`;
 
   return {
     totalPrice,
-    textDetaills: `${sizeLabel} см, ${typeLabel} пицца, ингредиенты: ${ingredientText}`,
+    textDetaills: summary,
   };
 };

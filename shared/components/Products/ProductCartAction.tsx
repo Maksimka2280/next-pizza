@@ -45,14 +45,14 @@ export default function ProductCartAction({
               quantity: 1,
             }),
             {
-              loading: "Добавление...",
+              loading: "Добавляем...",
               success: "Заказ успешно добавлен в корзину",
               error: "Не удалось добавить товар в корзину",
             }
           );
         }}
       >
-        + добавить
+        + додати
       </button>
     );
   }

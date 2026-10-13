@@ -20,14 +20,14 @@ export const CheckoutPersonalInfoForm = () => {
         <CheckoutField
           name="firstName"
           label="Имя"
-          placeholder="Введіть ваше ім'я"
+          placeholder="Введите ваше имя"
           autoComplete="given-name"
         />
 
         <CheckoutField
           name="lastName"
           label="Фамилия"
-          placeholder="Введіть вашу фамілію"
+          placeholder="Введите вашу фамилию"
           autoComplete="family-name"
         />
 

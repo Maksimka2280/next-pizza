@@ -14,7 +14,7 @@ export const registerSchema = z.object({
         .string()
         .trim()
         .min(1, "Введите почту")
-        .pipe(z.email("Неверний формат почты")),
+        .pipe(z.email("Неверный формат почты")),
 
     Password: z
         .string()

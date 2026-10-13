@@ -26,7 +26,7 @@ export function OrdersWindow() {
         const loadOrders = async () => {
             const token = getOrCreateGuestCartToken();
             if (!token) {
-                setError("Не удалось получить данные заказов");
+                setError("Не вдалося отримати дані замовлень");
                 setIsLoading(false);
                 return;
             }
@@ -54,7 +54,7 @@ export function OrdersWindow() {
     }, []);
 
     return (
-        <div className="max-w-[750px] space-y-5">
+        <div className="max-w-[750px] space-y-5 mt-[40px]">
             {isLoading && (
                 <>
                     {[0, 1].map((order) => (
@@ -112,7 +112,7 @@ export function OrdersWindow() {
                                     className="text-[16px] text-[#AEAEAE]"
                                     dateTime={order.createdAt}
                                 >
-                                    {new Date(order.createdAt).toLocaleString("ru-RU")}
+                                    {new Date(order.createdAt).toLocaleString("uk-UA")}
                                 </time>
                             </div>
 

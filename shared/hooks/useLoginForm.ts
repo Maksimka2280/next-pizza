@@ -3,20 +3,28 @@ import { useForm } from 'react-hook-form';
 import { loginSchema } from '../components/Auth/LoginValidate';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
-import { sendLoginCode } from '@/actions/EmailActions';
+import { sendLoginCode, verifyEmailCode } from '@/actions/EmailActions';
 import toast from 'react-hot-toast';
+
+type LoginFormValues = z.infer<typeof loginSchema> & {
+    CodeConfirm?: string;
+};
 
 export const useLoginForm = ({ onRegister, onClose }: { onRegister?: () => void; onClose?: () => void } = {}) => {
     const [isSendingCode, setIsSendingCode] = useState(false);
     const [open, setOpen] = useState(false);
+    const [code, setCode] = useState('');
     const [isCodeSent, setIsCodeSent] = useState(false);
-
-    const form = useForm<z.infer<typeof loginSchema>>({
+    const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+    const [isEmailVerified, setIsEmailVerified] = useState(false);
+    const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         mode: 'onSubmit',
         reValidateMode: 'onChange',
         defaultValues: {
             Email: '',
+            Password: '',
+            CodeConfirm: '',
         },
     });
 
@@ -31,11 +39,14 @@ export const useLoginForm = ({ onRegister, onClose }: { onRegister?: () => void;
     const doYouRegister = () => setOpen(true);
 
     const handleInvalidSubmit = () => {
-        toast.error('Пожалуйста, заполните все поля правильно');
+        toast.error('Будь ласка, заповніть усі поля правильно');
     };
 
     const handleSendCode = async () => {
-        const isValid = await trigger('Email');
+        const isValid = await trigger([
+            "Email",
+            "Password"
+        ]);
 
         if (!isValid) {
             handleInvalidSubmit();
@@ -49,15 +60,60 @@ export const useLoginForm = ({ onRegister, onClose }: { onRegister?: () => void;
         try {
             await sendLoginCode(email);
             setIsCodeSent(true);
-            toast.success('Код подтверждения отправлен на вашу почту');
+            setCode("");
+            setIsEmailVerified(false);
+            toast.success('Код підтвердження надіслано на вашу пошту');
         } catch (error) {
-            console.error('Ошибка отправки:', error);
-            toast.error(error instanceof Error ? error.message : 'Не удалось отправить код подтверждения');
+            console.error('Помилка відправки:', error);
+            toast.error(error instanceof Error ? error.message : 'Не вдалося надіслати код підтвердження');
         } finally {
             setIsSendingCode(false);
         }
     };
+    const handleVerifyCode = async () => {
+        const data = getValues();
 
+        const isValid = await trigger([
+            "Email",
+            "Password",
+        ]);
+
+        if (!isValid) {
+            toast.error("Пожалуйста, заполните все поля");
+            return;
+        }
+
+        if (!isCodeSent) {
+            toast.error("Сначала отправьте код на почту");
+            return;
+        }
+
+        if (!code || code.length !== 4) {
+            toast.error("Код має містити 4 цифри");
+            return;
+        }
+
+        if (!data) return;
+
+        setIsVerifyingCode(true);
+
+        try {
+            const isValidCode = await verifyEmailCode(data.Email, code);
+
+            if (!isValidCode) {
+                toast.error("Неверный код");
+                return;
+            }
+
+            setIsEmailVerified(true);
+            toast.success("Email подтверждён");
+        } catch (error) {
+            console.error(error);
+            toast.error("Не удалось подтвердить код");
+        } finally {
+            setIsVerifyingCode(false);
+        }
+    };
     return {
         form,
         register,
@@ -66,7 +122,13 @@ export const useLoginForm = ({ onRegister, onClose }: { onRegister?: () => void;
         isSendingCode,
         isCodeSent,
         open,
+        isVerifyingCode,
         doYouRegister,
         handleSendCode,
+        isEmailVerified,
+        code,
+        setCode,
+        setIsCodeSent,
+        handleVerifyCode
     };
 };

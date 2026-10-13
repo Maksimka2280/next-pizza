@@ -53,7 +53,7 @@ export const useCodeConfirmation = ({
     const email = getEmail();
 
     if (!email) {
-      toast.error('Спочатку введіть email');
+      toast.error('Сначала введите email');
       return false;
     }
 
@@ -64,11 +64,11 @@ export const useCodeConfirmation = ({
       setIsResendDisabled(true);
       setResendCountdown(28);
       setCodeDigits(Array(CODE_LENGTH).fill(''));
-      toast.success('Код підтвердження надіслано на вашу пошту. Перевірте inbox.');
+      toast.success('Код подтверждения отправлен на вашу почту. Проверьте inbox.');
       return true;
     } catch (error) {
       console.error(error);
-      toast.error('Не вдалося надіслати код підтвердження');
+      toast.error('Не удалось отправить код подтверждения');
       return false;
     }
   };
@@ -97,14 +97,14 @@ export const useCodeConfirmation = ({
     const email = getEmail();
 
     if (!email) {
-      toast.error('Спочатку введіть email');
+      toast.error('Сначала введите email');
       return false;
     }
 
     const normalizedCode = enteredCode.trim();
 
     if (!normalizedCode || normalizedCode.length !== CODE_LENGTH) {
-      toast.error('Введіть код підтвердження');
+      toast.error('Введите код подтверждения');
       return false;
     }
 
@@ -114,15 +114,15 @@ export const useCodeConfirmation = ({
       const isValid = await verifyEmailCode(email, normalizedCode);
 
       if (!isValid) {
-        toast.error('Невірний код підтвердження');
+        toast.error('Неверный код подтверждения');
         return false;
       }
 
       closeModal();
       await toast.promise(onPay, {
-        loading: 'Підтвердження...',
-        success: 'Замовлення успішно оформлене. Перехід до оплати.',
-        error: 'Не вдалося оформити замовлення',
+        loading: 'Подтверждение...',
+        success: 'Заказ успешно оформлен. Переход к оплате.',
+        error: 'Не удалось оформить заказ',
       });
 
       return true;
