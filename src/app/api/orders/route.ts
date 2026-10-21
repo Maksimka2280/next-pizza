@@ -1,19 +1,51 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../prisma/prisma-client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
 
 export async function GET(req: Request) {
-  const token = new URL(req.url).searchParams.get("token");
+  try {
+    const session = await getServerSession(authOptions);
+    if (session?.user?.id) {
+      const userId = Number(session.user.id);
 
-  if (!token) {
-    return NextResponse.json({ error: "Missing order token" }, { status: 400 });
+      if (!Number.isSafeInteger(userId) || userId <= 0) {
+        return NextResponse.json(
+          { error: "Invalid user ID" },
+          { status: 401 }
+        );
+      }
+
+      const orders = await prisma.order.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+      });
+
+      return NextResponse.json(orders);
+    }
+    const token = new URL(req.url).searchParams.get("token");
+
+    if (!token) {
+      return NextResponse.json(
+        { error: "Missing order token" },
+        { status: 400 }
+      );
+    }
+
+    const orders = await prisma.order.findMany({
+      where: { token, userId: null },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json(orders);
+  } catch (error) {
+    console.error("GET /api/orders:", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch orders" },
+      { status: 500 }
+    );
   }
-
-  const orders = await prisma.order.findMany({
-    where: { token },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return NextResponse.json(orders);
 }
 
 export async function POST(req: Request) {

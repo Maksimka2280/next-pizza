@@ -9,9 +9,12 @@ export async function createOrder(dto: CreateOrderDto): Promise<OrderDto> {
   return data;
 }
 
-export async function getOrders(token: string): Promise<OrderDto[]> {
-  const {data} = await axios.get<OrderDto[]>(
-    `${BASE}${ApiRoutes.ORDERS}?token=${encodeURIComponent(token)}`,
-  );
+export async function getOrders(token?: string): Promise<OrderDto[]> {
+  const url = token
+    ? `${BASE}${ApiRoutes.ORDERS}?token=${encodeURIComponent(token)}`
+    : `${BASE}${ApiRoutes.ORDERS}`;
+
+  const { data } = await axios.get<OrderDto[]>(url);
+
   return data;
 }

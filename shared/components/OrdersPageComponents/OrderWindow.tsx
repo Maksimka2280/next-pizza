@@ -7,6 +7,7 @@ import type { OrderDto } from "../../types/cart.dto";
 import { getOrCreateGuestCartToken } from "../../lib/guestCart";
 import { CheckoutCard } from "../CheckOutComponents/CheckoutCard";
 import { Skeleton } from "../ui/skeleton";
+import { useSession } from "next-auth/react";
 
 const orderStatusLabels: Record<string, string> = {
     PENDING: "Ожидает оплаты",
@@ -19,39 +20,51 @@ export function OrdersWindow() {
     const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { data: session, status } = useSession();
+ useEffect(() => {
+    let isMounted = true;
+    if (status === "loading") return;
+    const loadOrders = async () => {
+        try {
+            let customerOrders;
 
-    useEffect(() => {
-        let isMounted = true;
+            if (session?.user?.id) {
+                customerOrders = await getOrders();
+            } else {
+                const token = getOrCreateGuestCartToken();
 
-        const loadOrders = async () => {
-            const token = getOrCreateGuestCartToken();
-            if (!token) {
-                setError("Не вдалося отримати дані замовлень");
-                setIsLoading(false);
-                return;
+                if (!token) {
+                    throw new Error("Не вдалося отримати токен кошика");
+                }
+
+                customerOrders = await getOrders(token);
             }
 
-            try {
-                const customerOrders = await getOrders(token);
-                if (isMounted) {
-                    setOrders(customerOrders);
-                    setExpandedOrders(new Set(customerOrders.map((order) => order.id)));
-                }
-            } catch (loadError) {
-                console.error("Не удалось загрузить заказы:", loadError);
-                if (isMounted) {
-                    setError("Не удалось загрузить заказы. Попробуйте обновить страницу.");
-                }
-            } finally {
-                if (isMounted) setIsLoading(false);
+            if (isMounted) {
+                setOrders(customerOrders);
+                setExpandedOrders(
+                    new Set(customerOrders.map((order) => order.id))
+                );
             }
-        };
+        } catch (loadError) {
+            console.error("Не удалось загрузить заказы:", loadError);
 
-        void loadOrders();
-        return () => {
-            isMounted = false;
-        };
-    }, []);
+            if (isMounted) {
+                setError(
+                    "Не удалось загрузить заказы. Попробуйте обновить страницу."
+                );
+            }
+        } finally {
+            if (isMounted) setIsLoading(false);
+        }
+    };
+
+    void loadOrders();
+
+    return () => {
+        isMounted = false;
+    };
+}, [session, status]);
 
     return (
         <div className="max-w-[750px] space-y-5 mt-[40px]">
@@ -150,8 +163,8 @@ export function OrdersWindow() {
 
                         <div
                             className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isExpanded
-                                    ? "grid-rows-[1fr] opacity-100"
-                                    : "grid-rows-[0fr] opacity-0"
+                                ? "grid-rows-[1fr] opacity-100"
+                                : "grid-rows-[0fr] opacity-0"
                                 }`}
                         >
                             <div className="min-h-0 overflow-hidden">

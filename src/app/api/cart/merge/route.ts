@@ -1,37 +1,85 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth';
 import { prisma } from '../../../../../prisma/prisma-client';
 
 
-export const runtime = 'nodejs';
-
 export async function POST(req: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    const sessionUserId = session?.user?.id;
+
+    if (!sessionUserId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 },
+      );
+    }
+
+    const userId = Number(sessionUserId);
+
+    if (!Number.isSafeInteger(userId) || userId <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid user ID' },
+        { status: 400 },
+      );
+    }
+
     const body = await req.json();
-    const { token, userId } = body;
-    if (!token || !userId) {
-      return NextResponse.json({ error: 'Missing token or userId' }, { status: 400 });
+    const token = body.token;
+
+    if (typeof token !== 'string' || !token.trim()) {
+      return NextResponse.json(
+        { error: 'Missing token' },
+        { status: 400 },
+      );
     }
 
-    const guestCart = await prisma.cart.findFirst({ where: { token } });
-    if (!guestCart) return NextResponse.json({ ok: true, message: 'No guest cart' });
+    const guestCart = await prisma.cart.findFirst({
+      where: {
+        token,
+        userId: null,
+      },
+    });
 
-    const userCart = await prisma.cart.findUnique({ where: { userId: Number(userId) } });
-
-    if (!userCart) {
-      // simply assign guest cart to user
-      await prisma.cart.update({ where: { id: guestCart.id }, data: { userId: Number(userId) } });
-      return NextResponse.json({ ok: true });
+    if (!guestCart) {
+      return NextResponse.json({
+        ok: true,
+        message: 'No guest cart',
+      });
     }
 
-    // move cart items from guest to user cart
-    await prisma.cartItem.updateMany({ where: { cartId: guestCart.id }, data: { cartId: userCart.id } });
+    await prisma.$transaction(async (tx) => {
+      const userCart = await tx.cart.findUnique({
+        where: { userId },
+      });
 
-    // delete guest cart
-    await prisma.cart.delete({ where: { id: guestCart.id } });
+      if (!userCart) {
+        await tx.cart.update({
+          where: { id: guestCart.id },
+          data: { userId },
+        });
+
+        return;
+      }
+
+      await tx.cartItem.updateMany({
+        where: { cartId: guestCart.id },
+        data: { cartId: userCart.id },
+      });
+
+      await tx.cart.delete({
+        where: { id: guestCart.id },
+      });
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: 'Internal' }, { status: 500 });
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 },
+    );
   }
 }

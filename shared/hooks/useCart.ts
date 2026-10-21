@@ -4,9 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getOrCreateGuestCartToken } from "../lib/guestCart";
 import type { AddToCartDto, UpdateCartItemDto, CartDto, MergeCartDto } from "../types/cart.dto";
 import { fetchCartApi, addToCartApi, updateCartItemApi, deleteCartItemApi, mergeCartApi, cleanCartApi } from "../service/cart.client";
-
+import { useSession } from 'next-auth/react';
 type Maybe<T> = T | null;
 const CART_CACHE_KEY = "guest_cart_cache";
+const getCartCacheKey = (userId?: string | null) =>
+  userId ? `cart_cache_user_${userId}` : CART_CACHE_KEY;
 const CART_UPDATED_EVENT = "next-pizza-cart-updated";
 
 function notifyCartUpdate(cart: Maybe<CartDto>) {
@@ -19,11 +21,11 @@ function notifyCartUpdate(cart: Maybe<CartDto>) {
   }
 }
 
-function readCachedCart(): Maybe<CartDto> {
+function readCachedCart(userId?: string | null): Maybe<CartDto> {
   if (typeof window === "undefined") return null;
 
   try {
-    const cached = localStorage.getItem(CART_CACHE_KEY);
+    const cached = localStorage.getItem(getCartCacheKey(userId));
     if (!cached) return null;
     const parsed = JSON.parse(cached) as CartDto | null;
     if (!parsed || !Array.isArray(parsed.items)) return null;
@@ -33,14 +35,14 @@ function readCachedCart(): Maybe<CartDto> {
   }
 }
 
-function writeCachedCart(cart: Maybe<CartDto>) {
+function writeCachedCart(cart: Maybe<CartDto>, userId?: string | null) {
   if (typeof window === "undefined") return;
 
   try {
     if (!cart) {
-      localStorage.removeItem(CART_CACHE_KEY);
+      localStorage.removeItem(getCartCacheKey(userId));
     } else {
-      localStorage.setItem(CART_CACHE_KEY, JSON.stringify(cart));
+      localStorage.setItem(getCartCacheKey(userId), JSON.stringify(cart));
     }
     notifyCartUpdate(cart);
   } catch {
@@ -53,29 +55,37 @@ export function useCart() {
   const [loading, setLoading] = useState(true);
   const tokenRef = useRef<string | null>(null);
   const inFlightRef = useRef(false);
-
+  const { data: session, status } = useSession();
+  const isAuthenticated = Boolean(session?.user?.id);
   const fetchCart = useCallback(async (token?: string) => {
-    const t = token ?? tokenRef.current ?? getOrCreateGuestCartToken();
-    if (!t) {
+    if (status === 'loading') return null;
+
+    const guestToken = isAuthenticated
+      ? undefined
+      : token ?? tokenRef.current ?? getOrCreateGuestCartToken();
+
+    if (!isAuthenticated && !guestToken) {
+      setCart(null);
       setLoading(false);
       return null;
     }
 
-    tokenRef.current = t;
+    if (guestToken) {
+      tokenRef.current = guestToken;
+    }
+
     if (inFlightRef.current) return null;
+
     inFlightRef.current = true;
     setLoading(true);
 
-    const cached = readCachedCart();
-    if (cached) {
-      setCart(cached);
-    }
-
     try {
-      const json = await fetchCartApi(t);
+      const json = await fetchCartApi(guestToken || undefined);
       const nextCart = json.cart ?? null;
+
       setCart(nextCart);
-      writeCachedCart(nextCart);
+      writeCachedCart(nextCart, session?.user?.id ?? null);
+
       return nextCart;
     } catch (e) {
       console.error(e);
@@ -84,45 +94,77 @@ export function useCart() {
       inFlightRef.current = false;
       setLoading(false);
     }
-  }, []);
+  }, [session?.user?.id, status]);
 
   useEffect(() => {
+    if (status === 'loading') return;
+
+    const userId = session?.user?.id ?? null;
+    const isAuthenticated = Boolean(userId);
+
     const syncCartFromEvent = (event: Event) => {
       const customEvent = event as CustomEvent<Maybe<CartDto>>;
-      const nextCart = customEvent.detail ?? readCachedCart();
+      const nextCart = customEvent.detail ?? readCachedCart(userId);
+
       setCart(nextCart);
     };
 
     const handleStorage = (event: StorageEvent) => {
-      if (event.key === CART_CACHE_KEY) {
-        setCart(readCachedCart());
+      if (event.key === getCartCacheKey(userId)) {
+        setCart(readCachedCart(userId));
       }
     };
 
-    const t = getOrCreateGuestCartToken();
-    if (!t) {
-      setCart(readCachedCart());
-      setLoading(false);
-    } else {
-      tokenRef.current = t;
-      void fetchCart(t);
+    const guestToken = isAuthenticated
+      ? undefined
+      : getOrCreateGuestCartToken();
+
+    if (guestToken) {
+      tokenRef.current = guestToken;
+    } else if (isAuthenticated) {
+      tokenRef.current = null;
     }
 
-    window.addEventListener(CART_UPDATED_EVENT, syncCartFromEvent as EventListener);
-    window.addEventListener("storage", handleStorage);
+    setCart(readCachedCart(userId));
+
+    window.addEventListener(
+      CART_UPDATED_EVENT,
+      syncCartFromEvent as EventListener,
+    );
+    window.addEventListener('storage', handleStorage);
+
+    void fetchCart(guestToken || undefined);
 
     return () => {
-      window.removeEventListener(CART_UPDATED_EVENT, syncCartFromEvent as EventListener);
-      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener(
+        CART_UPDATED_EVENT,
+        syncCartFromEvent as EventListener,
+      );
+      window.removeEventListener('storage', handleStorage);
     };
-  }, [fetchCart]);
+  }, [fetchCart, session?.user?.id, status]);
 
   const addToCart = useCallback(async (dto: AddToCartDto) => {
-    const token = dto.token ?? tokenRef.current ?? getOrCreateGuestCartToken();
-    if (!token) return null;
+    if (status === 'loading') return null;
+
+    const isAuthenticated = Boolean(session?.user?.id);
+
+    const token = isAuthenticated
+      ? undefined
+      : dto.token ?? tokenRef.current ?? getOrCreateGuestCartToken();
+
+    if (!isAuthenticated && !token) return null;
 
     try {
-      const json = await addToCartApi({ ...dto, token });
+      const payload: AddToCartDto = isAuthenticated
+        ? {
+          productItemId: dto.productItemId,
+          quantity: dto.quantity,
+          ingredients: dto.ingredients,
+        }
+        : { ...dto, token: token ?? undefined };
+
+      const json = await addToCartApi(payload);
       const cartItem = json.cartItem;
 
       if (json.cart) {
@@ -131,16 +173,25 @@ export function useCart() {
         return cartItem;
       }
 
-      const next = cart ? ({ ...cart, items: [...cart.items, cartItem] } as CartDto) : ({ items: [cartItem] } as CartDto);
+      const next = cart
+        ? ({
+          ...cart,
+          items: [...cart.items, cartItem],
+        } as CartDto)
+        : ({
+          items: [cartItem],
+        } as CartDto);
+
       setCart(next);
       writeCachedCart(next);
 
       return cartItem;
+
     } catch (e) {
       console.error(e);
       return null;
     }
-  }, [cart]);
+  }, [cart, session, status]);
 
   const updateItem = useCallback(async (dto: UpdateCartItemDto) => {
     const safeQuantity = Math.max(1, dto.quantity || 1);
@@ -236,21 +287,26 @@ export function useCart() {
     }
   }, [fetchCart]);
   const clearCart = useCallback(async () => {
-    const token = tokenRef.current ?? getOrCreateGuestCartToken();
-    if (!token) return false;
+    const token = isAuthenticated
+      ? undefined
+      : tokenRef.current ?? getOrCreateGuestCartToken() ?? undefined;
 
-    tokenRef.current = token;
+    if (!isAuthenticated && !token) return false;
 
     try {
-      await cleanCartApi(token);
+      const result = await cleanCartApi(token);
+
+      console.log("Результат очищення кошика:", result);
+
       setCart(null);
       writeCachedCart(null);
+
       return true;
     } catch (e) {
       console.error(e);
       return false;
     }
-  }, []);
+  }, [isAuthenticated]);
   const total = useMemo(() => {
     if (!cart) return 0;
     return cart.items.reduce((s, it) => {

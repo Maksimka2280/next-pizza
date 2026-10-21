@@ -3,10 +3,12 @@ import { User } from "lucide-react";
 import { Button } from "../ui/button";
 import { LoginWindow } from "../Auth/Login";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 
 export default function CheckOutHeader() {
     const [openAuth, setOpenAuth] = useState<"login" | "register" | null>(null)
+    const { data: session, status } = useSession();
     const openLoginFunction = () => {
         setOpenAuth("login");
     }
@@ -25,9 +27,16 @@ export default function CheckOutHeader() {
                         </div>
                     </a>
                     <div className=" flex items-center gap-4 ">
-                        <Button className="text-[#FE5F00] w-[110px] h-[50px] rounded-[15px] text-[16px] font-semibold" variant="outline" onClick={openLoginFunction}>
-                            <User strokeWidth={3} /> Войти
-                        </Button>
+                        {status === 'unauthenticated' ? (
+                            <Button
+                                className="text-[#FE5F00] w-[110px] h-[50px] rounded-[15px] text-[16px] font-semibold"
+                                variant="outline"
+                                onClick={openLoginFunction}
+                            >
+                                <User strokeWidth={3} />
+                                Войти
+                            </Button>
+                        ) : null}
                     </div>
                 </div>
             </header>

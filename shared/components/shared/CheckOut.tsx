@@ -12,10 +12,11 @@ import { checkoutPersonalInfoSchema, type CheckoutPersonalInfoFormValues } from 
 import { getOrCreateGuestCartToken } from "../../lib/guestCart"
 import { guestId } from "../../lib/guestId"
 import { createOrder } from "../../service/orders"
+import { useSession } from "next-auth/react"
 
 export const Checkout = () => {
   const { cart, total, updateItem, removeItem, clearCart, loading } = useCart();
-
+  const { data: session } = useSession();
   const methods = useForm<CheckoutPersonalInfoFormValues>({
     resolver: zodResolver(checkoutPersonalInfoSchema),
     mode: 'onChange',
@@ -40,19 +41,27 @@ export const Checkout = () => {
     );
   }
 
-  const onSubmit = async (values: CheckoutPersonalInfoFormValues, totalAmount: number) => {
+  const onSubmit = async (
+    values: CheckoutPersonalInfoFormValues,
+    totalAmount: number
+  ) => {
     if (!cart?.items.length) {
-      throw new Error("Нельзя оформить заказ с пустой корзиной")
+      throw new Error("Нельзя оформить заказ с пустой корзиной");
     }
 
-    const token = cart.token ?? getOrCreateGuestCartToken() ?? guestId()
-    if (!token) {
-      throw new Error("Не удалось получить токен гостевой корзины")
+    const isAuthenticated = Boolean(session?.user?.id);
+
+    const token = isAuthenticated
+      ? cart.token
+      : cart.token ?? getOrCreateGuestCartToken() ?? guestId();
+
+    if (!isAuthenticated && !token) {
+      throw new Error("Не удалось получить токен гостевой корзины");
     }
 
     await createOrder({
-      token,
-      userId: null,
+      token: token ?? undefined,
+      userId: session?.user?.id ? Number(session.user.id) : null,
       totalAmount,
       items: cart.items,
       fullName: `${values.firstName} ${values.lastName}`.trim(),
@@ -60,8 +69,8 @@ export const Checkout = () => {
       phone: values.phone,
       address: values.address,
       comment: values.comment || null,
-    })
-  }
+    });
+  };
 
   const validateOrder = async () => {
     const formValues = methods.getValues();
