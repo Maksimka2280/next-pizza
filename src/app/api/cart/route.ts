@@ -91,30 +91,32 @@ export async function POST(req: Request) {
           },
         });
       }
-    } else {
-      if (!token) {
-        console.error('Cart request has no authenticated user or guest token');
+   } else {
+  if (!token) {
+    console.error('Cart request has no authenticated user or guest token');
 
-        return NextResponse.json(
-          { error: 'Missing guest token' },
-          { status: 400 },
-        );
-      }
+    return NextResponse.json(
+      { error: 'Missing guest token' },
+      { status: 400 },
+    );
+  }
 
-      cart = await prisma.cart.findFirst({
-        where: {
-          token,
-          userId: null,
-        },
-      });
+  cart = await prisma.cart.findFirst({
+    where: {
+      token,
+      userId: null,
+    },
+  });
 
-      if (!cart) {
-        return NextResponse.json(
-          { error: 'Guest cart not found' },
-          { status: 404 },
-        );
-      }
-    }
+  if (!cart) {
+    cart = await prisma.cart.create({
+      data: {
+        token,
+        userId: null,
+      },
+    });
+  }
+}
 
     const cartItem = await prisma.cartItem.create({
       data: {

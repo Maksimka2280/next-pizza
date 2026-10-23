@@ -2,13 +2,14 @@
 'use client';
 
 import { Button } from "../ui/button";
-import { ListOrdered, ShoppingCart, User } from "lucide-react";
+import { ListOrdered, ShoppingCart, SquareArrowRightExit, User } from "lucide-react";
 import { SearchInput } from "../SearchInput";
 import { Cart } from "../shared/Cart";
 import { useState } from "react";
 import Link from "next/link";
 import { LoginWindow } from "../Auth/Login";
 import { RegisterWindow } from "../Auth/Register";
+import { signOut } from "next-auth/react";
 
 type MainHeaderClientProps = {
     isAuthenticated: boolean;
@@ -77,7 +78,6 @@ export default function MainHeaderClient({
                                 Войти
                             </Button>
                         )}
-
                         <Button
                             variant="outline"
                             className="h-[50px] w-[50px] rounded-[15px] text-[#FE5F00]"
@@ -94,6 +94,16 @@ export default function MainHeaderClient({
                                 <ListOrdered strokeWidth={3} />
                             </Button>
                         </Link>
+                        {isAuthenticated && (
+                            <Button
+                                onClick={() => signOut({ callbackUrl: '/' })}
+                                variant="outline"
+                                className="h-[50px] w-[50px] rounded-[15px] text-[#FE5F00]"
+                            >
+                                <SquareArrowRightExit strokeWidth={3} />
+                            </Button>
+                        )}
+
                     </div>
                 </div>
             </header>
