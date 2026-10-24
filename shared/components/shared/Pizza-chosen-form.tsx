@@ -13,7 +13,8 @@ import { cn } from '../../lib/utils';
 import { getPizzaDetails } from '../../lib/getPizzaDetails';
 import { usePizzaOptions } from '../../hooks/usePizzaOptions';
 import { useCart } from '../../hooks/useCart';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   imageUrl: string;
@@ -51,6 +52,7 @@ export const ChoosePizzaForm: React.FC<Props> = ({
   } = usePizzaOptions(items)
   const { addOrIncrement } = useCart();
   const [adding, setAdding] = useState(false);
+  const router = useRouter();
   const { totalPrice, textDetaills } = getPizzaDetails(
     type,
     size,
@@ -59,34 +61,36 @@ export const ChoosePizzaForm: React.FC<Props> = ({
     selectedIngredients,
   );
 
-const handleClickAdd = async () => {
-  const itemIdToAdd = currentItemId ?? items?.[0]?.id ?? null;
-  if (!itemIdToAdd) return;
-  onClickAddCart?.();
-  setAdding(true);
-  try {
-    await toast.promise(
-      addOrIncrement({
-        productItemId: itemIdToAdd,
-        quantity: 1,
-        ingredients: Array.from(selectedIngredients),
-      }),
-      {
-        loading: "Додаємо...",
-        success: "Замовлення успішно додано до кошика",
-        error: "Не вдалося додати товар до кошика",
-      }
-    );
-  } catch (e) {
-    console.error("addOrIncrement failed", e);
-  } finally {
-    setAdding(false);
-  }
-};
+  const handleClickAdd = async () => {
+    const itemIdToAdd = currentItemId ?? items?.[0]?.id ?? null;
+    if (!itemIdToAdd) return;
+    onClickAddCart?.();
+    setAdding(true);
+    try {
+      await toast.promise(
+        addOrIncrement({
+          productItemId: itemIdToAdd,
+          quantity: 1,
+          ingredients: Array.from(selectedIngredients),
+        }),
+        {
+          loading: "Додаємо...",
+          success: "Замовлення успішно додано до кошика",
+          error: "Не вдалося додати товар до кошика",
+        }
+      );
+    } catch (e) {
+      console.error("addOrIncrement failed", e);
+    } finally {
+      setAdding(false);
+    }
+  };
   const finalPrice = price + totalPrice;
 
   return (
+
     <div className={cn(className, 'flex flex-1')}>
+
       <div className="w-1/2 flex items-center justify-center bg-white ">
         <PizzaImage imageUrl={imageUrl} size={size} className="w-full h-full" />
       </div>
@@ -140,6 +144,16 @@ const handleClickAdd = async () => {
         </Button>
 
         <Toaster position="top-center" />
+      </div>
+      <div className={cn(className, "relative flex flex-1")}>
+        <button
+          type="button"
+          onClick={() => router.back()}
+          aria-label="Закрити вікно"
+          className="absolute right-3 top-2 z-50 flex h-10 w-10 text-[#7C7C7C] hover:text-black items-center justify-center rounded-full transition "
+        >
+          <X size={25} />
+        </button>
       </div>
     </div>
   );

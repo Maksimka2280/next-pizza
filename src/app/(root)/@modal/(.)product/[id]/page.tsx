@@ -35,7 +35,6 @@ export default async function ProductModalPage({
       <div className="max-w-[1000px] w-full h-[580px] bg-[#F4F1EE] rounded-[30px] overflow-hidden">
 
         <div className="flex h-full">
-
           <ChoosePizzaForm
             name={productName}
             imageUrl={productImage}
