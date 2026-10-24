@@ -1,85 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { Skeleton } from "../ui/skeleton";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Button } from "../ui/button";
-import { useCart } from "../../hooks/useCart";
-import {
-  filterProducts,
-  parseProductFilters,
-  type ProductResponse,
-} from "./productFilters";
 import { Toaster } from "react-hot-toast";
-import { Api } from "../../service/api-clients";
 import ProductCartAction from "./ProductCartAction";
+import { useCardFilters } from "../../hooks/useCardFilters";
 
 export default function CartProducts() {
-  const searchParams = useSearchParams();
-  const filters = useMemo(() => parseProductFilters(searchParams), [searchParams]);
-  const [products, setProducts] = useState<ProductResponse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const itemsPerPage = 8;
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await Api.products.getAll();
-        setProducts(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [products.length]);
-
-  const filteredProducts = useMemo(() => filterProducts(products, filters), [products, filters]);
-
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [filteredProducts.length]);
-
-  useEffect(() => {
-    if (!isTransitioning) return;
-
-    const timer = window.setTimeout(() => setIsTransitioning(false), 220);
-    return () => window.clearTimeout(timer);
-  }, [isTransitioning]);
-
-  const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
-
-  const visibleProducts = useMemo(() => {
-    const startIndex = currentPage * itemsPerPage;
-    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-  }, [currentPage, filteredProducts]);
-
-  const groupedVisibleProducts = useMemo(() => {
-    const groups = new Map<string, ProductResponse[]>();
-
-    visibleProducts.forEach((product) => {
-      const categoryName = product.category?.name?.trim() || "Другие";
-      const current = groups.get(categoryName) ?? [];
-      current.push(product);
-      groups.set(categoryName, current);
-    });
-
-    return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b, "ru"));
-  }, [visibleProducts]);
-
-  const clearFilters = () => {
-    const params = new URLSearchParams();
-    window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
-  };
+  const { 
+    loading,
+    groupedVisibleProducts,
+    filters,
+    clearFilters,
+    pageCount,
+    setIsTransitioning,
+    setCurrentPage,
+    isTransitioning,
+    currentPage } = useCardFilters()
   return (
     <div className="flex flex-col gap-[30px] cursor-pointer">
       {loading ? (

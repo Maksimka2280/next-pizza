@@ -7,7 +7,7 @@ import MainFilters from "../../../shared/components/main-page/main-filters/main-
 import CartProducts from "../../../shared/components/Products/Cart-products";
 import { Title } from "../../../shared/components/shared/Title";
 
-export default function Dashboard() {
+export default function Page() {
   return (
     <main className="w-full flex justify-center">
       <div className="w-full max-w-[1440px] py-[40px]">

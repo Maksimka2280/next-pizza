@@ -72,55 +72,59 @@ export const useLoginForm = ({ onRegister, onClose }: { onRegister?: () => void;
         }
     };
     const handleVerifyCode = async () => {
-    const data = getValues();
+        const data = getValues();
 
-    const isValid = await trigger(["Email", "Password"]);
+        const isValid = await trigger(["Email", "Password"]);
 
-    if (!isValid) {
-        toast.error("Пожалуйста, заполните все поля");
-        return;
-    }
-
-    if (!isCodeSent) {
-        toast.error("Сначала отправьте код на почту");
-        return;
-    }
-
-    if (!code || !/^\d{4}$/.test(code)) {
-        toast.error("Код має містити 4 цифри");
-        return;
-    }
-
-    setIsVerifyingCode(true);
-
-    try {
-        const isValidCode = await verifyEmailCode(data.Email, code);
-
-        if (!isValidCode) {
-            toast.error("Неверный код");
+        if (!isValid) {
+            toast.error("Пожалуйста, заполните все поля");
             return;
         }
 
-        const result = await signIn("credentials", {
-            email: data.Email,
-            password: data.Password,
-            redirect: false,
-        });
-
-        if (!result || result.error || !result.ok) {
-            toast.error("Код підтверджено, але не вдалося створити сесію");
+        if (!isCodeSent) {
+            toast.error("Сначала отправьте код на почту");
             return;
         }
 
-        setIsEmailVerified(true);
-        toast.success("Email подтверждён, вы вошли в аккаунт");
-    } catch (error) {
-        console.error(error);
-        toast.error("Не удалось подтвердить код или войти");
-    } finally {
-        setIsVerifyingCode(false);
-    }
-};
+        if (!code || !/^\d{4}$/.test(code)) {
+            toast.error("Код має містити 4 цифри");
+            return;
+        }
+
+        setIsVerifyingCode(true);
+
+        try {
+            const isValidCode = await verifyEmailCode(data.Email, code);
+
+            if (!isValidCode) {
+                toast.error("Неверный код");
+                return;
+            }
+
+            const result = await signIn("credentials", {
+                email: data.Email,
+                password: data.Password,
+                redirect: false,
+                callbackUrl: "/",
+            });
+
+
+            if (!result || result.error || !result.ok) {
+                toast.error("Код підтверджено, але не вдалося створити сесію");
+                return;
+            }
+
+            setIsEmailVerified(true);
+            toast.success("Email подтверждён, вы вошли в аккаунт");
+            onClose?.();
+            window.location.href = "/";
+        } catch (error) {
+            console.error(error);
+            toast.error("Не удалось подтвердить код или войти");
+        } finally {
+            setIsVerifyingCode(false);
+        }
+    };
     return {
         form,
         register,
