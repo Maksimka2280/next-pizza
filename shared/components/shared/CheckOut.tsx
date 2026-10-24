@@ -72,40 +72,12 @@ export const Checkout = () => {
     });
   };
 
+
   const validateOrder = async () => {
-    const formValues = methods.getValues();
-    const parsed = checkoutPersonalInfoSchema.safeParse(formValues);
+    const isValid = await methods.trigger();
 
-    if (!parsed.success) {
-      const fieldErrors = parsed.error.flatten().fieldErrors;
-
-      (Object.keys(fieldErrors) as Array<keyof CheckoutPersonalInfoFormValues>).forEach((field) => {
-        const message = fieldErrors[field]?.[0];
-        if (message) {
-          methods.setError(field, { type: 'manual', message });
-        }
-      });
-
-      (Object.keys({
-        firstName: true,
-        lastName: true,
-        email: true,
-        phone: true,
-        address: true,
-        comment: true,
-        deliveryTime: true,
-      }) as Array<keyof CheckoutPersonalInfoFormValues>).forEach((field) => {
-        if (!fieldErrors[field]) {
-          methods.clearErrors(field);
-        }
-      });
-
-      return false;
-    }
-
-    methods.clearErrors();
-    return true;
-  }
+    return isValid;
+  };
 
   const submitOrder = async () => {
     const values = methods.getValues()

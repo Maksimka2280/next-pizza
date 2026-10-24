@@ -1,15 +1,23 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, useFormContext, useFormState } from "react-hook-form";
 import { Toaster } from "react-hot-toast";
 import { Title } from "./Title";
 import { CheckoutField } from "../CheckOutComponents/CheckoutField";
 import { Timer } from "lucide-react";
+import { CheckoutPersonalInfoFormValues } from "../CheckOutComponents/CheckoutValidate";
 
 export const CheckoutAddressForm = () => {
-    const methods = useFormContext();
-
+    const methods = useFormContext<CheckoutPersonalInfoFormValues>();
+    const { control } = methods;
+    const { errors } = useFormState({
+        control,
+        name: ["address", "deliveryTime"],
+        exact: true,
+    });
+    const addressError = errors.address?.message;
+    // const deliveryTimeError = errors.deliveryTime?.message;
     const formatTimeValue = (value: string) => {
         const digits = value.replace(/\D/g, "").slice(0, 4);
 
@@ -18,24 +26,15 @@ export const CheckoutAddressForm = () => {
     };
 
     const [showSuggestions, setShowSuggestions] = useState(false);
+
     const addressRef = useRef<HTMLUListElement | null>(null);
     const addressContainerRef = useRef<HTMLDivElement | null>(null);
+
     const addressValue = (methods.watch("address") ?? "") as string;
-    const deliveryTimeValue = (methods.watch("deliveryTime") ?? "") as string;
-
-    const filteredSuggestions = addressValue.trim() ? [addressValue.trim()] : [];
-
-    useEffect(() => {
-        const handleDocClick = (e: MouseEvent) => {
-            const target = e.target as Node;
-            if (showSuggestions && addressContainerRef.current && !addressContainerRef.current.contains(target)) {
-                setShowSuggestions(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleDocClick);
-        return () => document.removeEventListener("mousedown", handleDocClick);
-    }, [showSuggestions]);
+    // const deliveryTimeValue = (methods.watch("deliveryTime") ?? "") as string;
+    const filteredSuggestions = addressValue.trim()
+        ? [addressValue.trim()]
+        : [];
 
     return (
         <div className="w-full max-w-[750px] rounded-[30px] bg-white px-[30px] py-[30px]">
@@ -52,9 +51,11 @@ export const CheckoutAddressForm = () => {
                                 {...field}
                                 value={field.value ?? ""}
                                 placeholder="Например: Москва, ул. Мира 12"
-                                aria-invalid={Boolean(methods.formState.errors.address)}
-                                aria-describedby={methods.formState.errors.address ? "address-error" : undefined}
-                                className={`h-[48px] w-full rounded-[10px] border bg-transparent px-[18px] text-[16px] text-[#1F1F1F] outline-none transition-all ${methods.formState.errors.address ? "border-[#FF4D4F] shadow-[0_0_0_1px_rgba(255,77,79,0.35)]" : "border-[#E7E7E7] focus:border-[#FF7A00]"
+                                aria-invalid={Boolean(addressError)}
+                                aria-describedby={addressError ? "address-error" : undefined}
+                                className={`h-[48px] w-full rounded-[10px] border bg-transparent px-[18px] text-[16px] text-[#1F1F1F] outline-none transition-all ${addressError
+                                    ? "border-[#FF4D4F] shadow-[0_0_0_1px_rgba(255,77,79,0.35)]"
+                                    : "border-[#E7E7E7] focus:border-[#FF7A00]"
                                     }`}
                                 onFocus={() => setShowSuggestions(true)}
                                 onClick={() => setShowSuggestions(true)}
@@ -62,9 +63,13 @@ export const CheckoutAddressForm = () => {
                             />
                         )}
                     />
-                    {methods.formState.errors.address && (
-                        <span id="address-error" className="text-[14px] font-medium text-[#FF4D4F] mt-[8px] block">
-                            {String(methods.formState.errors.address.message)}
+
+                    {addressError && (
+                        <span
+                            id="address-error"
+                            className="mt-[8px] block text-[14px] font-medium text-[#FF4D4F]"
+                        >
+                            {String(addressError)}
                         </span>
                     )}
 
@@ -97,7 +102,10 @@ export const CheckoutAddressForm = () => {
                 <div className="mt-[20px]">
                     <label className="text-[14px] font-bold text-[#212121]">Время доставки</label>
                     <div className="relative mt-[8px]">
-                        <div className="flex items-center gap-[10px] h-[48px] w-full rounded-[10px] border border-[#E7E7E7] bg-transparent px-[18px] transition-all focus-within:border-[#FF7A00]">
+                        <div className={`flex items-center gap-[10px] h-[48px] w-full rounded-[10px] border border-[#E7E7E7] bg-transparent px-[18px] transition-all focus-within:border-[#FF7A00] ${addressError
+                            ? "border-[#FF4D4F] shadow-[0_0_0_1px_rgba(255,77,79,0.35)]"
+                            : "border-[#E7E7E7] focus:border-[#FF7A00]"
+                            }`}>
                             <Timer size={20} className="text-[#212121]" />
                             <Controller
                                 control={methods.control}
@@ -111,14 +119,14 @@ export const CheckoutAddressForm = () => {
                                         placeholder="Например: 18:30"
                                         value={field.value ?? ""}
                                         onChange={(event) => field.onChange(formatTimeValue(event.target.value))}
-                                        className="h-full w-full border-0 bg-transparent text-[16px] text-[#1F1F1F] outline-none placeholder:text-[#A7A7A7]"
+                                        className={`h-full w-full border-0 bg-transparent text-[16px] text-[#1F1F1F] outline-none placeholder:text-[#A7A7A7] `}
                                     />
                                 )}
                             />
                         </div>
-                        {methods.formState.errors.deliveryTime && (
+                        {addressError && (
                             <span id="deliveryTime-error" className="text-[14px] font-medium text-[#FF4D4F] mt-[8px] block">
-                                {String(methods.formState.errors.deliveryTime.message)}
+                                {String(addressError)}
                             </span>
                         )}
                     </div>
