@@ -5,7 +5,7 @@ import CheckOutHeader from "../../../shared/components/headers/checkout-header";
 
 
 export const metadata: Metadata = {
-    title: "checkout",
+    title: "Next-Pizza - страница оплаты",
 };
 
 export default function DashboardLayout({
