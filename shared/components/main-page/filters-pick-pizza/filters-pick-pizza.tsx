@@ -3,13 +3,8 @@ import { ArrowDownUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Api } from "../../../service/api-clients";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
+
 export default function PizzaPick() {
     const searchParams = useSearchParams();
     const pathname = usePathname();

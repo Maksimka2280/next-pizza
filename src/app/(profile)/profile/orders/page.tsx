@@ -1,4 +1,5 @@
-import { OrdersPage } from "../../../../shared/components/shared/OrdersPage";
+import { OrdersPage } from "../../../../../shared/components/shared/OrdersPage";
+
 
 export default function Orders() {
     return (

@@ -9,7 +9,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { LoginWindow } from "../Auth/Login";
 import { RegisterWindow } from "../Auth/Register";
-import { signOut } from "next-auth/react";
 
 type MainHeaderClientProps = {
     isAuthenticated: boolean;
@@ -68,6 +67,17 @@ export default function MainHeaderClient({
                     </div>
 
                     <div className="flex shrink-0 items-center gap-4">
+                        {isAuthenticated && (
+                            <Link href={'/profile'}>
+                                <Button
+                                    variant="outline"
+                                    className="h-[50px] w-[130px] rounded-[15px] text-[15px] font-semibold text-[#FE5F00]"
+                                >
+                                    <User className="size-[18px] stroke-[2.5px]" />
+                                    Профиль
+                                </Button>
+                            </Link>
+                        )}
                         {!isAuthenticated && (
                             <Button
                                 className="h-[50px] w-[110px] rounded-[15px] text-[16px] font-semibold text-[#FE5F00]"
@@ -86,23 +96,8 @@ export default function MainHeaderClient({
                             <ShoppingCart strokeWidth={3} />
                         </Button>
 
-                        <Link href="/orders">
-                            <Button
-                                variant="outline"
-                                className="h-[50px] w-[50px] rounded-[15px] text-[#FE5F00]"
-                            >
-                                <ListOrdered strokeWidth={3} />
-                            </Button>
-                        </Link>
-                        {isAuthenticated && (
-                            <Button
-                                onClick={() => signOut({ callbackUrl: '/' })}
-                                variant="outline"
-                                className="h-[50px] w-[50px] rounded-[15px] text-[#FE5F00]"
-                            >
-                                <SquareArrowRightExit strokeWidth={3} />
-                            </Button>
-                        )}
+
+                        
 
                     </div>
                 </div>
