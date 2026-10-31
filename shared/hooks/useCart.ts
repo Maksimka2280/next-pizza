@@ -296,8 +296,6 @@ export function useCart() {
     try {
       const result = await cleanCartApi(token);
 
-      console.log("Результат очищення кошика:", result);
-
       setCart(null);
       writeCachedCart(null);
 

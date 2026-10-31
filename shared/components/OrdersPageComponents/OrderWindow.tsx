@@ -14,57 +14,60 @@ const orderStatusLabels: Record<string, string> = {
     SUCCEEDED: "Оплачено",
     CANCELLED: "Отменено",
 };
+interface OrdersWindowProps {
+    token?: string;
+}
 
-export function OrdersWindow() {
+export function OrdersWindow({ token }: OrdersWindowProps) {
     const [orders, setOrders] = useState<OrderDto[]>([]);
     const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { data: session, status } = useSession();
- useEffect(() => {
-    let isMounted = true;
-    if (status === "loading") return;
-    const loadOrders = async () => {
-        try {
-            let customerOrders;
+    useEffect(() => {
+        let isMounted = true;
+        if (status === "loading") return;
+        const loadOrders = async () => {
+            try {
+                let customerOrders;
 
-            if (session?.user?.id) {
-                customerOrders = await getOrders();
-            } else {
-                const token = getOrCreateGuestCartToken();
+                // if (session?.user?.id) {
+                //     customerOrders = await getOrders();
+                // } else {
+                //     const token = getOrCreateGuestCartToken();
 
-                if (!token) {
-                    throw new Error("Не вдалося отримати токен кошика");
-                }
+                //     if (!token) {
+                //         throw new Error("Не вдалося отримати токен кошика");
+                //     }
 
+                //     customerOrders = await getOrders(token);
+                // }
                 customerOrders = await getOrders(token);
+                if (isMounted) {
+                    setOrders(customerOrders);
+                    setExpandedOrders(
+                        new Set(customerOrders.map((order) => order.id))
+                    );
+                }
+            } catch (loadError) {
+                console.error("Не удалось загрузить заказы:", loadError);
+
+                if (isMounted) {
+                    setError(
+                        "Не удалось загрузить заказы. Попробуйте обновить страницу."
+                    );
+                }
+            } finally {
+                if (isMounted) setIsLoading(false);
             }
+        };
 
-            if (isMounted) {
-                setOrders(customerOrders);
-                setExpandedOrders(
-                    new Set(customerOrders.map((order) => order.id))
-                );
-            }
-        } catch (loadError) {
-            console.error("Не удалось загрузить заказы:", loadError);
+        void loadOrders();
 
-            if (isMounted) {
-                setError(
-                    "Не удалось загрузить заказы. Попробуйте обновить страницу."
-                );
-            }
-        } finally {
-            if (isMounted) setIsLoading(false);
-        }
-    };
-
-    void loadOrders();
-
-    return () => {
-        isMounted = false;
-    };
-}, [session, status]);
+        return () => {
+            isMounted = false;
+        };
+    }, [token, session, status]);
 
     return (
         <div className="max-w-[750px] space-y-5 mt-[40px]">

@@ -5,35 +5,37 @@ import { authOptions } from "@/auth";
 
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (session?.user?.id) {
-      const userId = Number(session.user.id);
+    const token = new URL(req.url).searchParams.get("token");
 
-      if (!Number.isSafeInteger(userId) || userId <= 0) {
-        return NextResponse.json(
-          { error: "Invalid user ID" },
-          { status: 401 }
-        );
-      }
-
+    if (token) {
       const orders = await prisma.order.findMany({
-        where: { userId },
+        where: { token, userId: null },
         orderBy: { createdAt: "desc" },
       });
 
       return NextResponse.json(orders);
     }
-    const token = new URL(req.url).searchParams.get("token");
 
-    if (!token) {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "Missing order token" },
-        { status: 400 }
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const userId = Number(session.user.id);
+
+    if (!Number.isSafeInteger(userId) || userId <= 0) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 401 }
       );
     }
 
     const orders = await prisma.order.findMany({
-      where: { token, userId: null },
+      
       orderBy: { createdAt: "desc" },
     });
 
@@ -50,25 +52,17 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    const session = await getServerSession(authOptions);
+
+
+
     const body = await req.json();
-
-    if (
-      !body.token ||
-      !Number.isInteger(body.totalAmount) ||
-      !Array.isArray(body.items) ||
-      body.items.length === 0 ||
-      !body.fullName ||
-      !body.email ||
-      !body.phone ||
-      !body.address
-    ) {
-      return NextResponse.json({ error: "Invalid order data" }, { status: 400 });
-    }
-
     const order = await prisma.order.create({
       data: {
         token: body.token,
-        userId: body.userId ?? null,
+        userId: session?.user?.id
+          ? Number(session.user.id)
+          : null,
         totalAmount: body.totalAmount,
         status: "PENDING",
         paymentId: null,
@@ -84,6 +78,9 @@ export async function POST(req: Request) {
     return NextResponse.json(order);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create order" },
+      { status: 500 }
+    );
   }
 }

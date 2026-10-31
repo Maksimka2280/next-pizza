@@ -9,10 +9,11 @@ import { Button } from '../ui/button';
 import { checkoutPaymentSchema } from '../CheckOutComponents/CheckoutValidate';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../../hooks/useCart';
+import { OrderDto } from '../../types/cart.dto';
 
 type CheckoutPaymentFormProps = {
     total: number;
-    onConfirm: () => Promise<void>;
+    onConfirm: () => Promise<OrderDto>;
     onClose: () => void;
 };
 
@@ -33,10 +34,10 @@ export const CheckoutPaymentForm = ({ total, onConfirm, onClose }: CheckoutPayme
     });
     const submitPayment = async () => {
         try {
-            await onConfirm();
+            const order = await onConfirm();
             onClose();
-            router.push('/orders');
             effectiveClear();
+            router.push(`/order/${order.token}`);
             toast.success('Заказ оформлен. Это тестовая оплата.');
         } catch {
             toast.error('Не удалось оформить заказ');

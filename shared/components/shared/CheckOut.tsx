@@ -55,11 +55,13 @@ export const Checkout = () => {
       ? cart.token
       : cart.token ?? getOrCreateGuestCartToken() ?? guestId();
 
+console.log("ORDER TOKEN:", token);
+console.log("GUEST TOKEN:", getOrCreateGuestCartToken());
     if (!isAuthenticated && !token) {
       throw new Error("Не удалось получить токен гостевой корзины");
     }
 
-    await createOrder({
+    const result = await createOrder({
       token: token ?? undefined,
       userId: session?.user?.id ? Number(session.user.id) : null,
       totalAmount,
@@ -70,19 +72,20 @@ export const Checkout = () => {
       address: values.address,
       comment: values.comment || null,
     });
+    return result;
   };
 
 
   const validateOrder = async () => {
     const isValid = await methods.trigger();
-
     return isValid;
   };
 
   const submitOrder = async () => {
-    const values = methods.getValues()
-    await onSubmit(values, total)
-  }
+    const values = methods.getValues();
+    const result = await onSubmit(values, total);
+    return result;
+  };
 
   return (
     <FormProvider {...methods}>

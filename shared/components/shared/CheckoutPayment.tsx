@@ -2,11 +2,12 @@
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import { CheckoutPaymentForm } from './CheckoutPaymentForm';
+import { OrderDto } from '../../types/cart.dto';
 
 type Props = {
     sum: number;
     validateOrder: () => Promise<boolean>;
-    onSubmit: () => Promise<void>;
+    onSubmit: () => Promise<OrderDto>;
 };
 
 export const CheckoutPayment = ({ sum, validateOrder, onSubmit }: Props) => {

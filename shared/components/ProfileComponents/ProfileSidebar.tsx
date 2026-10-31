@@ -58,55 +58,54 @@ export function ProfileSidebar() {
                                 {menuItems.map((item) => {
                                     const isActive = pathname === item.url;
 
-                                  return (
-    <SidebarMenuItem key={item.url ?? item.title}>
-        <SidebarMenuButton
-            
-            isActive={isActive}
-            tooltip={item.title}
-            className={`h-[48px] min-h-[48px] rounded-[12px] px-4 py-3 text-[16px] text-[#707070]
+                                    return (
+                                        <SidebarMenuItem key={item.url ?? item.title}>
+                                            <SidebarMenuButton
+
+                                                isActive={isActive}
+                                                tooltip={item.title}
+                                                className={`h-[48px] min-h-[48px] rounded-[12px] px-4 py-3 text-[16px] text-[#707070]
                 group-data-[collapsible=icon]:!size-[48px]
                 group-data-[collapsible=icon]:!min-h-[48px]
                 group-data-[collapsible=icon]:!p-0
                 group-data-[collapsible=icon]:!mx-auto
                 group-data-[collapsible=icon]:justify-center
-                ${
-                    isActive
-                        ? "!bg-[#FFF0E7] !text-[#FF6900] hover:!bg-[#FFF0E7] hover:!text-[#FF6900]"
-                        : "hover:bg-[#FFF0E7] hover:text-[#FF6900]"
-                }`}
-        >
-            {item.onClick ? (
-                <button
-                    type="button"
-                    onClick={item.onClick}
-                    className="flex w-full items-center gap-[10px]"
-                >
-                    <span className="flex shrink-0 items-center justify-center [&_svg]:size-[22px] [&_svg]:stroke-[2.5px]">
-                        {item.img}
-                    </span>
+                ${isActive
+                                                        ? "!bg-[#FFF0E7] !text-[#FF6900] hover:!bg-[#FFF0E7] hover:!text-[#FF6900]"
+                                                        : "hover:bg-[#FFF0E7] hover:text-[#FF6900]"
+                                                    }`}
+                                            >
+                                                {item.onClick ? (
+                                                    <button
+                                                        type="button"
+                                                        onClick={item.onClick}
+                                                        className="flex w-full items-center gap-[10px]"
+                                                    >
+                                                        <span className="flex shrink-0 items-center justify-center [&_svg]:size-[22px] [&_svg]:stroke-[2.5px]">
+                                                            {item.img}
+                                                        </span>
 
-                    <span className="truncate text-[15px] font-semibold group-data-[collapsible=icon]:hidden">
-                        {item.title}
-                    </span>
-                </button>
-            ) : (
-                <Link
-                    href={item.url!}
-                    className="flex items-center gap-[10px]"
-                >
-                    <span className="flex shrink-0 items-center justify-center [&_svg]:size-[22px] [&_svg]:stroke-[2.5px]">
-                        {item.img}
-                    </span>
+                                                        <span className="truncate text-[15px] font-semibold group-data-[collapsible=icon]:hidden">
+                                                            {item.title}
+                                                        </span>
+                                                    </button>
+                                                ) : (
+                                                    <Link
+                                                        href={item.url!}
+                                                        className="flex items-center gap-[10px]"
+                                                    >
+                                                        <span className="flex shrink-0 items-center justify-center [&_svg]:size-[22px] [&_svg]:stroke-[2.5px]">
+                                                            {item.img}
+                                                        </span>
 
-                    <span className="truncate text-[15px] font-semibold group-data-[collapsible=icon]:hidden">
-                        {item.title}
-                    </span>
-                </Link>
-            )}
-        </SidebarMenuButton>
-    </SidebarMenuItem>
-);
+                                                        <span className="truncate text-[15px] font-semibold group-data-[collapsible=icon]:hidden">
+                                                            {item.title}
+                                                        </span>
+                                                    </Link>
+                                                )}
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    );
                                 })}
                             </SidebarMenu>
                         </SidebarGroupContent>

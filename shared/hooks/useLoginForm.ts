@@ -107,8 +107,6 @@ export const useLoginForm = ({ onRegister, onClose }: { onRegister?: () => void;
                 redirect: false,
                 callbackUrl: "/",
             });
-
-
             if (!result || result.error || !result.ok) {
                 toast.error("Код підтверджено, але не вдалося створити сесію");
                 return;
