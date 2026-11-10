@@ -156,7 +156,7 @@ export const useRegisterForm = (onClose?: () => void) => {
             onClose?.();
         } catch (error) {
             console.error(error);
-            toast.error("Не вдалося завершити реєстрацію");
+            toast.error("Не удалось завершить регистрацию");
         } finally {
             setIsRegistering(false);
         }
@@ -182,5 +182,4 @@ export const useRegisterForm = (onClose?: () => void) => {
         handleRegister,
     };
 };
-
 

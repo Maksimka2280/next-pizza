@@ -35,7 +35,7 @@ export const getVariantLabel = (value: number | string): string => {
     return MapNuggetsCount[normalized as keyof typeof MapNuggetsCount];
   }
 
-  if (normalized === 1) return 'Міні';
+  if (normalized === 1) return 'Мини';
   if (normalized === 2) return 'Стандарт';
   if (normalized === 3) return 'XL';
 

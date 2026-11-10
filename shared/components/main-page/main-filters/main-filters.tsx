@@ -4,12 +4,15 @@ import { Button } from "../../../components/ui/button";
 import { Checkbox } from "../../../components/ui/checkbox";
 import CustomInput from "../../../components/ui/CustomInput";
 import { Radio } from "../../../components/ui/Radio";
-import { useIngredients } from "../../../hooks/use-ingredients";
+import type { Ingredient } from "@prisma/client";
 import { useProductFilters } from "../../../hooks/use-product-filters";
 import { usePathname, useRouter } from 'next/navigation'
 
-export default function MainFilters() {
-  const { ingredients, loading } = useIngredients();
+export default function MainFilters({
+  ingredients,
+}: {
+  ingredients: Pick<Ingredient, "id" | "name">[];
+}) {
   const {
     pendingMinPrice,
     setPendingMinPrice,
@@ -87,7 +90,7 @@ export default function MainFilters() {
           limit={6}
           defaultItems={items.slice(0, 6)}
           items={items}
-          loading={loading}
+          loading={false}
           onClickCheckbox={toggleIngredient}
           selected={pendingIngredientIds}
         />

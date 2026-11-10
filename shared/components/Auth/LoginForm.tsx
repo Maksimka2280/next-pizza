@@ -90,19 +90,19 @@ export const LoginForm = ({ onRegister, onClose }: Props) => {
                         disabled={isSendingCode}
                         className="mt-4 rounded-[18px] bg-[#FE5F00] py-[15px] text-[16px] font-extrabold text-white transition-opacity disabled:opacity-70"
                     >
-                        {isSendingCode ? 'Надсилаємо код...' : 'Надіслати код'}
+                        {isSendingCode ? 'Отправляем код...' : 'Отправить код'}
                     </Button>)
 
                     }
                 </form>
-                <button type="button" onClick={doYouRegister} className='text-[#7C7C7C]'> Немає акаунта? </button>
+                <button type="button" onClick={doYouRegister} className='text-[#7C7C7C]'> Нет аккаунта? </button>
                 {open && (
                     <Button
                         type="button"
                         onClick={onRegister}
                         className="rounded-[18px] bg-[#FE5F00] py-[15px] text-[16px] font-extrabold text-white disabled:opacity-70"
                     >
-                        Зареєструватися
+                        Зарегистрироваться
                     </Button>
                 )}
 

@@ -45,16 +45,16 @@ export function ProfileSidebar() {
     return (
         <div>
 
-            <Sidebar className="mt-[150px]" collapsible="icon">
+            <Sidebar className="mt-[150px] " collapsible="icon" >
 
-                <SidebarContent className="p-[10px] group-data-[collapsible=icon]:p-0">
+                <SidebarContent className="p-[10px] group-data-[collapsible=icon]:p-0 bg-[#F4F1EE]">
 
                     <div className="flex justify-end group-data-[collapsible=icon]:justify-center text-[#707070]">
                         <SidebarTrigger />
                     </div>
                     <SidebarGroup>
                         <SidebarGroupContent>
-                            <SidebarMenu className="gap-[20px] group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:items-center rounded-[15px] border p-[10px] group-data-[collapsible=icon]:p-[4px] group-data-[collapsible=icon]:border-none">
+                            <SidebarMenu className="gap-[20px] group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:items-center rounded-[15px] border-[2px] border-[#e4e4e4] p-[10px] group-data-[collapsible=icon]:p-[4px] group-data-[collapsible=icon]:border-none">
                                 {menuItems.map((item) => {
                                     const isActive = pathname === item.url;
 
@@ -79,7 +79,7 @@ export function ProfileSidebar() {
                                                     <button
                                                         type="button"
                                                         onClick={item.onClick}
-                                                        className="flex w-full items-center gap-[10px]"
+                                                        className="flex items-center gap-[10px] "
                                                     >
                                                         <span className="flex shrink-0 items-center justify-center [&_svg]:size-[22px] [&_svg]:stroke-[2.5px]">
                                                             {item.img}

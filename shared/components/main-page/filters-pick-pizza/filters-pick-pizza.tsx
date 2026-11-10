@@ -1,32 +1,15 @@
 'use client'
 import { ArrowDownUp } from "lucide-react";
-import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Api } from "../../../service/api-clients";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
 
-export default function PizzaPick() {
+export default function PizzaPick({ categories }: { categories: string[] }) {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const router = useRouter();
     const categoryQuery = searchParams.get("category") ?? "";
     const selected = categoryQuery || "Все";
-    const [categories, setCategories] = useState<string[]>(["Все"]);
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const data = await Api.categories.getAll();
-                if (Array.isArray(data)) {
-                    setCategories(["Все", ...data]);
-                }
-            } catch (error) {
-                console.error("Failed to load categories", error);
-            }
-        };
-
-        fetchCategories();
-    }, []);
+    const categoryOptions = ["Все", ...categories];
     const onCategoryClick = (item: string) => {
         const params = new URLSearchParams(searchParams.toString());
         if (item === "Все") {
@@ -61,7 +44,7 @@ export default function PizzaPick() {
         <div className="flex items-center justify-between">
             <div className="w-full max-w-[700px] h-[55px] rounded-[15px] bg-[#FAFAFA] flex items-center justify-center">
                 <ul className="flex w-full items-center justify-between px-[25px]">
-                    {categories.map((item) => (
+                    {categoryOptions.map((item) => (
                         <li
                             key={item}
                             onClick={() => onCategoryClick(item)}

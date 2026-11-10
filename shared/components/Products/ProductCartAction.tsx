@@ -52,7 +52,7 @@ export default function ProductCartAction({
           );
         }}
       >
-        + додати
+        + добавить
       </button>
     );
   }

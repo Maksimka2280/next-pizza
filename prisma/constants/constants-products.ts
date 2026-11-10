@@ -17,7 +17,7 @@
     name: 'Кофе Латте',
     category: 'Завтрак',
     imageUrl: 'https://media.dodostatic.net/image/r:292x292/11EE7D61B0C26A3F85D97A78FEEE00AD.webp',
-    ingredients: ['Ванільний сироп', 'Карамельний сироп', 'М’ята'],
+    ingredients: ['Ванильный сироп', 'Карамельный сироп', 'Мята'],
     variants: [
       { price: 89, size: 200 },
       { price: 109, size: 300 },
@@ -70,7 +70,7 @@
     name: 'Банановый молочный коктейль',
     category: 'Коктейли',
     imageUrl: 'https://media.dodostatic.net/image/r:292x292/11EEE20B8772A72A9B60CFB20012C185.webp',
-    ingredients: ['Бананове пюре', 'Ванільний сироп', 'Льодяна крихта'],
+    ingredients: ['Банановое пюре', 'Ванильный сироп', 'Ледяная крошка'],
     variants: [
       { price: 149, size: 300 },
       { price: 189, size: 500 },
@@ -80,7 +80,7 @@
     name: 'Карамельное яблоко молочный коктейль',
     category: 'Коктейли',
     imageUrl: 'https://media.dodostatic.net/image/r:292x292/11EE79702E2A22E693D96133906FB1B8.webp',
-    ingredients: ['Карамельний сироп', 'Лимонний сироп', 'Льодяна крихта'],
+    ingredients: ['Карамельный сироп', 'Лимонный сироп', 'Ледяная крошка'],
     variants: [
       { price: 149, size: 300 },
       { price: 189, size: 500 },
@@ -90,7 +90,7 @@
     name: 'Молочный коктейль с печеньем Орео',
     category: 'Коктейли',
     imageUrl: 'https://media.dodostatic.net/image/r:292x292/11EE796FA1F50F8F8111A399E4C1A1E3.webp',
-    ingredients: ['Шоколадний сироп', 'Кокосова стружка', 'М’ята'],
+    ingredients: ['Шоколадный сироп', 'Кокосовая стружка', 'Мята'],
     variants: [
       { price: 159, size: 300 },
       { price: 199, size: 500 },
@@ -100,7 +100,7 @@
     name: 'Классический молочный коктейль 👶',
     category: 'Коктейли',
     imageUrl: 'https://media.dodostatic.net/image/r:292x292/11EE796F93FB126693F96CB1D3E403FB.webp',
-    ingredients: ['Ванільний сироп', 'Карамельний сироп', 'Льодяна крихта'],
+    ingredients: ['Ванильный сироп', 'Карамельный сироп', 'Ледяная крошка'],
     variants: [
       { price: 129, size: 300 },
       { price: 169, size: 500 },
@@ -110,7 +110,7 @@
     name: 'Лимонад Лайм',
     category: 'Напитки',
     imageUrl: 'https://images.unsplash.com/photo-1622483767028-3f66f2b0c1a1?auto=format&fit=crop&w=800&q=80',
-    ingredients: ['Лимонний сироп', 'М’ята', 'Льодяна крихта'],
+    ingredients: ['Лимонный сироп', 'Мята', 'Ледяная крошка'],
     variants: [
       { price: 79, size: 250 },
       { price: 99, size: 500 },
@@ -120,7 +120,7 @@
     name: 'Чай Зеленый',
     category: 'Напитки',
     imageUrl: 'https://images.unsplash.com/photo-1515823064-d6e0c04616a7?auto=format&fit=crop&w=800&q=80',
-    ingredients: ['М’ята', 'Лимонний сироп'],
+    ingredients: ['Мята', 'Лимонный сироп'],
     variants: [
       { price: 69, size: 250 },
       { price: 89, size: 500 },
@@ -130,7 +130,7 @@
     name: 'Фреш Апельсиновый',
     category: 'Напитки',
     imageUrl: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?auto=format&fit=crop&w=800&q=80',
-    ingredients: ['Лимонний сироп', 'Льодяна крихта'],
+    ingredients: ['Лимонный сироп', 'Ледяная крошка'],
     variants: [
       { price: 119, size: 250 },
       { price: 149, size: 500 },
@@ -162,7 +162,7 @@
     name: 'Ирландский Капучино',
     category: 'Напитки',
     imageUrl: 'https://media.dodostatic.net/image/r:292x292/11EE7D61999EBDA59C10E216430A6093.webp',
-    ingredients: ['Карамельний сироп', 'Шоколадний сироп', 'М’ята'],
+    ingredients: ['Карамельный сироп', 'Шоколадный сироп', 'Мята'],
     variants: [
       { price: 119, size: 200 },
       { price: 139, size: 300 },
@@ -172,7 +172,7 @@
     name: 'Кофе Карамельный капучино',
     category: 'Напитки',
     imageUrl: 'https://media.dodostatic.net/image/r:292x292/11EE7D61AED6B6D4BFDAD4E58D76CF56.webp',
-    ingredients: ['Карамельний сироп', 'Ванільний сироп', 'Льодяна крихта'],
+    ingredients: ['Карамельный сироп', 'Ванильный сироп', 'Ледяная крошка'],
     variants: [
       { price: 119, size: 200 },
       { price: 139, size: 300 },
@@ -182,7 +182,7 @@
     name: 'Кофе Кокосовый латте',
     category: 'Напитки',
     imageUrl: 'https://media.dodostatic.net/image/r:292x292/11EE7D61B19FA07090EE88B0ED347F42.webp',
-    ingredients: ['Кокосова стружка', 'Ванільний сироп', 'Шоколадний сироп'],
+    ingredients: ['Кокосовая стружка', 'Ванильный сироп', 'Шоколадный сироп'],
     variants: [
       { price: 129, size: 200 },
       { price: 149, size: 300 },
@@ -192,17 +192,17 @@
     name: 'Кофе Американо',
     category: 'Напитки',
     imageUrl: 'https://media.dodostatic.net/image/r:292x292/11EE7D61B044583596548A59078BBD33.webp',
-    ingredients: ['Лимонний сироп', 'М’ята', 'Льодяна крихта'],
+    ingredients: ['Лимонный сироп', 'Мята', 'Ледяная крошка'],
     variants: [
       { price: 89, size: 200 },
       { price: 109, size: 300 },
     ],
   },
    {
-    name: 'Фраголіно',
+    name: 'Фраголино',
     category: 'Напитки',
     imageUrl: 'https://src.zakaz.atbmarket.com/cache/photos/82831/catalog_product_main_82831.jpg',
-    ingredients: ['Лимонний сироп', 'М’ята', 'Кокосова стружка'],
+    ingredients: ['Лимонный сироп', 'Мята', 'Кокосовая стружка'],
     variants: [
       { price: 60, size: 250 },
       { price: 80, size: 500 },
@@ -212,7 +212,7 @@
     name: 'Кофе Латте',
     category: 'Напитки',
     imageUrl: 'https://media.dodostatic.net/image/r:292x292/11EE7D61B0C26A3F85D97A78FEEE00AD.webp',
-    ingredients: ['Ванільний сироп', 'Карамельний сироп', 'Шоколадний сироп'],
+    ingredients: ['Ванильный сироп', 'Карамельный сироп', 'Шоколадный сироп'],
     variants: [
       { price: 99, size: 200 },
       { price: 119, size: 300 },

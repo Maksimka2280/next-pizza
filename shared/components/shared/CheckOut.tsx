@@ -9,14 +9,10 @@ import { Title } from "./Title"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { checkoutPersonalInfoSchema, type CheckoutPersonalInfoFormValues } from "../CheckOutComponents/CheckoutValidate"
-import { getOrCreateGuestCartToken } from "../../lib/guestCart"
-import { guestId } from "../../lib/guestId"
 import { createOrder } from "../../service/orders"
-import { useSession } from "next-auth/react"
 
 export const Checkout = () => {
   const { cart, total, updateItem, removeItem, clearCart, loading } = useCart();
-  const { data: session } = useSession();
   const methods = useForm<CheckoutPersonalInfoFormValues>({
     resolver: zodResolver(checkoutPersonalInfoSchema),
     mode: 'onChange',
@@ -49,21 +45,7 @@ export const Checkout = () => {
       throw new Error("Нельзя оформить заказ с пустой корзиной");
     }
 
-    const isAuthenticated = Boolean(session?.user?.id);
-
-    const token = isAuthenticated
-      ? cart.token
-      : cart.token ?? getOrCreateGuestCartToken() ?? guestId();
-
-console.log("ORDER TOKEN:", token);
-console.log("GUEST TOKEN:", getOrCreateGuestCartToken());
-    if (!isAuthenticated && !token) {
-      throw new Error("Не удалось получить токен гостевой корзины");
-    }
-
     const result = await createOrder({
-      token: token ?? undefined,
-      userId: session?.user?.id ? Number(session.user.id) : null,
       totalAmount,
       items: cart.items,
       fullName: `${values.firstName} ${values.lastName}`.trim(),

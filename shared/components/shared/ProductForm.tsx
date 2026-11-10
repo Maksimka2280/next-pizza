@@ -16,6 +16,7 @@ import { toast, Toaster } from "react-hot-toast";
 import { Toast } from "@base-ui/react";
 import { LoaderCircle } from "lucide-react";
 import { sendEmail } from "@/actions/EmailActions";
+import { FavoriteButton } from "../Products/FavoriteButton";
 
 interface Props {
   imageUrl: string;
@@ -28,6 +29,9 @@ interface Props {
   loading?: boolean;
   onSubmit?: (itemId: number, ingredients: number[]) => void;
   price: number;
+  productId: number;
+  isFavorite: boolean;
+  favoriteIds: number[];
 }
 
 export const ProductForm: React.FC<Props> = ({
@@ -40,7 +44,10 @@ export const ProductForm: React.FC<Props> = ({
   recommendations = [],
   onSubmit,
   loading,
-  price
+  price,
+  productId,
+  isFavorite,
+  favoriteIds,
 }) => {
 
   const {
@@ -97,13 +104,13 @@ export const ProductForm: React.FC<Props> = ({
 
       <div className="flex flex-wrap items-center gap-2 text-sm text-[#777777] mb-[20px]">
         <Link href="/" className="hover:text-[#FE5F00]">
-          Головна
+          Главная
         </Link>
 
         <span>/</span>
 
         <button className="font-semibold hover:text-[#FE5F00]">
-          {categoryName || "Категорія"}
+          {categoryName || "Категория"}
         </button>
 
         <span>/</span>
@@ -124,7 +131,10 @@ export const ProductForm: React.FC<Props> = ({
         </div>
         <div className="flex flex-col gap-6">
           <div>
-            <Title text={name} size="md" className="font-extrabold mb-1" />
+            <div className="flex items-start justify-between gap-4">
+              <Title text={name} size="md" className="font-extrabold mb-1" />
+              <FavoriteButton productId={productId} initialFavorite={isFavorite} />
+            </div>
 
             <p className="text-[#777777] mt-2">
               {textDetaills}
@@ -186,7 +196,10 @@ export const ProductForm: React.FC<Props> = ({
             Рекомендации
           </h2>
 
-          <RecommendationProducts products={recommendations} />
+          <RecommendationProducts
+            products={recommendations}
+            favoriteIds={favoriteIds}
+          />
         </div>
       )}
       <Toaster position="top-center" />

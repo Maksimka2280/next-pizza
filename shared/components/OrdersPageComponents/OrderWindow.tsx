@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { getOrders } from "../../service/orders";
 import type { OrderDto } from "../../types/cart.dto";
-import { getOrCreateGuestCartToken } from "../../lib/guestCart";
 import { CheckoutCard } from "../CheckOutComponents/CheckoutCard";
 import { Skeleton } from "../ui/skeleton";
 import { useSession } from "next-auth/react";
@@ -14,11 +13,7 @@ const orderStatusLabels: Record<string, string> = {
     SUCCEEDED: "Оплачено",
     CANCELLED: "Отменено",
 };
-interface OrdersWindowProps {
-    token?: string;
-}
-
-export function OrdersWindow({ token }: OrdersWindowProps) {
+export function OrdersWindow({ token }: { token?: string }) {
     const [orders, setOrders] = useState<OrderDto[]>([]);
     const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
@@ -29,20 +24,7 @@ export function OrdersWindow({ token }: OrdersWindowProps) {
         if (status === "loading") return;
         const loadOrders = async () => {
             try {
-                let customerOrders;
-
-                // if (session?.user?.id) {
-                //     customerOrders = await getOrders();
-                // } else {
-                //     const token = getOrCreateGuestCartToken();
-
-                //     if (!token) {
-                //         throw new Error("Не вдалося отримати токен кошика");
-                //     }
-
-                //     customerOrders = await getOrders(token);
-                // }
-                customerOrders = await getOrders(token);
+                const customerOrders = await getOrders(token);
                 if (isMounted) {
                     setOrders(customerOrders);
                     setExpandedOrders(
@@ -67,7 +49,7 @@ export function OrdersWindow({ token }: OrdersWindowProps) {
         return () => {
             isMounted = false;
         };
-    }, [token, session, status]);
+    }, [session, status, token]);
 
     return (
         <div className="max-w-[750px] space-y-5 mt-[40px]">
@@ -128,7 +110,7 @@ export function OrdersWindow({ token }: OrdersWindowProps) {
                                     className="text-[16px] text-[#AEAEAE]"
                                     dateTime={order.createdAt}
                                 >
-                                    {new Date(order.createdAt).toLocaleString("uk-UA")}
+                                    {new Date(order.createdAt).toLocaleString("ru-RU")}
                                 </time>
                             </div>
 

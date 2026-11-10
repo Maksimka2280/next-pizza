@@ -5,37 +5,35 @@ import { authOptions } from "@/auth";
 
 export async function GET(req: Request) {
   try {
-    const token = new URL(req.url).searchParams.get("token");
-
-    if (token) {
+    const orderToken = new URL(req.url).searchParams.get("token");
+    if (orderToken) {
       const orders = await prisma.order.findMany({
-        where: { token, userId: null },
+        where: { token: orderToken, userId: null },
         orderBy: { createdAt: "desc" },
       });
-
       return NextResponse.json(orders);
     }
 
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+    const userId = Number(session?.user?.id);
+    const guestToken = req.headers
+      .get("cookie")
+      ?.split(";")
+      .map((part) => part.trim())
+      .find((part) => part.startsWith("guest_cart_token="))
+      ?.slice("guest_cart_token=".length);
 
-    const userId = Number(session.user.id);
+    const where = Number.isSafeInteger(userId) && userId > 0
+      ? { userId }
+      : guestToken
+        ? { token: decodeURIComponent(guestToken), userId: null }
+        : null;
 
-    if (!Number.isSafeInteger(userId) || userId <= 0) {
-      return NextResponse.json(
-        { error: "Invalid user ID" },
-        { status: 401 }
-      );
-    }
+    if (!where) return NextResponse.json([]);
 
     const orders = await prisma.order.findMany({
-      
+      where,
       orderBy: { createdAt: "desc" },
     });
 
@@ -57,12 +55,27 @@ export async function POST(req: Request) {
 
 
     const body = await req.json();
+    const guestToken = req.headers
+      .get("cookie")
+      ?.split(";")
+      .map((part) => part.trim())
+      .find((part) => part.startsWith("guest_cart_token="))
+      ?.slice("guest_cart_token=".length);
+    const userId = session?.user?.id ? Number(session.user.id) : null;
+    const token = userId !== null
+      ? crypto.randomUUID()
+      : guestToken
+        ? decodeURIComponent(guestToken)
+        : null;
+
+    if (typeof token !== "string" || !token) {
+      return NextResponse.json({ error: "Missing cart cookie" }, { status: 401 });
+    }
+
     const order = await prisma.order.create({
       data: {
-        token: body.token,
-        userId: session?.user?.id
-          ? Number(session.user.id)
-          : null,
+        token,
+        userId,
         totalAmount: body.totalAmount,
         status: "PENDING",
         paymentId: null,

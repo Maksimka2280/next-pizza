@@ -15,8 +15,11 @@ import { usePizzaOptions } from '../../hooks/usePizzaOptions';
 import { useCart } from '../../hooks/useCart';
 import { LoaderCircle, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { FavoriteButton } from '../Products/FavoriteButton';
 
 interface Props {
+  productId: number;
+  isFavorite: boolean;
   imageUrl: string;
   name: string;
   ingredients: Ingredient[];
@@ -30,6 +33,8 @@ interface Props {
 
 
 export const ChoosePizzaForm: React.FC<Props> = ({
+  productId,
+  isFavorite,
   name,
   items,
   imageUrl,
@@ -74,9 +79,9 @@ export const ChoosePizzaForm: React.FC<Props> = ({
           ingredients: Array.from(selectedIngredients),
         }),
         {
-          loading: "Додаємо...",
-          success: "Замовлення успішно додано до кошика",
-          error: "Не вдалося додати товар до кошика",
+          loading: "Добавляем...",
+          success: "Заказ успешно добавлен в корзину",
+          error: "Не удалось добавить товар в корзину",
         }
       );
     } catch (e) {
@@ -96,7 +101,10 @@ export const ChoosePizzaForm: React.FC<Props> = ({
       </div>
 
       <div className="w-1/2 bg-[#F4F1EE] p-7">
-        <Title text={name} size="md" className="font-extrabold mb-1" />
+        <div className="flex items-start justify-between gap-4">
+          <Title text={name} size="md" className="font-extrabold mb-1" />
+          <FavoriteButton productId={productId} initialFavorite={isFavorite} />
+        </div>
         <p className="text-gray-400">{textDetaills}</p>
         <div className="flex flex-col gap-4 mt-5">
           {availableSizes?.length > 0 && (
@@ -149,10 +157,10 @@ export const ChoosePizzaForm: React.FC<Props> = ({
         <button
           type="button"
           onClick={() => router.back()}
-          aria-label="Закрити вікно"
-          className="absolute right-3 top-2 z-50 flex h-10 w-10 text-[#7C7C7C] hover:text-black items-center justify-center rounded-full transition "
+          aria-label="Закрыть окно"
+          className="absolute right-1 top-1 z-50 flex h-10 w-10 text-[#7C7C7C] hover:text-black items-center justify-center rounded-full transition "
         >
-          <X size={25} />
+          <X size={20} />
         </button>
       </div>
     </div>

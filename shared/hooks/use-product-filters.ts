@@ -1,6 +1,6 @@
 import { Ingredient } from "@prisma/client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 const parseNumber = (value: string | null) => {
   if (value === null || value === "") return "";
@@ -15,19 +15,34 @@ const parseIngredientIds = (value: string | null) => {
   return new Set(value.split(",").filter(Boolean));
 };
 
-export const useProductFilters = (ingredients: Ingredient[]) => {
+export const useProductFilters = (ingredients: Pick<Ingredient, "id" | "name">[]) => {
   const searchParams = useSearchParams();
+  const searchParamsKey = searchParams.toString();
   const pathname = usePathname();
   const router = useRouter();
 
-  const [pendingMinPrice, setPendingMinPrice] = useState<number | "">("");
-  const [pendingMaxPrice, setPendingMaxPrice] = useState<number | "">("");
-  const [pendingIngredientIds, setPendingIngredientIds] = useState<Set<string>>(new Set());
-  const [pendingCanBuild, setPendingCanBuild] = useState(false);
-  const [pendingNew, setPendingNew] = useState(false);
-  const [selected2, setSelected2] = useState("Традиционное");
+  const [previousSearchParamsKey, setPreviousSearchParamsKey] = useState(searchParamsKey);
+  const [pendingMinPrice, setPendingMinPrice] = useState<number | "">(() =>
+    parseNumber(searchParams.get("priceFrom"))
+  );
+  const [pendingMaxPrice, setPendingMaxPrice] = useState<number | "">(() =>
+    parseNumber(searchParams.get("priceTo"))
+  );
+  const [pendingIngredientIds, setPendingIngredientIds] = useState<Set<string>>(() =>
+    parseIngredientIds(searchParams.get("ingredients"))
+  );
+  const [pendingCanBuild, setPendingCanBuild] = useState(() =>
+    parseBoolean(searchParams.get("canBuild"))
+  );
+  const [pendingNew, setPendingNew] = useState(() =>
+    parseBoolean(searchParams.get("new"))
+  );
+  const [selected2, setSelected2] = useState(() =>
+    searchParams.get("dough") === "Тонкое" ? "Тонкое" : "Традиционное"
+  );
 
-  useEffect(() => {
+  if (searchParamsKey !== previousSearchParamsKey) {
+    setPreviousSearchParamsKey(searchParamsKey);
     setPendingMinPrice(parseNumber(searchParams.get("priceFrom")));
     setPendingMaxPrice(parseNumber(searchParams.get("priceTo")));
     setPendingIngredientIds(parseIngredientIds(searchParams.get("ingredients")));
@@ -36,7 +51,7 @@ export const useProductFilters = (ingredients: Ingredient[]) => {
 
     const doughValue = searchParams.get("dough");
     setSelected2(doughValue === "Тонкое" ? "Тонкое" : "Традиционное");
-  }, [searchParams]);
+  }
 
   const items = useMemo(
     () => ingredients.map((item) => ({ value: String(item.id), text: item.name })),

@@ -25,7 +25,7 @@ export const RegisterWindow = ({ onClose }: Props) => {
                 <button
                     type="button"
                     onClick={onClose}
-                    aria-label="Закрити реєстрацію"
+                    aria-label="Закрыть окно регистрации"
                     className="absolute right-5 top-4 text-2xl text-[#7C7C7C] hover:text-black"
                 >
                     <X />

@@ -1,15 +1,25 @@
 "use client";
 
 import ReactPaginate from "react-paginate";
-import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
 import ProductCartAction from "./ProductCartAction";
 import { useCardFilters } from "../../hooks/useCardFilters";
+import { FavoriteButton } from "./FavoriteButton";
+import { useState } from "react";
+import type { ProductResponse } from "./productFilters";
 
-export default function CartProducts() {
+type CartProductsProps = {
+  initialProducts: ProductResponse[];
+  initialFavoriteIds: number[];
+};
+
+export default function CartProducts({
+  initialProducts,
+  initialFavoriteIds,
+}: CartProductsProps) {
+  const [favoriteIds, setFavoriteIds] = useState(() => new Set(initialFavoriteIds));
   const { 
-    loading,
     groupedVisibleProducts,
     filters,
     clearFilters,
@@ -17,27 +27,11 @@ export default function CartProducts() {
     setIsTransitioning,
     setCurrentPage,
     isTransitioning,
-    currentPage } = useCardFilters()
+    currentPage     } = useCardFilters(initialProducts)
+
   return (
     <div className="flex flex-col gap-[30px] cursor-pointer">
-      {loading ? (
-        <div className={`flex flex-wrap gap-[50px] transition-all duration-300 ease-in-out ${isTransitioning ? "translate-y-2 opacity-0" : "translate-y-0 opacity-100"}`}>
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div key={`skeleton-${index}`} className="max-w-[285px] w-full animate-pulse">
-              <div className="flex flex-col">
-                <Skeleton className="h-[260px] w-[285px] rounded-[15px]" />
-                <Skeleton className="mt-[15px] h-[24px] w-[70%] rounded-[8px]" />
-                <Skeleton className="mt-[10px] h-[14px] w-full rounded-[8px]" />
-                <Skeleton className="mt-[8px] h-[14px] w-[80%] rounded-[8px]" />
-                <div className="mt-[18px] flex items-center justify-between">
-                  <Skeleton className="h-[20px] w-[35%] rounded-[8px]" />
-                  <Skeleton className="h-[40px] w-[125px] rounded-[15px]" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : groupedVisibleProducts.length > 0 ? (
+      {groupedVisibleProducts.length > 0 ? (
         groupedVisibleProducts.map(([categoryName, products]) => (
           <div key={categoryName} className="flex flex-col gap-5">
 
@@ -54,14 +48,14 @@ export default function CartProducts() {
                 const productItemId = product.items?.[0]?.id;
 
                 return (
-                  <Link
+                  <div
                     key={product.id ?? productName}
-                    href={`/product/${product.id}`}
+                    className="max-w-[285px] w-full"
                   >
-                    <div className="max-w-[285px] w-full">
                       <div className="flex flex-col">
-                        <div className="flex h-[260px] w-[285px] items-center justify-center overflow-hidden rounded-[15px] bg-[#FFF7EE]">
-                          <div className="h-[210px] w-[210px]">
+                        <div className="relative flex h-[260px] w-[285px] items-center justify-center overflow-hidden rounded-[15px] bg-[#FFF7EE]">
+                          <div className="relative flex h-[210px] w-[210px] items-center justify-center">
+                            <Link href={`/product/${product.id}`} className="flex h-[190px] w-[190px] items-center justify-center">
                             {product.imageUrl ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img
@@ -71,19 +65,38 @@ export default function CartProducts() {
                               />
                             ) : (
                               <div className="flex h-full items-center justify-center text-sm text-[#B1B1B1]">
-                                Немає зображення
+                                Нет изображения
                               </div>
                             )}
+                            </Link>
                           </div>
+                          {product.id && (
+                            <div className="absolute right-2 top-2">
+                              <FavoriteButton
+                                productId={product.id}
+                                initialFavorite={favoriteIds.has(product.id)}
+                                onFavoriteChange={(isFavorite) => {
+                                  setFavoriteIds((current) => {
+                                    const next = new Set(current);
+                                    if (isFavorite) next.add(product.id);
+                                    else next.delete(product.id);
+                                    return next;
+                                  });
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
 
-                        <h1 className="mt-[15px] mb-[7px] text-[22px] font-bold truncate">
-                          {productName}
-                        </h1>
+                        <Link href={`/product/${product.id}`}>
+                          <h1 className="mt-[15px] mb-[7px] text-[22px] font-bold truncate">
+                            {productName}
+                          </h1>
 
-                        <p className="max-w-full h-[60px] break-words text-[14px] text-[#B1B1B1]">
-                          {ingredients || "Опис буде доступний після отримання даних"}
-                        </p>
+                          <p className="max-w-full h-[60px] break-words text-[14px] text-[#B1B1B1]">
+                            {ingredients || "Описание появится после загрузки данных"}
+                          </p>
+                        </Link>
 
                         <div className="mt-3 flex items-center justify-between">
                           <p className="text-[20px]">
@@ -95,8 +108,7 @@ export default function CartProducts() {
                           />
                         </div>
                       </div>
-                    </div>
-                  </Link>
+                  </div>
                 );
               })}
             </div>
@@ -121,7 +133,7 @@ export default function CartProducts() {
         </div>
       )}
       <div className="flex justify-start items-center my-[50px]">
-        {!loading && pageCount > 1 && (
+        {pageCount > 1 && (
           <ReactPaginate
             previousLabel={"<"}
             nextLabel={">"}

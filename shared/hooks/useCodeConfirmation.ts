@@ -128,7 +128,7 @@ export const useCodeConfirmation = ({
       return true;
     } catch (error) {
       console.error(error);
-      toast.error('Щось пішло не так');
+      toast.error('Что-то пошло не так');
       return false;
     } finally {
       setIsVerifying(false);

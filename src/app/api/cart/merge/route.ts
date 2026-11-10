@@ -25,28 +25,42 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
-    const token = body.token;
+    const token = req.headers
+      .get('cookie')
+      ?.split(';')
+      .map((part) => part.trim())
+      .find((part) => part.startsWith('guest_cart_token='))
+      ?.slice('guest_cart_token='.length);
 
-    if (typeof token !== 'string' || !token.trim()) {
+    if (!token) {
       return NextResponse.json(
         { error: 'Missing token' },
         { status: 400 },
       );
     }
 
+    const decodedToken = decodeURIComponent(token);
+
     const guestCart = await prisma.cart.findFirst({
       where: {
-        token,
+        token: decodedToken,
         userId: null,
       },
     });
 
     if (!guestCart) {
-      return NextResponse.json({
+      const response = NextResponse.json({
         ok: true,
         message: 'No guest cart',
       });
+      response.cookies.set('guest_cart_token', '', {
+        httpOnly: true,
+        maxAge: 0,
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+      });
+      return response;
     }
 
     await prisma.$transaction(async (tx) => {
@@ -73,7 +87,15 @@ export async function POST(req: Request) {
       });
     });
 
-    return NextResponse.json({ ok: true });
+    const response = NextResponse.json({ ok: true });
+    response.cookies.set('guest_cart_token', '', {
+      httpOnly: true,
+      maxAge: 0,
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+    return response;
   } catch (err) {
     console.error(err);
 

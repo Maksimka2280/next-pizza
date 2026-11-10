@@ -40,7 +40,7 @@ export const useLoginForm = ({ onRegister, onClose }: { onRegister?: () => void;
     const doYouRegister = () => setOpen(true);
 
     const handleInvalidSubmit = () => {
-        toast.error('Будь ласка, заповніть усі поля правильно');
+        toast.error('Пожалуйста, заполните все поля правильно');
     };
 
     const handleSendCode = async () => {
@@ -63,10 +63,10 @@ export const useLoginForm = ({ onRegister, onClose }: { onRegister?: () => void;
             setIsCodeSent(true);
             setCode("");
             setIsEmailVerified(false);
-            toast.success('Код підтвердження надіслано на вашу пошту');
+            toast.success('Код подтверждения отправлен на вашу почту');
         } catch (error) {
-            console.error('Помилка відправки:', error);
-            toast.error(error instanceof Error ? error.message : 'Не вдалося надіслати код підтвердження');
+            console.error('Ошибка отправки:', error);
+            toast.error(error instanceof Error ? error.message : 'Не удалось отправить код подтверждения');
         } finally {
             setIsSendingCode(false);
         }
@@ -87,7 +87,7 @@ export const useLoginForm = ({ onRegister, onClose }: { onRegister?: () => void;
         }
 
         if (!code || !/^\d{4}$/.test(code)) {
-            toast.error("Код має містити 4 цифри");
+            toast.error("Код должен содержать 4 цифры");
             return;
         }
 
@@ -108,7 +108,7 @@ export const useLoginForm = ({ onRegister, onClose }: { onRegister?: () => void;
                 callbackUrl: "/",
             });
             if (!result || result.error || !result.ok) {
-                toast.error("Код підтверджено, але не вдалося створити сесію");
+                toast.error("Код подтверждён, но не удалось создать сессию");
                 return;
             }
 

@@ -5,6 +5,35 @@ import { authOptions } from '@/auth';
 
 export const runtime = 'nodejs';
 
+const GUEST_CART_COOKIE = 'guest_cart_token';
+const GUEST_CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
+function getGuestCartToken(req: Request) {
+  const cookie = req.headers
+    .get('cookie')
+    ?.split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${GUEST_CART_COOKIE}=`));
+
+  if (!cookie) return null;
+
+  try {
+    return decodeURIComponent(cookie.slice(GUEST_CART_COOKIE.length + 1)) || null;
+  } catch {
+    return null;
+  }
+}
+
+function setGuestCartCookie(response: NextResponse, token: string) {
+  response.cookies.set(GUEST_CART_COOKIE, token, {
+    httpOnly: true,
+    maxAge: GUEST_CART_COOKIE_MAX_AGE,
+    path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  });
+  return response;
+}
 
 export async function POST(req: Request) {
   try {
@@ -16,17 +45,6 @@ export async function POST(req: Request) {
       quantity = 1,
       ingredients = [],
     } = body;
-
-    const url = new URL(req.url);
-
-    const cookieToken = req.headers
-      .get('cookie')
-      ?.match(/(?:^|;\s*)guest_cart_token=([^;]+)/)?.[1];
-
-    const token =
-      url.searchParams.get('token') ??
-      (typeof body.token === 'string' ? body.token : null) ??
-      (cookieToken ? decodeURIComponent(cookieToken) : null);
 
     const productId = Number(productItemId);
     const itemQuantity = Number(quantity);
@@ -76,8 +94,8 @@ export async function POST(req: Request) {
     }
 
     let cart;
-    console.log('RESOLVED USER ID:', userId);
-    console.log('GUEST TOKEN:', token);
+    let guestToken: string | null = null;
+    let shouldSetGuestCookie = false;
     if (userId !== null) {
       cart = await prisma.cart.findUnique({
         where: { userId },
@@ -92,18 +110,15 @@ export async function POST(req: Request) {
         });
       }
     } else {
-      if (!token) {
-        console.error('Cart request has no authenticated user or guest token');
-
-        return NextResponse.json(
-          { error: 'Missing guest token' },
-          { status: 400 },
-        );
+      guestToken = getGuestCartToken(req);
+      if (!guestToken) {
+        guestToken = crypto.randomUUID();
       }
+      shouldSetGuestCookie = true;
 
       cart = await prisma.cart.findFirst({
         where: {
-          token,
+          token: guestToken,
           userId: null,
         },
       });
@@ -111,7 +126,7 @@ export async function POST(req: Request) {
       if (!cart) {
         cart = await prisma.cart.create({
           data: {
-            token,
+            token: guestToken,
             userId: null,
           },
         });
@@ -147,14 +162,23 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         ok: true,
         cartItem,
-        cart: fullCart,
+        cart: fullCart
+          ? {
+              id: fullCart.id,
+              items: fullCart.items,
+              totalAmount: fullCart.totalAmount,
+            }
+          : null,
       },
       { status: 201 },
     );
+    return shouldSetGuestCookie && guestToken
+      ? setGuestCartCookie(response, guestToken)
+      : response;
   } catch (err) {
     console.error(err);
 
@@ -172,6 +196,8 @@ export async function GET(req: Request) {
     const sessionUserId = session?.user?.id;
 
     let cart = null;
+    let guestToken: string | null = null;
+    let shouldSetGuestCookie = false;
 
     if (sessionUserId) {
       const userId = Number(sessionUserId);
@@ -197,16 +223,15 @@ export async function GET(req: Request) {
         },
       });
     } else {
-      const url = new URL(req.url);
-      const token = url.searchParams.get('token');
-
-      if (!token) {
-        return NextResponse.json({ cart: null });
+      guestToken = getGuestCartToken(req);
+      if (!guestToken) {
+        guestToken = crypto.randomUUID();
       }
+      shouldSetGuestCookie = true;
 
       cart = await prisma.cart.findFirst({
         where: {
-          token,
+          token: guestToken,
           userId: null,
         },
         include: {
@@ -222,7 +247,18 @@ export async function GET(req: Request) {
       });
     }
 
-    return NextResponse.json({ cart });
+    const response = NextResponse.json({
+      cart: cart
+        ? {
+            id: cart.id,
+            items: cart.items,
+            totalAmount: cart.totalAmount,
+          }
+        : null,
+    });
+    return shouldSetGuestCookie && guestToken
+      ? setGuestCartCookie(response, guestToken)
+      : response;
 
   } catch (err) {
     console.error(err);
@@ -238,8 +274,7 @@ export async function GET(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    const url = new URL(req.url);
-    const token = url.searchParams.get("token");
+    const token = getGuestCartToken(req);
 
     let cart = null;
 
@@ -251,7 +286,7 @@ export async function DELETE(req: Request) {
       });
     } else if (token) {
       cart = await prisma.cart.findFirst({
-        where: { token },
+        where: { token, userId: null },
       });
     }
 

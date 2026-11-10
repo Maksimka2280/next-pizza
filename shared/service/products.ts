@@ -3,7 +3,7 @@ import { axiosInstance } from "./instance";
 import { ApiRoutes } from "./constants";
 
 export type ProductWithRelations = {
-  id?: number;
+  id: number;
   name?: string;
   imageUrl?: string;
   items?: Array<{ id?: number; price?: number }>;

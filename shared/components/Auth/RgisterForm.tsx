@@ -77,7 +77,7 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
                         disabled={isSendingCode}
                         className="rounded-[18px] py-[25px] text-[16px] font-extrabold disabled:opacity-70"
                     >
-                        {isSendingCode ? 'Надсилаємо код...' : 'Надіслати код'}
+                        {isSendingCode ? 'Отправляем код...' : 'Отправить код'}
                     </Button>
                 )}
 
@@ -126,7 +126,7 @@ export const RegisterForm = ({ onClose }: { onClose?: () => void }) => {
                         disabled={isRegistering}
                         className="rounded-[18px] py-[25px] text-[16px] font-extrabold disabled:opacity-70"
                     >
-                        {isRegistering ? 'Реєструємо...' : 'Зареєструватися'}
+                        {isRegistering ? 'Регистрируем...' : 'Зарегистрироваться'}
                     </Button>
                 )}
             </form>

@@ -1,49 +1,35 @@
-import axios from 'axios';
-import type { AddToCartDto, UpdateCartItemDto, MergeCartDto } from "../types/cart.dto";
+import { axiosInstance } from "./instance";
+import type { AddToCartDto, UpdateCartItemDto } from "../types/cart.dto";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL;
-
-export async function fetchCartApi(token?: string) {
-  const res = await axios.get(`${BASE}/cart`, {
-    params: token ? { token } : {},
-  });
+export async function fetchCartApi() {
+  const res = await axiosInstance.get("/cart");
 
   return res.data;
 }
 
 export async function addToCartApi(dto: AddToCartDto) {
-  const { token, ...data } = dto;
-
-  const res = await axios.post(
-    `${BASE}/cart`,
-    data,
-    {
-      params: token ? { token } : {},
-    },
-  );
+  const res = await axiosInstance.post("/cart", dto);
 
   return res.data;
 }
 
 export async function updateCartItemApi(dto: UpdateCartItemDto) {
-  const res = await axios.patch(`${BASE}/cart/item`, dto);
+  const res = await axiosInstance.patch("/cart/item", dto);
   return res.data;
 }
 
 export async function deleteCartItemApi(cartItemId: number) {
-  const res = await axios.delete(`${BASE}/cart/item`, { data: { cartItemId } });
+  const res = await axiosInstance.delete("/cart/item", { data: { cartItemId } });
   return res.data;
 }
 
-export async function cleanCartApi(token?: string) {
-  const res = await axios.delete(`${BASE}/cart`, {
-    ...(token ? { params: { token } } : {}),
-  });
+export async function cleanCartApi() {
+  const res = await axiosInstance.delete("/cart");
 
   return res.data;
 }
 
-export async function mergeCartApi(dto: MergeCartDto) {
-  const res = await axios.post(`${BASE}/cart/merge`, dto);
+export async function mergeCartApi() {
+  const res = await axiosInstance.post("/cart/merge", {});
   return res.data;
 }

@@ -1,20 +1,16 @@
-import axios from "axios";
+import { axiosInstance } from "./instance";
 import type { CreateOrderDto, OrderDto } from "../types/cart.dto";
 import { ApiRoutes } from "./constants";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ;
-
 export async function createOrder(dto: CreateOrderDto): Promise<OrderDto> {
-  const { data } = await axios.post<OrderDto>(`${BASE}${ApiRoutes.ORDERS}`, dto);
+  const { data } = await axiosInstance.post<OrderDto>(ApiRoutes.ORDERS, dto);
   return data;
 }
 
 export async function getOrders(token?: string): Promise<OrderDto[]> {
-  const url = token
-    ? `${BASE}${ApiRoutes.ORDERS}?token=${encodeURIComponent(token)}`
-    : `${BASE}${ApiRoutes.ORDERS}`;
-
-  const { data } = await axios.get<OrderDto[]>(url);
+  const { data } = await axiosInstance.get<OrderDto[]>(ApiRoutes.ORDERS, {
+    params: token ? { token } : undefined,
+  });
 
   return data;
 }

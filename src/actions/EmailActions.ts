@@ -104,7 +104,7 @@ export async function sendRegistrationCode(email: string) {
     return { success: true };
   } catch (error) {
     console.error('AgentMail error:', error);
-    throw new Error('Не вдалося відправити email');
+    throw new Error('Не удалось отправить письмо');
   }
 }
 
@@ -278,7 +278,7 @@ export async function sendEmail(email: string) {
     return { success: true, code };
   } catch (error) {
     console.error('AgentMail error:', error);
-    throw new Error('Не вдалося відправити email');
+    throw new Error('Не удалось отправить письмо');
   }
 }
 

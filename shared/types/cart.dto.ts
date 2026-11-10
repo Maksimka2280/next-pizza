@@ -1,5 +1,4 @@
 export interface AddToCartDto {
-  token?: string;
   productItemId: number;
   quantity?: number;
   ingredients?: number[];
@@ -12,11 +11,6 @@ export interface UpdateCartItemDto {
 
 export interface RemoveCartItemDto {
   cartItemId: number;
-}
-
-export interface MergeCartDto {
-  token: string;
-  userId: number;
 }
 
 export interface CartItemDto {
@@ -40,14 +34,11 @@ export interface CartItemDto {
 
 export interface CartDto {
   id: number;
-  token: string;
   items: CartItemDto[];
   totalAmount?: number;
 }
 
 export interface CreateOrderDto {
-  token: string;
-  userId: number | null;
   totalAmount: number;
   items: CartItemDto[];
   fullName: string;
@@ -59,6 +50,8 @@ export interface CreateOrderDto {
 
 export interface OrderDto extends CreateOrderDto {
   id: number;
+  token: string;
+  userId: number | null;
   status: string;
   paymentId: string | null;
   createdAt: string;

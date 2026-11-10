@@ -1,34 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { filterProducts, parseProductFilters, ProductResponse } from "../components/Products/productFilters";
 import { useSearchParams } from "next/navigation";
-import { Api } from "../service/api-clients";
 
-export const useCardFilters = () => {
+export const useCardFilters = (initialProducts: ProductResponse[]) => {
     const searchParams = useSearchParams();
     const filters = useMemo(() => parseProductFilters(searchParams), [searchParams]);
-    const [products, setProducts] = useState<ProductResponse[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(0);
+    const products = initialProducts;
+    const pageKey = `${searchParams.toString()}-${products.length}`;
+    const [pageState, setPageState] = useState({ key: pageKey, page: 0 });
+    const currentPage = pageState.key === pageKey ? pageState.page : 0;
+    const setCurrentPage = (page: number) => setPageState({ key: pageKey, page });
     const [isTransitioning, setIsTransitioning] = useState(false);
     const itemsPerPage = 8;
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const data = await Api.products.getAll();
-                setProducts(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProducts();
-    }, []);
-
-    useEffect(() => {
-        setCurrentPage(0);
-    }, [products.length]);
     const getProductPrice = (product: ProductResponse): number => {
         const prices = product.items
             ?.map((item) => item.price)
@@ -63,10 +46,6 @@ export const useCardFilters = () => {
                 return result;
         }
     }, [filteredProducts, sortBy]);
-    useEffect(() => {
-        setCurrentPage(0);
-    }, [filteredProducts.length, sortBy]);
-
     useEffect(() => {
         if (!isTransitioning) return;
 
@@ -108,7 +87,6 @@ export const useCardFilters = () => {
         window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
     };
     return {
-        loading,
         groupedVisibleProducts,
         clearFilters,
         pageCount,
