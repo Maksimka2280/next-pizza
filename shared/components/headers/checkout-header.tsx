@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { LoginWindow } from "../Auth/Login";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 
 export default function CheckOutHeader() {
@@ -17,15 +18,15 @@ export default function CheckOutHeader() {
     }
     return (
         <>
-            <header className="flex items-center  justify-center w-full px-[67px] py-[25px] sticky top-0 z-50  backdrop-blur-xs">
+            <header className="profile-layout-header sticky top-0 z-50 flex w-full items-center justify-center border-b border-[#EDEDED] px-6 py-4 backdrop-blur-md sm:px-[67px] sm:py-[25px]">
                 <div className="flex items-center justify-between w-full max-w-[1440px] ">
-                    <a className="flex items-center gap-4 " href="/">
+                    <Link className="flex items-center gap-4 " href="/">
                         <img src="/img/header/pizza-logo.png" alt="Pizza Logo" className="w-25 h-25" />
                         <div className="flex flex-col">
                             <h1 className="text-2xl font-black uppercase">next pizza</h1>
-                            <p className="text-[16px] text-[#7B7B7B] leading-none">вкусней уже некуда</p>
+                            <p className="text-[16px] text-[#7B7B7B] leading-none dark:text-zinc-400">вкусней уже некуда</p>
                         </div>
-                    </a>
+                    </Link>
                     <div className=" flex items-center gap-4 ">
                         {status === 'unauthenticated' ? (
                             <Button
@@ -40,7 +41,6 @@ export default function CheckOutHeader() {
                     </div>
                 </div>
             </header>
-            <div className="w-full  bg-[#EDEDED] h-[2px]"></div>
             {openAuth === "login" && (
                 <LoginWindow
                     onRegister={() => setOpenAuth("register")}

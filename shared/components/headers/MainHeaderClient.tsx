@@ -38,7 +38,7 @@ export default function MainHeaderClient({
 
     return (
         <>
-            <header className="sticky top-0 z-50 flex w-full items-center justify-center bg-white/70 px-[67px] py-[25px] backdrop-blur-xs">
+            <header className="sticky top-0 z-50 flex w-full items-center justify-center border-b border-[#EDEDED] bg-white/95 px-[67px] py-[25px] backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950">
                 <div className="flex w-full max-w-[1440px] items-center">
                     <Link
                         className="flex shrink-0 items-center gap-4"
@@ -54,7 +54,7 @@ export default function MainHeaderClient({
                             <h1 className="text-2xl font-black uppercase">
                                 next pizza
                             </h1>
-                            <p className="text-[16px] leading-none text-[#7B7B7B]">
+                            <p className="text-[16px] leading-none text-[#7B7B7B] dark:text-zinc-400">
                                 вкусней уже некуда
                             </p>
                         </div>
@@ -116,7 +116,6 @@ export default function MainHeaderClient({
                 <RegisterWindow onClose={closeLoginFunction} />
             )}
 
-            <div className="h-[1px] w-full bg-[#EDEDED]" />
         </>
     );
 }

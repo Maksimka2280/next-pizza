@@ -1,6 +1,7 @@
 
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Nunito } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import CookieConsent from '../../shared/components/shared/CookieConsent';
 import { Providers } from './providers';
@@ -31,6 +32,17 @@ export default function DashboardLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ru">
+      <head>
+        <Script id="load-site-preferences" strategy="beforeInteractive">
+          {`try {
+            var preferences = JSON.parse(localStorage.getItem("next-pizza-preferences") || "{}");
+            if (preferences.isDark === true) document.documentElement.classList.add("dark");
+            if (preferences.reduceMotion === true) document.documentElement.classList.add("reduce-motion");
+          } catch (error) {
+            console.error("Не удалось применить сохранённые настройки сайта:", error);
+          }`}
+        </Script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${nunito.variable} antialiased`}
       >

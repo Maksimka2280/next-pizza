@@ -1,178 +1,80 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { getOrders } from "../../service/orders";
-import type { OrderDto } from "../../types/cart.dto";
-import { CheckoutCard } from "../CheckOutComponents/CheckoutCard";
+import { Clock3, PackageOpen } from "lucide-react";
+import { useOrdersWindow } from "../../hooks/useOrdersWindow";
+import { OrderCard } from "./OrderCard";
 import { Skeleton } from "../ui/skeleton";
-import { useSession } from "next-auth/react";
 
-const orderStatusLabels: Record<string, string> = {
-    PENDING: "Ожидает оплаты",
-    SUCCEEDED: "Оплачено",
-    CANCELLED: "Отменено",
-};
 export function OrdersWindow({ token }: { token?: string }) {
-    const [orders, setOrders] = useState<OrderDto[]>([]);
-    const [expandedOrders, setExpandedOrders] = useState<Set<number>>(new Set());
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const { data: session, status } = useSession();
-    useEffect(() => {
-        let isMounted = true;
-        if (status === "loading") return;
-        const loadOrders = async () => {
-            try {
-                const customerOrders = await getOrders(token);
-                if (isMounted) {
-                    setOrders(customerOrders);
-                    setExpandedOrders(
-                        new Set(customerOrders.map((order) => order.id))
-                    );
-                }
-            } catch (loadError) {
-                console.error("Не удалось загрузить заказы:", loadError);
+  const { orders, expandedOrders, isLoading, error, toggleOrder } =
+    useOrdersWindow(token);
 
-                if (isMounted) {
-                    setError(
-                        "Не удалось загрузить заказы. Попробуйте обновить страницу."
-                    );
-                }
-            } finally {
-                if (isMounted) setIsLoading(false);
-            }
-        };
-
-        void loadOrders();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [session, status, token]);
-
+  if (isLoading) {
     return (
-        <div className="max-w-[750px] space-y-5 mt-[40px]">
-            {isLoading && (
-                <>
-                    {[0, 1].map((order) => (
-                        <div key={order} className="rounded-[30px] bg-white p-[30px]">
-                            <div className="flex items-center justify-between gap-5">
-                                <div className="flex items-center gap-5">
-                                    <Skeleton className="h-7 w-28 rounded-[10px] bg-[#F2EEE9]" />
-                                    <Skeleton className="h-5 w-44 rounded-[10px] bg-[#F2EEE9]" />
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <Skeleton className="h-[35px] w-[100px] rounded-[30px] bg-[#F2EEE9]" />
-                                    <Skeleton className="h-6 w-6 rounded-full bg-[#F2EEE9]" />
-                                </div>
-                            </div>
-                            <div className="mt-5 space-y-5">
-                                {[0, 1].map((item) => (
-                                    <div key={item} className="flex items-center gap-5">
-                                        <Skeleton className="h-[72px] w-[72px] shrink-0 rounded-[16px] bg-[#F2EEE9]" />
-                                        <div className="flex-1 space-y-2">
-                                            <Skeleton className="h-5 w-2/3 rounded-[10px] bg-[#F2EEE9]" />
-                                            <Skeleton className="h-4 w-1/2 rounded-[10px] bg-[#F2EEE9]" />
-                                        </div>
-                                        <Skeleton className="h-5 w-16 rounded-[10px] bg-[#F2EEE9]" />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </>
-            )}
-
-            {error && (
-                <p role="alert" className="rounded-[30px] bg-white p-[30px] text-red-600">
-                    {error}
-                </p>
-            )}
-
-            {!isLoading && !error && orders.length === 0 && (
-                <p className="rounded-[30px] bg-white p-[30px] text-[#777777]">
-                    У вас пока нет заказов.
-                </p>
-            )}
-
-            {orders.map((order) => {
-                const isExpanded = expandedOrders.has(order.id);
-                const status = orderStatusLabels[order.status] ?? order.status;
-
-                return (
-                    <section key={order.id} className="mt-[45px] rounded-[30px] bg-white p-[30px]">
-                        <div className="flex items-center justify-between gap-5">
-                            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                                <h2 className="text-[24px] font-bold">Заказ #{order.id}</h2>
-
-                                <time
-                                    className="text-[16px] text-[#AEAEAE]"
-                                    dateTime={order.createdAt}
-                                >
-                                    {new Date(order.createdAt).toLocaleString("ru-RU")}
-                                </time>
-                            </div>
-
-                            <div className="flex shrink-0 items-center gap-4">
-                                <span className="rounded-[30px] bg-[#EAF8F4] px-4 py-2 text-[14px] font-medium text-[#1BB486]">
-                                    {status}
-                                </span>
-
-                                <button
-                                    type="button"
-                                    aria-label={`${isExpanded ? "Скрыть" : "Показать"} товары заказа ${order.id}`}
-                                    aria-expanded={isExpanded}
-                                    onClick={() => {
-                                        setExpandedOrders((current) => {
-                                            const next = new Set(current);
-
-                                            if (next.has(order.id)) {
-                                                next.delete(order.id);
-                                            } else {
-                                                next.add(order.id);
-                                            }
-
-                                            return next;
-                                        });
-                                    }}
-                                >
-                                    <ChevronDown
-                                        color="#AEAEAE"
-                                        className={`transition-transform duration-300 ease-in-out ${isExpanded ? "rotate-180" : ""
-                                            }`}
-                                    />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div
-                            className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isExpanded
-                                ? "grid-rows-[1fr] opacity-100"
-                                : "grid-rows-[0fr] opacity-0"
-                                }`}
-                        >
-                            <div className="min-h-0 overflow-hidden">
-                                <div className="mt-5 max-h-[300px] overflow-y-auto">
-                                    {order.items.map((item) => (
-                                        <CheckoutCard
-                                            key={item.id}
-                                            item={item}
-                                            readOnly
-                                        />
-                                    ))}
-
-                                    <div className="mt-5 flex justify-between border-t border-[#EDEDED] pt-4 font-bold">
-                                        <span>Итого</span>
-                                        <span>{order.totalAmount} ₴</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                );
-            })}
-        </div>
+      <div className="mt-6 space-y-4" aria-label="Загружаем заказы">
+        {[0, 1].map((item) => (
+          <div
+            key={item}
+            className="rounded-3xl border border-[#F0ECE8] bg-white p-6 shadow-sm"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-36 rounded-lg bg-[#F2EEE9]" />
+                <Skeleton className="h-4 w-48 rounded-lg bg-[#F2EEE9]" />
+              </div>
+              <Skeleton className="h-8 w-28 rounded-full bg-[#F2EEE9]" />
+            </div>
+            <div className="mt-6 flex items-center gap-4">
+              <Skeleton className="size-16 rounded-xl bg-[#F2EEE9]" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-5 w-2/3 rounded-lg bg-[#F2EEE9]" />
+                <Skeleton className="h-4 w-1/2 rounded-lg bg-[#F2EEE9]" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <p role="alert" className="mt-6 rounded-2xl bg-white p-6 text-red-700 shadow-sm">
+        {error}
+      </p>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="mt-6 flex flex-col items-center rounded-3xl border border-dashed border-[#FED7AA] bg-white px-6 py-12 text-center shadow-sm">
+        <span className="flex size-14 items-center justify-center rounded-2xl bg-[#FFF0E7] text-[#FE5F00]">
+          <PackageOpen size={26} aria-hidden="true" />
+        </span>
+        <p className="mt-4 text-lg font-semibold text-[#292929]">
+          Заказов пока нет
+        </p>
+        <p className="mt-2 text-sm text-[#707070]">
+          Как только вы оформите заказ, он появится здесь.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6 space-y-4">
+      <p className="flex items-center gap-2 text-sm text-[#777]">
+        <Clock3 size={16} aria-hidden="true" />
+        Заказов: <span className="font-semibold text-[#292929]">{orders.length}</span>
+      </p>
+      {orders.map((order) => (
+        <OrderCard
+          key={order.id}
+          order={order}
+          isExpanded={expandedOrders.has(order.id)}
+          onToggle={toggleOrder}
+        />
+      ))}
+    </div>
+  );
 }

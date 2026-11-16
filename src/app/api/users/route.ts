@@ -1,20 +1,38 @@
-import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { NextResponse } from "next/server";
+import { authOptions } from "@/auth";
 import { prisma } from "../../../../prisma/prisma-client";
 
 export async function GET() {
-  const users = await prisma.user.findMany();
-  return NextResponse.json(users);
-}
-export async function POST(req: NextRequest) {
-  const data = await req.json();
+  const session = await getServerSession(authOptions);
+  const userId = Number(session?.user?.id);
 
-  try {
-    const user = await prisma.user.create({
-      data,
-    });
-    return NextResponse.json(user);
-  } catch (error) {
-    console.error('Error creating user:', error);
-    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+  if (!Number.isSafeInteger(userId) || userId <= 0) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      fullName: true,
+      name: true,
+      email: true,
+      image: true,
+      createdAt: true,
+    },
+  });
+
+  if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(user);
+}
+
+export async function POST() {
+  return NextResponse.json(
+    { error: "Use the email verification registration flow" },
+    { status: 405, headers: { Allow: "GET" } },
+  );
 }

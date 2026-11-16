@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/auth";
 import { prisma } from "../../../../../prisma/prisma-client";
-import { FavoriteProducts } from "../../../../../shared/components/ProfileComponents/FavoriteProducts";
+import { FavoritesProfilePage } from "../../../../../shared/components/ProfileComponents/FavoritesProfilePage";
 import type { FavoriteProduct } from "../../../../../shared/service/favorites";
 
 const favoriteProductSelect = {
@@ -47,10 +47,5 @@ export default async function FavoritesPage() {
     return product ? [product] : [];
   });
 
-  return (
-    <section className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold">Избранные товары</h1>
-      <FavoriteProducts initialFavorites={favorites} />
-    </section>
-  );
+  return <FavoritesProfilePage initialFavorites={favorites} />;
 }

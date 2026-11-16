@@ -51,6 +51,15 @@ body {
   font-family: 'Nunito';
 }
 
+.profile-layout-header {
+  background-color: #f4f1ee;
+}
+
+.dark .profile-layout-header {
+  background-color: #09090b;
+  border-color: #27272a;
+}
+
 button{
   cursor: pointer;
 }
@@ -135,6 +144,205 @@ input[type="number"]::-webkit-outer-spin-button {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  color-scheme: dark;
+}
+
+.dark body,
+.dark [class~="bg-[#F4F1EE]"] {
+  background-color: #18181b;
+  color: #f4f4f5;
+}
+
+.dark [class~="bg-white"],
+.dark [class~="bg-gray-50"],
+.dark [class~="bg-gray-100"],
+.dark [class~="bg-[#FAF8F6]"],
+.dark [class~="bg-[#F8F7F5]"],
+.dark [class~="bg-[#F8F8F8]"],
+.dark [class~="bg-[#F9FAFB]"],
+.dark [class~="bg-[#FAFAFA]"],
+.dark [class~="bg-[#FFF7EE]"],
+.dark [class~="bg-[#FFF7ED]"],
+.dark [class~="bg-[#FFF3EB]"],
+.dark [class~="bg-[#F4ECE4]"],
+.dark [class~="bg-[#F1F1F1]"],
+.dark [class~="bg-[#F0EAE5]"],
+.dark [class~="bg-[#F2EEE9]"],
+.dark [class~="bg-[#E7E0DA]"],
+.dark [class~="bg-[#ECECEC]"],
+.dark [class~="bg-[#EDEDED]"],
+.dark [class~="bg-[#D9D9D9]"],
+.dark [class~="bg-[#F4F4F4]"],
+.dark [class~="bg-[#FFFAF4]"],
+.dark [class~="bg-[#FFFAF6]"],
+.dark [class~="bg-[#FFFFFF]"],
+.dark [class~="bg-gray-300"],
+.dark [class~="bg-[#D5D5D5]"] {
+  background-color: #27272a !important;
+}
+
+.dark [class~="bg-[#FFF0E7]"],
+.dark [class~="bg-orange-50"],
+.dark [class~="bg-amber-50"] {
+  background-color: #422b20 !important;
+}
+
+.dark [class~="!bg-[#FFF0E7]"] {
+  background-color: #27272a !important;
+}
+
+.dark [class~="bg-red-50"] {
+  background-color: #3f2424 !important;
+}
+
+.dark [class~="bg-emerald-50"] {
+  background-color: #17352b !important;
+}
+
+.dark [class~="bg-[#F4F1EE]"],
+.dark [class~="bg-gray-200"] {
+  background-color: #18181b !important;
+}
+
+.dark [class~="text-[#292929]"],
+.dark [class~="text-[#000000]"],
+.dark [class~="text-[#111111]"],
+.dark [class~="text-[#1A1A1A]"],
+.dark [class~="text-[#1F1F1F]"],
+.dark [class~="text-[#212121]"],
+.dark [class~="text-[#333333]"],
+.dark [class~="text-[#333]"],
+.dark [class~="text-[#111827]"],
+.dark [class~="text-gray-900"],
+.dark [class~="text-gray-800"],
+.dark [class~="text-black"] {
+  color: #f4f4f5 !important;
+}
+
+.dark [class~="text-[#777]"],
+.dark [class~="text-[#4B4B4B]"],
+.dark [class~="text-[#5F5F5F]"],
+.dark [class~="text-[#666666]"],
+.dark [class~="text-[#888]"],
+.dark [class~="text-[#777777]"],
+.dark [class~="text-[#7A7A7A]"],
+.dark [class~="text-[#7B7B7B]"],
+.dark [class~="text-[#929292]"],
+.dark [class~="text-[#707070]"],
+.dark [class~="text-[#7C7C7C]"],
+.dark [class~="text-[#818181]"],
+.dark [class~="text-[#888888]"],
+.dark [class~="text-[#898989]"],
+.dark [class~="text-[#4B5563]"],
+.dark [class~="text-[#999999]"],
+.dark [class~="text-[#A1A1A1]"],
+.dark [class~="text-[#A7A7A7]"],
+.dark [class~="text-[#B1B1B1]"],
+.dark [class~="text-[#EDEDED]"],
+.dark [class~="text-gray-700"],
+.dark [class~="text-gray-600"],
+.dark [class~="text-gray-500"],
+.dark [class~="text-gray-400"] {
+  color: #a1a1aa !important;
+}
+
+.dark [class~="text-[#FE5F00]"],
+.dark [class~="text-[#FE5F1E]"],
+.dark [class~="text-[#FF6900]"],
+.dark [class~="!text-[#FF6900]"] {
+  color: #fdba74 !important;
+}
+
+.dark [class~="text-amber-700"] {
+  color: #fcd34d !important;
+}
+
+.dark [class~="text-emerald-700"] {
+  color: #6ee7b7 !important;
+}
+
+.dark [class~="text-red-500"],
+.dark [class~="text-red-600"],
+.dark [class~="text-red-700"] {
+  color: #fca5a5 !important;
+}
+
+.dark [class~="border-[#F0ECE8]"],
+.dark [class~="border-[#E5E5E5]"],
+.dark [class~="border-[#E7E7E7]"],
+.dark [class~="border-[#F0F0F0]"],
+.dark [class~="border-[#EDEDED]"],
+.dark [class~="border-[#D9D9D9]"],
+.dark [class~="border-[#e4e4e4]"],
+.dark [class~="border-[#E5E7EB]"],
+.dark [class~="border-[#F1EEE9]"],
+.dark [class~="border-[#FED7AA]"],
+.dark [class~="border-[#FFD2B8]"],
+.dark [class~="border-[#898989]"],
+.dark [class~="border-gray-100"],
+.dark [class~="border-gray-200"],
+.dark [class~="border-gray-300"] {
+  border-color: #3f3f46 !important;
+}
+
+.dark [class~="border-red-200"] {
+  border-color: #7f3b3b !important;
+}
+
+.dark [class~="border-orange-500"] {
+  border-color: #c2410c !important;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
+  border-color: #52525b;
+  background-color: #27272a;
+  color: #f4f4f5;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #a1a1aa;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #fb923c;
+}
+
+.dark [class~="bg-[#FFF0E7]"] [class~="text-[#FE5F00]"] {
+  color: #fdba74 !important;
+}
+
+.setting-switch-track {
+  background-color: #d5d5d5;
+}
+
+.dark .setting-switch-track {
+  background-color: #52525b;
+}
+
+.setting-switch-track[data-checked="true"] {
+  background-color: #fe5f00;
+}
+
+.setting-switch-thumb {
+  background-color: #fff;
+}
+
+.dark .setting-switch-thumb {
+  background-color: #fff !important;
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
 }
 
 @layer base {
