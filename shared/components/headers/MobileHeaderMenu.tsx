@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Home, Menu, UserRound, X } from "lucide-react";
 import { Button } from "../ui/button";
@@ -15,6 +16,8 @@ export function MobileHeaderMenu({
     onLogin,
 }: MobileHeaderMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [menuPosition, setMenuPosition] = useState({ top: 64, right: 12 });
+    const buttonRef = useRef<HTMLButtonElement>(null);
     const menuId = "mobile-header-menu";
 
     useEffect(() => {
@@ -22,8 +25,36 @@ export function MobileHeaderMenu({
         const closeOnEscape = (event: KeyboardEvent) => {
             if (event.key === "Escape") setIsOpen(false);
         };
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
         window.addEventListener("keydown", closeOnEscape);
-        return () => window.removeEventListener("keydown", closeOnEscape);
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            window.removeEventListener("keydown", closeOnEscape);
+        };
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const updatePosition = () => {
+            const rect = buttonRef.current?.getBoundingClientRect();
+            if (!rect) return;
+
+            setMenuPosition({
+                top: rect.bottom + 8,
+                right: Math.max(12, window.innerWidth - rect.right),
+            });
+        };
+
+        const frameId = window.requestAnimationFrame(updatePosition);
+        window.addEventListener("resize", updatePosition);
+        window.addEventListener("scroll", updatePosition, true);
+        return () => {
+            window.cancelAnimationFrame(frameId);
+            window.removeEventListener("resize", updatePosition);
+            window.removeEventListener("scroll", updatePosition, true);
+        };
     }, [isOpen]);
 
     const handleLogin = () => {
@@ -34,6 +65,7 @@ export function MobileHeaderMenu({
     return (
         <div className="relative sm:hidden">
             <Button
+                ref={buttonRef}
                 type="button"
                 variant="outline"
                 aria-label={isOpen ? "Закрыть меню" : "Открыть меню"}
@@ -45,18 +77,20 @@ export function MobileHeaderMenu({
                 {isOpen ? <X size={20} /> : <Menu size={20} />}
             </Button>
 
-            {isOpen && (
-                <>
+            {isOpen &&
+                createPortal(
+                    <>
                     <button
                         type="button"
                         aria-label="Закрыть меню"
                         onClick={() => setIsOpen(false)}
-                        className="fixed inset-0 z-40 cursor-default bg-black/20"
+                        className="fixed inset-0 z-[60] cursor-default bg-black/20"
                     />
                     <nav
                         id={menuId}
                         aria-label="Основное меню"
-                        className="absolute right-0 top-[calc(100%+12px)] z-50 w-[min(290px,calc(100vw-24px))] rounded-2xl border border-[#F1E7DF] bg-white p-3 shadow-[0_16px_40px_rgba(40,25,15,0.18)]"
+                        style={menuPosition}
+                        className="fixed z-[70] w-[min(290px,calc(100vw-24px))] rounded-2xl border border-[#F1E7DF] bg-white p-3 shadow-[0_16px_40px_rgba(40,25,15,0.18)]"
                     >
                         <Link
                             href="/"
@@ -86,8 +120,10 @@ export function MobileHeaderMenu({
                             </button>
                         )}
                     </nav>
-                </>
-            )}
+                    </>,
+                    document.body,
+                )
+            }
         </div>
     );
 }
