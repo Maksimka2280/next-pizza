@@ -22,8 +22,10 @@ export default function DashboardLayout({
             >
                 <ProfileSidebar />
 
-                <main className="min-w-0 flex-1 p-6">
-                    {/* <SidebarTrigger /> */}
+                <main className="min-w-0 flex-1 p-3 sm:p-4 lg:p-6">
+                    <div className="mb-3 flex justify-end md:hidden">
+                        <SidebarTrigger aria-label="Открыть меню профиля" />
+                    </div>
                     {children}
                     
                 </main>

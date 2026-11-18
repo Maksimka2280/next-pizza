@@ -1,22 +1,17 @@
 'use client';
 
 import { usePizzaOptions } from "../../hooks/usePizzaOptions";
-import { Ingredient, ProductItem } from '@prisma/client';
-import RecommendationProducts from "../Products/cart-products-recomend";
-import Link from "next/link";
+import type { Ingredient, Product, ProductItem } from "@prisma/client";
 import { PizzaSize, PizzaType } from "../../constants/Pizza";
-import { GroupVariants } from "../GroupVariants";
 import { Title } from "./Title";
 import { getPizzaDetails } from "../../lib/getPizzaDetails";
-import { IngredientItem } from "./IngredientItem";
-import { Button } from "../ui/button";
 import { useState } from 'react';
 import { useCart } from '../../hooks/useCart';
 import { toast, Toaster } from "react-hot-toast";
-import { Toast } from "@base-ui/react";
-import { LoaderCircle } from "lucide-react";
-import { sendEmail } from "@/actions/EmailActions";
 import { FavoriteButton } from "../Products/FavoriteButton";
+import { ProductCustomization } from "./ProductCustomization";
+import { ProductBreadcrumbs } from "./ProductBreadcrumbs";
+import { ProductRecommendations } from "./ProductRecommendations";
 
 interface Props {
   imageUrl: string;
@@ -24,8 +19,7 @@ interface Props {
   categoryName?: string;
   ingredients: Ingredient[];
   items: ProductItem[];
-  pizzaTypes: any[];
-  recommendations?: any[];
+  recommendations?: Array<Product & { ingredients: Ingredient[]; items: ProductItem[] }>;
   loading?: boolean;
   onSubmit?: (itemId: number, ingredients: number[]) => void;
   price: number;
@@ -40,7 +34,6 @@ export const ProductForm: React.FC<Props> = ({
   imageUrl,
   ingredients,
   categoryName,
-  pizzaTypes,
   recommendations = [],
   onSubmit,
   loading,
@@ -54,7 +47,6 @@ export const ProductForm: React.FC<Props> = ({
     size,
     type,
     selectedIngredients,
-    availableSizes,
     currentItemId,
     setSize,
     setType,
@@ -100,29 +92,10 @@ export const ProductForm: React.FC<Props> = ({
   };
   const finalPrice = price + totalPrice;
   return (
-    <div className='w-full max-w-[1300px] mx-auto'>
-
-      <div className="flex flex-wrap items-center gap-2 text-sm text-[#777777] mb-[20px]">
-        <Link href="/" className="hover:text-[#FE5F00]">
-          Главная
-        </Link>
-
-        <span>/</span>
-
-        <button className="font-semibold hover:text-[#FE5F00]">
-          {categoryName || "Категория"}
-        </button>
-
-        <span>/</span>
-
-        <span className="font-bold text-[#1F1F1F]">
-          {name}
-        </span>
-      </div>
-
-
-      <div className="grid grid-cols-2 gap-10 max-w-[1300px] w-full">
-        <div className="w-full aspect-square rounded-[20px] p-[40px] bg-[#FFF7EE] flex items-center justify-center overflow-hidden">
+    <div className='mx-auto w-full max-w-[1300px] px-3 sm:px-5 lg:px-0'>
+      <ProductBreadcrumbs categoryName={categoryName} productName={name} />
+      <div className="grid w-full max-w-[1300px] grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:gap-10">
+        <div className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-[20px] bg-[#FFF7EE] p-5 sm:p-8 lg:p-[40px]">
           <img
             src={imageUrl}
             alt={name}
@@ -131,7 +104,7 @@ export const ProductForm: React.FC<Props> = ({
         </div>
         <div className="flex flex-col gap-6">
           <div>
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 items-start justify-between gap-3">
               <Title text={name} size="md" className="font-extrabold mb-1" />
               <FavoriteButton productId={productId} initialFavorite={isFavorite} />
             </div>
@@ -141,67 +114,29 @@ export const ProductForm: React.FC<Props> = ({
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 mt-5">
-            {availablePizzaSizes?.length > 0 && (
-              <GroupVariants
-                items={availablePizzaSizes}
-                value={String(size)}
-                onClick={(value) => setSize(Number(value) as PizzaSize)}
-              />
-            )}
-
-            {hasTypeSelector && (
-              <GroupVariants
-                items={availableTypeOptions}
-                value={String(type)}
-                onClick={(value) => setType(Number(value) as PizzaType)}
-              />
-            )}
-          </div>
-
-          <h2 className="text-[18px] font-bold">
-            Ингредиенты
-          </h2>
-          <div className="flex gap-10">
-            {ingredients.map((ingredient) => (
-              <IngredientItem
-                key={ingredient.id}
-                name={ingredient.name}
-                price={ingredient.price}
-                imageUrl={ingredient.imageUrl}
-                onClick={() => addIngredient(ingredient.id)}
-                active={selectedIngredients.has(ingredient.id)}
-              />
-            ))}
-          </div>
-          <Button
-            disabled={loading || adding}
-            onClick={handleClickAdd}
-            className="h-13.75 px-10 text-base rounded-[18px] w-full mt-8
-             disabled:bg-gray-300 disabled:text-gray-500
-             disabled:cursor-not-allowed"
-          >
-            {loading || adding ? (
-              <LoaderCircle className="h-5 w-5 animate-spin" />
-            ) : (
-              `Добавить в корзину за ${finalPrice} ₴`
-            )}
-          </Button>
+          <ProductCustomization
+            availablePizzaSizes={availablePizzaSizes}
+            availableTypeOptions={availableTypeOptions}
+            hasTypeSelector={hasTypeSelector}
+            size={size}
+            type={type}
+            ingredients={ingredients}
+            selectedIngredients={selectedIngredients}
+            loading={Boolean(loading)}
+            adding={adding}
+            finalPrice={finalPrice}
+            onSizeChange={(value) => setSize(Number(value) as PizzaSize)}
+            onTypeChange={(value) => setType(Number(value) as PizzaType)}
+            onIngredientToggle={addIngredient}
+            onAdd={handleClickAdd}
+          />
         </div>
 
       </div>
-      {recommendations.length > 0 && (
-        <div className="mt-20 pb-20">
-          <h2 className="mb-8 text-[28px] font-bold">
-            Рекомендации
-          </h2>
-
-          <RecommendationProducts
-            products={recommendations}
-            favoriteIds={favoriteIds}
-          />
-        </div>
-      )}
+      <ProductRecommendations
+        products={recommendations}
+        favoriteIds={favoriteIds}
+      />
       <Toaster position="top-center" />
     </div>
   );

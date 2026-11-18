@@ -1,5 +1,5 @@
 import { axiosInstance } from "./instance";
-import type { CreateOrderDto, OrderDto } from "../types/cart.dto";
+import type { CreateOrderDto, OrderDto, OrderHistoryDto } from "../types/cart.dto";
 import { ApiRoutes } from "./constants";
 
 export async function createOrder(dto: CreateOrderDto): Promise<OrderDto> {
@@ -7,8 +7,8 @@ export async function createOrder(dto: CreateOrderDto): Promise<OrderDto> {
   return data;
 }
 
-export async function getOrders(token?: string): Promise<OrderDto[]> {
-  const { data } = await axiosInstance.get<OrderDto[]>(ApiRoutes.ORDERS, {
+export async function getOrders(token?: string): Promise<OrderHistoryDto[]> {
+  const { data } = await axiosInstance.get<OrderHistoryDto[]>(ApiRoutes.ORDERS, {
     params: token ? { token } : undefined,
   });
 

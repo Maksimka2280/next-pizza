@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getAll } from "../service/favorites";
 import { getOrders } from "../service/orders";
-import type { OrderDto } from "../types/cart.dto";
+import type { OrderHistoryDto } from "../types/cart.dto";
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated";
 
@@ -13,7 +13,7 @@ export function useProfileOverview(
     userId: string;
     orderCount: number;
     favoriteCount: number;
-    recentOrder: OrderDto | undefined;
+    recentOrder: OrderHistoryDto | undefined;
     error: string | null;
   }>();
 

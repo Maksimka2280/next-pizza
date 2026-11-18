@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { authOptions } from "@/auth";
 import { prisma } from "../../../../prisma/prisma-client";
+import { calculateCheckoutTotal } from "../../../../shared/lib/checkout-pricing";
 
 const checkoutSchema = z.object({
   fullName: z.string().trim().min(2).max(120),
@@ -29,6 +30,13 @@ const checkoutCartSelect = {
     },
   },
 } satisfies Prisma.CartSelect;
+const orderHistorySelect = {
+  id: true,
+  items: true,
+  totalAmount: true,
+  status: true,
+  createdAt: true,
+} satisfies Prisma.OrderSelect;
 
 type CheckoutCart = Prisma.CartGetPayload<{
   select: typeof checkoutCartSelect;
@@ -41,6 +49,7 @@ export async function GET(req: Request) {
       const orders = await prisma.order.findMany({
         where: { token: orderToken },
         orderBy: { createdAt: "desc" },
+        select: orderHistorySelect,
       });
       return NextResponse.json(orders);
     }
@@ -65,6 +74,7 @@ export async function GET(req: Request) {
     const orders = await prisma.order.findMany({
       where,
       orderBy: { createdAt: "desc" },
+      select: orderHistorySelect,
     });
     return NextResponse.json(orders);
   } catch (error) {
@@ -132,13 +142,14 @@ export async function POST(req: Request) {
       productItem: item.productItem,
       ingredients: item.ingredients,
     })) satisfies Prisma.InputJsonObject[];
-    const totalAmount = cart.items.reduce((sum, item) => {
+    const subtotal = cart.items.reduce((sum, item) => {
       const ingredientsTotal = item.ingredients.reduce(
         (ingredientSum, ingredient) => ingredientSum + ingredient.price,
         0,
       );
       return sum + (item.productItem.price + ingredientsTotal) * item.quantity;
     }, 0);
+    const totalAmount = calculateCheckoutTotal(subtotal);
 
     const order = await prisma.order.create({
       data: {

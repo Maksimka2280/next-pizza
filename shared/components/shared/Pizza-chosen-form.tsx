@@ -6,9 +6,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import { PizzaImage } from './PizzaImage';
 import { Title } from './Title';
 import { Button } from '../ui/button';
-import { GroupVariants } from '../GroupVariants';
-import { PizzaSize, PizzaType, pizzaTypes } from '../../constants/Pizza';
-import { IngredientItem } from './IngredientItem';
 import { cn } from '../../lib/utils';
 import { getPizzaDetails } from '../../lib/getPizzaDetails';
 import { usePizzaOptions } from '../../hooks/usePizzaOptions';
@@ -16,6 +13,8 @@ import { useCart } from '../../hooks/useCart';
 import { LoaderCircle, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FavoriteButton } from '../Products/FavoriteButton';
+import { IngredientGrid } from './IngredientGrid';
+import { PizzaVariantSelectors } from './PizzaVariantSelectors';
 
 interface Props {
   productId: number;
@@ -93,49 +92,33 @@ export const ChoosePizzaForm: React.FC<Props> = ({
   const finalPrice = price + totalPrice;
 
   return (
-
-    <div className={cn(className, 'flex flex-1')}>
-
-      <div className="w-1/2 flex items-center justify-center bg-white ">
-        <PizzaImage imageUrl={imageUrl} size={size} className="w-full h-full" />
+    <div className={cn(className, 'flex min-w-0 flex-1 flex-col md:flex-row')}>
+      <div className="relative flex min-h-[220px] w-full items-center justify-center overflow-hidden bg-white sm:min-h-[280px] md:min-h-0 md:w-1/2">
+        <PizzaImage imageUrl={imageUrl} size={size} className="h-full w-full" />
       </div>
 
-      <div className="w-1/2 bg-[#F4F1EE] p-7">
+      <div className="w-full min-w-0 bg-[#F4F1EE] p-4 sm:p-6 md:w-1/2 md:p-7">
         <div className="flex items-start justify-between gap-4">
           <Title text={name} size="md" className="font-extrabold mb-1" />
           <FavoriteButton productId={productId} initialFavorite={isFavorite} />
         </div>
         <p className="text-gray-400">{textDetaills}</p>
-        <div className="flex flex-col gap-4 mt-5">
-          {availableSizes?.length > 0 && (
-            <GroupVariants
-              items={availablePizzaSizes}
-              value={String(size)}
-              onClick={(value) => setSize(Number(value) as PizzaSize)}
-            />
-          )}
+        <PizzaVariantSelectors
+          availableSizes={availableSizes}
+          availablePizzaSizes={availablePizzaSizes}
+          size={size}
+          type={type}
+          onSizeChange={setSize}
+          onTypeChange={setType}
+        />
 
-          <GroupVariants
-            items={pizzaTypes}
-            value={String(type)}
-            onClick={(value) => setType(Number(value) as PizzaType)}
-          />
-        </div>
-
-        <div className="p-5 rounded-md max-h-[250px] overflow-y-auto  mt-5">
-          <div className="grid grid-cols-3 gap-3">
-            {ingredients.map((ingredient) => (
-              <IngredientItem
-                key={ingredient.id}
-                name={ingredient.name}
-                price={ingredient.price}
-                imageUrl={ingredient.imageUrl}
-                onClick={() => addIngredient(ingredient.id)}
-                active={selectedIngredients.has(ingredient.id)}
-              />
-            ))}
-          </div>
-        </div>
+        <IngredientGrid
+          ingredients={ingredients}
+          selectedIngredients={selectedIngredients}
+          onToggle={addIngredient}
+          itemClassName="w-full"
+          className="mt-5 grid max-h-[250px] min-w-0 grid-cols-[repeat(2,minmax(0,1fr))] gap-2 overflow-y-auto rounded-md p-2 sm:grid-cols-[repeat(3,minmax(0,1fr))] sm:gap-3"
+        />
 
         <Button
           disabled={loading || adding}
@@ -153,12 +136,12 @@ export const ChoosePizzaForm: React.FC<Props> = ({
 
         <Toaster position="top-center" />
       </div>
-      <div className={cn(className, "relative flex flex-1")}>
+      <div className="pointer-events-none absolute inset-0 z-50">
         <button
           type="button"
           onClick={() => router.back()}
           aria-label="Закрыть окно"
-          className="absolute right-1 top-1 z-50 flex h-10 w-10 text-[#7C7C7C] hover:text-black items-center justify-center rounded-full transition "
+          className="pointer-events-auto absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full text-[#7C7C7C] transition hover:text-black sm:right-3 sm:top-3"
         >
           <X size={20} />
         </button>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Button } from '../ui/button';
 
 export default function CookieConsent() {
@@ -8,23 +9,34 @@ export default function CookieConsent() {
   const [entered, setEntered] = useState(false);
 
   useEffect(() => {
-    try {
-      const accepted = localStorage.getItem('cookiesAccepted') === 'true';
-      if (!accepted) {
-        setVisible(true);
-        setTimeout(() => setEntered(true), 20);
+    let enterFrame = 0;
+    const showFrame = window.requestAnimationFrame(() => {
+      let accepted = false;
+      try {
+        accepted = localStorage.getItem('cookiesAccepted') === 'true';
+      } catch (error) {
+        console.error('Не удалось проверить согласие на cookie:', error);
       }
-    } catch (e) {
-    }
+
+      if (accepted) return;
+      setVisible(true);
+      enterFrame = window.requestAnimationFrame(() => setEntered(true));
+    });
+
+    return () => {
+      window.cancelAnimationFrame(showFrame);
+      window.cancelAnimationFrame(enterFrame);
+    };
   }, []);
 
   function accept() {
     setEntered(false);
+    try {
+      localStorage.setItem('cookiesAccepted', 'true');
+    } catch (error) {
+      console.error('Не удалось сохранить согласие на cookie:', error);
+    }
     setTimeout(() => {
-      try {
-        localStorage.setItem('cookiesAccepted', 'true');
-      } catch (e) {
-      }
       setVisible(false);
     }, 250);
   }
@@ -41,7 +53,8 @@ export default function CookieConsent() {
 
       <div
         role="dialog"
-        aria-label="Cookie consent"
+        aria-modal="true"
+        aria-label="Согласие на использование cookie"
         className={`fixed bottom-0 left-0 right-0 z-50 transition-transform duration-250 ease-out ${entered ? 'translate-y-0' : 'translate-y-8'
           } w-full bg-white border-t border-[#EDEDED] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]`}
       >
@@ -74,12 +87,16 @@ export default function CookieConsent() {
                 Принять
               </Button>
 
-              <a
+              <Link
                 href="/privacy"
+                onClick={() => {
+                  setEntered(false);
+                  setTimeout(() => setVisible(false), 250);
+                }}
                 className="w-full sm:w-[160px] h-[50px] flex items-center justify-center text-[16px] rounded-lg border border-[#EDEDED] text-[#4B5563] hover:bg-[#F8F8F8] transition-colors"
               >
                 Подробнее
-              </a>
+              </Link>
             </div>
 
           </div>

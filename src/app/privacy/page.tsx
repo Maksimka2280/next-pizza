@@ -5,9 +5,9 @@ import Link from 'next/link'
 
 export default function PrivacyPage() {
   return (
-    <main className="w-full flex justify-center">
-      <div className="w-full max-w-[900px] py-[40px] px-4">
-        <h1 className="text-[36px] font-black pb-[20px]">Политика конфиденциальности и использование cookie</h1>
+    <main className="flex w-full justify-center px-3 sm:px-5">
+      <div className="w-full min-w-0 max-w-[900px] py-6 sm:py-10">
+        <h1 className="break-words pb-5 text-3xl font-black sm:text-[36px]">Политика конфиденциальности и использование cookie</h1>
 
         <section className="mb-6">
           <p className="text-sm text-[#333]">

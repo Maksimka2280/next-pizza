@@ -1,7 +1,7 @@
 
+import { notFound } from "next/navigation";
 import { prisma } from "../../../../../prisma/prisma-client";
 import { ProductForm } from "../../../../../shared/components/shared/ProductForm";
-import { pizzaTypes } from "../../../../../shared/constants/Pizza";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 
@@ -13,10 +13,14 @@ export default async function ProductPage({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
+    const productId = Number(id);
+    if (!Number.isSafeInteger(productId) || productId <= 0) {
+        notFound();
+    }
 
     const product = await prisma.product.findUnique({
         where: {
-            id: Number(id),
+            id: productId,
         },
         include: {
             ingredients: true,
@@ -28,7 +32,7 @@ export default async function ProductPage({
     const session = await getServerSession(authOptions);
 
     if (!product) {
-        return null;
+        notFound();
     }
     const [recommendations, favoriteRows] = await Promise.all([
         prisma.product.findMany({
@@ -55,8 +59,8 @@ export default async function ProductPage({
     return (
         <>
 
-            <div className=" w-full mt-[50px]">
-                <div className="flex gap-5 w-full justify-center items-center">
+            <div className="mt-6 w-full sm:mt-10 lg:mt-[50px]">
+                <div className="flex w-full items-center justify-center">
                     <ProductForm
                         name={product.name}
                         productId={product.id}
@@ -65,7 +69,6 @@ export default async function ProductPage({
                         ingredients={product.ingredients}
                         items={product.items}
                         categoryName={product.category.name}
-                        pizzaTypes={pizzaTypes}
                         recommendations={recommendations}
                         price={productPrice}
                         favoriteIds={favoriteIds}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Clock3, PackageCheck } from "lucide-react";
-import type { OrderDto } from "../../types/cart.dto";
+import type { OrderHistoryDto } from "../../types/cart.dto";
 
 const statusLabels: Record<string, string> = {
   PENDING: "Ожидает оплаты",
@@ -10,7 +10,7 @@ const statusLabels: Record<string, string> = {
 };
 
 interface ProfileRecentOrderProps {
-  order: OrderDto | undefined;
+  order: OrderHistoryDto | undefined;
   isLoading: boolean;
   isAuthenticated: boolean;
   hasError: boolean;

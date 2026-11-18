@@ -50,7 +50,7 @@ function writeCachedCart(cart: Maybe<CartDto>, userId?: string | null) {
 }
 
 export function useCart() {
-  const [cart, setCart] = useState<Maybe<CartDto>>(readCachedCart);
+  const [cart, setCart] = useState<Maybe<CartDto>>(null);
   const [loading, setLoading] = useState(true);
   const inFlightRef = useRef(false);
   const { data: session, status } = useSession();

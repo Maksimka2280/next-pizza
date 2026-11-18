@@ -86,13 +86,13 @@ export function FavoriteProducts({
               <h2 className="mt-4 truncate text-xl font-bold text-[#292929]">
                 {product.name}
               </h2>
-              <p className="mt-2 h-10 overflow-hidden break-words text-sm text-[#888]">
+              <p className="mt-2 h-10 overflow-hidden break-words text-sm text-[#888] line-clamp-2">
                 {product.ingredients.map(({ name }) => name).filter(Boolean).join(", ") ||
                   "Состав не указан"}
               </p>
             </Link>
 
-            <div className="mt-4 flex items-center justify-between border-t border-[#F0ECE8] pt-4">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[#F0ECE8] pt-4">
               <p className="text-sm text-[#777]">
                 от{" "}
                 <span className="text-lg font-bold text-[#292929]">

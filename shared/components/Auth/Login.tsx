@@ -14,7 +14,7 @@ export const LoginWindow = ({ onRegister, onClose }: Props) => {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
-      <div className='relative flex w-[450px] flex-col gap-[20px] rounded-[15px] bg-[#F4F1EE] p-[40px]'>
+      <div className='relative flex max-h-[90dvh] w-full max-w-[450px] flex-col gap-5 overflow-y-auto rounded-[15px] bg-[#F4F1EE] p-5 sm:p-8 lg:p-[40px]'>
 
         <div className="flex items-center justify-center gap-[18px] pt-[10px]">
           <div>

@@ -45,8 +45,8 @@ export const CartProductCardInner: React.FC<CartItemProps> = ({
     const totalPrice = unitPrice * (quantity || 1);
 
     return (
-        <main className="flex h-[140px] w-[395px] items-center gap-6 bg-white p-5">
-            <div className="flex h-[65px] w-[65px] shrink-0 items-center justify-center">
+        <main className="flex w-full min-w-0 items-center gap-3 bg-white p-3 sm:h-[140px] sm:gap-6 sm:p-5">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center sm:h-[65px] sm:w-[65px]">
                 <img
                     src={productItem?.product?.imageUrl || '/img/header/icon-login-header.svg'}
                     alt={productItem?.product?.name || 'product'}
@@ -54,15 +54,15 @@ export const CartProductCardInner: React.FC<CartItemProps> = ({
                 />
             </div>
 
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
                 <div className="mb-3">
-                    <h3 className="text-[16px] font-bold">{productItem?.product?.name}</h3>
+                    <h3 className="truncate text-[16px] font-bold">{productItem?.product?.name}</h3>
                     <p className="text-[14px] text-[#818181]">{`${ingredients.length} ингредиентов`}</p>
                 </div>
 
                 <div className="h-px w-full bg-[#EDEDED]" />
 
-                <div className="mt-3 flex items-center justify-between">
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                         <Button
                             variant="outline"
@@ -82,7 +82,7 @@ export const CartProductCardInner: React.FC<CartItemProps> = ({
                             +
                         </Button>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4">
                         <span className="text-[16px] font-bold">{totalPrice} ₴</span>
                         <Button variant="ghost" className="text-sm" onClick={() => onRemove?.(id)}>
                             <Trash color="#A1A1A1"/>

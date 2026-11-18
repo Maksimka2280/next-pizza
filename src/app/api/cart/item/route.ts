@@ -2,7 +2,16 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { prisma } from '../../../../../prisma/prisma-client';
+import { z } from 'zod';
 
+const cartItemIdSchema = z.coerce.number().int().positive().max(2_147_483_647);
+const updateCartItemSchema = z.object({
+  cartItemId: cartItemIdSchema,
+  quantity: z.coerce.number().int().positive().max(2_147_483_647),
+});
+const deleteCartItemSchema = z.object({
+  cartItemId: cartItemIdSchema,
+});
 
 export const runtime = 'nodejs';
 
@@ -41,11 +50,12 @@ async function getRequestCartId(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    const body = await req.json();
-    const { cartItemId, quantity } = body;
-    if (!cartItemId || typeof quantity !== 'number') {
-      return NextResponse.json({ error: 'Missing cartItemId or quantity' }, { status: 400 });
+    const body: unknown = await req.json().catch(() => null);
+    const parsedBody = updateCartItemSchema.safeParse(body);
+    if (!parsedBody.success) {
+      return NextResponse.json({ error: 'Invalid cart item details' }, { status: 400 });
     }
+    const { cartItemId, quantity } = parsedBody.data;
 
     const cartId = await getRequestCartId(req);
     if (!cartId) {
@@ -53,8 +63,8 @@ export async function PATCH(req: Request) {
     }
 
     const updated = await prisma.cartItem.update({
-      where: { id: Number(cartItemId), cartId },
-      data: { quantity: Number(quantity) },
+      where: { id: cartItemId, cartId },
+      data: { quantity },
     });
 
     return NextResponse.json({ ok: true, updated });
@@ -66,16 +76,19 @@ export async function PATCH(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const body = await req.json();
-    const { cartItemId } = body;
-    if (!cartItemId) return NextResponse.json({ error: 'Missing cartItemId' }, { status: 400 });
+    const body: unknown = await req.json().catch(() => null);
+    const parsedBody = deleteCartItemSchema.safeParse(body);
+    if (!parsedBody.success) {
+      return NextResponse.json({ error: 'Invalid cart item ID' }, { status: 400 });
+    }
+    const { cartItemId } = parsedBody.data;
 
     const cartId = await getRequestCartId(req);
     if (!cartId) {
       return NextResponse.json({ error: 'Cart not found' }, { status: 404 });
     }
 
-    await prisma.cartItem.delete({ where: { id: Number(cartItemId), cartId } });
+    await prisma.cartItem.delete({ where: { id: cartItemId, cartId } });
 
     return NextResponse.json({ ok: true });
   } catch (err) {

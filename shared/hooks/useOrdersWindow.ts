@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getOrders } from "../service/orders";
-import type { OrderDto } from "../types/cart.dto";
+import type { OrderHistoryDto } from "../types/cart.dto";
 
 export function useOrdersWindow(token?: string) {
   const { data: session, status } = useSession();
@@ -9,7 +9,7 @@ export function useOrdersWindow(token?: string) {
   const requestKey = `${token ?? ""}:${userId ?? ""}:${status}`;
   const [result, setResult] = useState<{
     key: string;
-    orders: OrderDto[];
+    orders: OrderHistoryDto[];
     expandedOrders: Set<number>;
     error: string | null;
   }>();

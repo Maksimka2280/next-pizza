@@ -1,5 +1,6 @@
 
 
+import { notFound } from "next/navigation";
 import { prisma } from "../../../../../../prisma/prisma-client";
 import { ChoosePizzaForm } from "../../../../../../shared/components/shared/Pizza-chosen-form";
 import { getServerSession } from "next-auth";
@@ -12,10 +13,14 @@ export default async function ProductModalPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const productId = Number(id);
+  if (!Number.isSafeInteger(productId) || productId <= 0) {
+    notFound();
+  }
 
   const product = await prisma.product.findUnique({
     where: {
-      id: Number(id),
+      id: productId,
     },
     include: {
       ingredients: true,
@@ -26,7 +31,7 @@ export default async function ProductModalPage({
   const session = await getServerSession(authOptions);
 
   if (!product) {
-    return null;
+    notFound();
   }
   const productName = product.name ?? "Unnamed product";
   const productImage = product.imageUrl ?? "";
@@ -43,10 +48,10 @@ export default async function ProductModalPage({
       }))
     : false;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8 bg-black/60">
-      <div className="max-w-[1000px] w-full h-[580px] bg-[#F4F1EE] rounded-[30px] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-4">
+      <div className="h-[calc(100dvh-1rem)] max-h-[900px] w-full max-w-[1000px] overflow-y-auto rounded-2xl bg-[#F4F1EE] sm:h-[calc(100dvh-2rem)] sm:rounded-[30px]">
 
-        <div className="flex h-full">
+        <div className="flex min-h-full">
           <ChoosePizzaForm
             productId={product.id}
             isFavorite={isFavorite}

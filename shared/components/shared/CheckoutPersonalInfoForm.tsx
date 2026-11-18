@@ -7,7 +7,7 @@ import { CheckoutField } from "../CheckOutComponents/CheckoutField";
 export const CheckoutPersonalInfoForm = () => {
 
   return (
-    <div className="w-full max-w-[750px] rounded-[30px] bg-white px-[30px] py-[30px]">
+    <div className="w-full min-w-0 rounded-2xl bg-white p-4 sm:rounded-[30px] sm:p-6 lg:max-w-[750px] lg:p-[30px]">
       <Title
         text="2. Персональная информация"
         className="mb-[24px] font-bold"

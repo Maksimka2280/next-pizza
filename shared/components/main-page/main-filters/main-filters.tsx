@@ -1,4 +1,6 @@
 'use client'
+import { useState } from "react";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { CheckboxFiltersGroup } from "../../../components/shared/GroupeFilterCheckbox";
 import { Button } from "../../../components/ui/button";
 import { Checkbox } from "../../../components/ui/checkbox";
@@ -13,6 +15,7 @@ export default function MainFilters({
 }: {
   ingredients: Pick<Ingredient, "id" | "name">[];
 }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
   const {
     pendingMinPrice,
     setPendingMinPrice,
@@ -43,7 +46,20 @@ export default function MainFilters({
   }
 
   return (
-    <div className="w-[250px]">
+    <div className="w-full lg:w-[250px]">
+      <button
+        type="button"
+        aria-expanded={mobileOpen}
+        onClick={() => setMobileOpen((open) => !open)}
+        className="flex min-h-12 w-full items-center justify-between rounded-xl border border-[#F1E7DF] bg-white px-4 text-left shadow-sm transition hover:border-[#FE5F00] lg:hidden"
+      >
+        <span className="flex items-center gap-2 font-bold">
+          <SlidersHorizontal className="size-4 text-[#FE5F00]" />
+          Фильтры товаров
+        </span>
+        <ChevronDown className={`size-4 text-[#8A786C] transition-transform ${mobileOpen ? "rotate-180" : ""}`} />
+      </button>
+      <div className={`${mobileOpen ? "block" : "hidden"} mt-4 rounded-2xl border border-[#F1E7DF] bg-white p-4 lg:mt-0 lg:block lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0`}>
       <h1 className="text-[22px] font-[700]">Фильтрация</h1>
       <div className="flex flex-col gap-2 mt-[25px]">
         <label className="flex items-center gap-2 cursor-pointer">
@@ -119,6 +135,7 @@ export default function MainFilters({
             <Button variant="outline" onClick={resetFilters} className={'h-[50px] rounded-[18px] text-[#FE5F00]  font-bold'}>Сбросить</Button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

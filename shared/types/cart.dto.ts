@@ -57,3 +57,8 @@ export interface OrderDto extends CreateOrderDto {
   createdAt: string;
   updatedAt: string;
 }
+
+export type OrderHistoryDto = Pick<
+  OrderDto,
+  "id" | "items" | "totalAmount" | "status" | "createdAt"
+>;

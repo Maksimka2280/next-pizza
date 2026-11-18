@@ -48,12 +48,12 @@ export default async function Page() {
   );
 
   return (
-    <main className="w-full flex justify-center">
-      <div className="w-full max-w-[1440px] py-[40px]">
+    <main className="flex w-full justify-center px-3 sm:px-5 lg:px-8">
+      <div className="w-full max-w-[1440px] py-5 sm:py-8 lg:py-[40px]">
         <div >
-           <div className="flex items-center gap-[12px] pb-[45px]">
-            <span className="block h-[40px] w-[7px] rounded-full bg-[#FE5F00]" />
-            <Title text="Все пиццы" size="lg" className="font-black" />
+           <div className="flex items-center gap-3 pb-5 sm:pb-8 lg:pb-[45px]">
+            <span className="block h-8 w-[6px] shrink-0 rounded-full bg-[#FE5F00] sm:h-[40px] sm:w-[7px]" />
+            <Title text="Меню" size="lg" className="font-black" />
           </div>
 
         <Suspense>
@@ -62,7 +62,7 @@ export default async function Page() {
         </div>
        
 
-        <div className="mt-[35px] grid grid-cols-[280px_minmax(0,1fr)] gap-[50px]">
+        <div className="mt-5 grid grid-cols-1 gap-5 md:mt-8 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-8 xl:gap-[50px]">
           <div className="w-full">
             <Suspense>
               <MainFilters ingredients={ingredients} />

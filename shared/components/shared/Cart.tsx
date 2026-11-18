@@ -34,7 +34,7 @@ export const Cart = ({ onClose }: Props) => {
       <main className="fixed inset-0 z-50">
         <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
-        <div className="absolute right-0 top-0 h-full w-[400px] bg-[#F4F1EE] flex flex-col">
+        <div className="absolute right-0 top-0 flex h-full w-full max-w-[400px] flex-col bg-[#F4F1EE]">
           <div className="flex items-center justify-between px-5 py-4">
             <div className="h-6 w-36 animate-pulse rounded-full bg-[#E7E0DA]" />
             <div className="h-8 w-8 animate-pulse rounded-full bg-[#E7E0DA]" />
@@ -70,7 +70,7 @@ export const Cart = ({ onClose }: Props) => {
     <main className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
-      <div className="absolute right-0 top-0 h-full w-[400px] bg-[#F4F1EE] flex flex-col">
+      <div className="absolute right-0 top-0 flex h-full w-full max-w-[400px] flex-col bg-[#F4F1EE]">
         {cart?.items?.length ? (
           <>
             <div className="flex items-center justify-between px-5 py-4 ">
@@ -96,7 +96,7 @@ export const Cart = ({ onClose }: Props) => {
               ))}
             </div>
 
-            <div className="bg-white w-full h-[210px] mt-auto px-5 pt-10">
+            <div className="mt-auto h-auto w-full bg-white px-4 pb-5 pt-6 sm:h-[210px] sm:px-5 sm:pt-10">
               <div className="w-full ">
                 <div className="flex items-end ">
                   <span className="text-[16px]">Итого:</span>
@@ -109,7 +109,7 @@ export const Cart = ({ onClose }: Props) => {
                   <span className="text-[18px] font-bold">{Math.round(totalSum * 0.05)} ₴</span>
                 </div>
               </div>
-              <div className="flex justify-center items-center mt-[21px] ">
+              <div className="mt-5 flex items-center justify-center">
                 <Link href="/checkout" className="w-full">
                 <Button className={'w-full h-[55px] text-[16px] rounded-[18px]'}>Оформить заказ <MoveRight /></Button>
                 </Link>

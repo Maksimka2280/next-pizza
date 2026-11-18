@@ -5,5 +5,5 @@ type Props = {
   src?: string;
 }
 export const CheckoutImg: React.FC<Props> = ({ src, className }) => {
-  return <img className={cn('w-[60px] h-[60px]', className)} src={src} />;
+  return <img className={cn('h-12 w-12 shrink-0 object-contain sm:h-[60px] sm:w-[60px]', className)} src={src} />;
 };

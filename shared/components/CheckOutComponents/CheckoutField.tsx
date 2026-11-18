@@ -1,7 +1,7 @@
 
 import { useFormContext, useFormState } from "react-hook-form";
 
-import { CheckoutPersonalInfoFormValues } from "./CheckoutValidate";
+import type { CheckoutPersonalInfoFormValues } from "./CheckoutValidate";
 
 type FieldProps = {
     name: keyof CheckoutPersonalInfoFormValues;
@@ -32,16 +32,18 @@ export function CheckoutField({
     });
 
     const errorMessage = errors[name]?.message;
-    const isInvalid = Boolean(errorMessage)
+    const isInvalid = Boolean(errorMessage);
+    const fieldId = String(name);
     return (
         <div className="flex w-full flex-col gap-[8px]">
-            <label className="text-[14px] font-bold text-[#212121]">
+            <label htmlFor={fieldId} className="text-[14px] font-bold text-[#212121]">
                 {label}
             </label>
 
             {textarea ? (
                 <textarea
-                    {...register(name as any)}
+                    id={fieldId}
+                    {...register(name)}
                     placeholder={placeholder}
                     aria-invalid={isInvalid}
                     aria-describedby={
@@ -54,7 +56,8 @@ export function CheckoutField({
                 />
             ) : (
                 <input
-                    {...register(name as any)}
+                    id={fieldId}
+                    {...register(name)}
                     type={type}
                     autoComplete={autoComplete}
                     inputMode={inputMode}
@@ -81,4 +84,3 @@ export function CheckoutField({
         </div>
     );
 }
-

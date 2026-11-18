@@ -23,14 +23,14 @@ export const IngredientItem: React.FC<Props> = ({
   return (
     <div
       className={cn(
-        'flex items-center flex-col p-1 rounded-[15px] h-45 w-32 text-center relative cursor-pointer shadow-md bg-white',
+        'relative flex h-45 w-32 min-w-0 cursor-pointer flex-col items-center rounded-[15px] bg-white p-2 text-center shadow-md',
         { 'border  border-[#FE5F00]': active },
         className,
       )}
       onClick={onClick}>
       {active && <CircleCheck className="absolute top-2 right-2 text-[#FE5F00]" />}
-      <img width={110} height={110} src={imageUrl} />
-      <span className="text-xs mb-1">{name}</span>
+      <img width={110} height={110} src={imageUrl} alt={name} className="h-[110px] max-w-full object-contain" />
+      <span className="mb-1 max-w-full break-words text-xs leading-tight">{name}</span>
       <span className="font-bold">{price} ₴</span>
     </div>
   );

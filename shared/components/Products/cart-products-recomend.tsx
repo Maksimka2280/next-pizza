@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import ReactPaginate from "react-paginate";
-import ProductCartAction from "./ProductCartAction";
-import { FavoriteButton } from "./FavoriteButton";
+import RecommendationProductCard from "./RecommendationProductCard";
 
 type ProductResponse = {
     id: number;
@@ -37,68 +35,22 @@ export default function RecommendationProducts({
 
     return (
         <div className="flex flex-col gap-10">
-            <div className="flex flex-wrap justify-center gap-[50px]">
+            <div className="grid grid-cols-1 justify-items-center gap-5 min-[420px]:grid-cols-2 sm:gap-6 xl:grid-cols-4">
                 {visibleProducts.map((product) => {
-                    const price = product.items?.[0]?.price ?? 0;
-                    const productItemId = product.items?.[0]?.id;
-
-                    const ingredients = product.ingredients
-                        ?.map((ingredient) => ingredient.name)
-                        .filter(Boolean)
-                        .join(", ");
-
                     return (
-                        <article key={product.id} className="relative w-[285px]">
-                            <div className="flex flex-col">
-                                <div className="relative flex h-[260px] w-[285px] items-center justify-center overflow-hidden rounded-[15px] bg-[#FFF7EE]">
-                                    <Link href={`/product/${product.id}`} className="flex h-[210px] w-[210px] items-center justify-center">
-                                        <img
-                                            src={product.imageUrl}
-                                            alt={product.name}
-                                            className="h-full w-full rounded-[30px] object-cover transition hover:scale-105"
-                                        />
-                                    </Link>
-                                    <div className="absolute right-3 top-3">
-                                        <FavoriteButton
-                                            productId={product.id}
-                                            initialFavorite={favoriteIds.has(product.id)}
-                                            onFavoriteChange={(isFavorite) => {
-                                                setFavoriteIds((current) => {
-                                                    const next = new Set(current);
-                                                    if (isFavorite) next.add(product.id);
-                                                    else next.delete(product.id);
-                                                    return next;
-                                                });
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-
-                                <Link href={`/product/${product.id}`}>
-                                    <h2 className="mb-[7px] mt-[15px] truncate text-[22px] font-bold">
-                                        {product.name}
-                                    </h2>
-
-                                    <p className="h-[60px] text-[14px] text-[#B1B1B1]">
-                                        {ingredients || "Описание появится после загрузки данных"}
-                                    </p>
-                                </Link>
-
-                                <div className="mt-3 flex items-center justify-between">
-                                    <p className="text-[20px]">
-                                        От{" "}
-                                        <span className="font-bold">
-                                            {price} ₴
-                                        </span>
-                                    </p>
-
-                                    <ProductCartAction
-                                        productId={product.id}
-                                        productItemId={productItemId}
-                                    />
-                                </div>
-                            </div>
-                        </article>
+                        <RecommendationProductCard
+                            key={product.id}
+                            product={product}
+                            isFavorite={favoriteIds.has(product.id)}
+                            onFavoriteChange={(isFavorite) => {
+                                setFavoriteIds((current) => {
+                                    const next = new Set(current);
+                                    if (isFavorite) next.add(product.id);
+                                    else next.delete(product.id);
+                                    return next;
+                                });
+                            }}
+                        />
                     );
                 })}
             </div>

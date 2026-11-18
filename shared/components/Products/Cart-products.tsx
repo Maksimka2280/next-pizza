@@ -1,12 +1,10 @@
 "use client";
 
 import ReactPaginate from "react-paginate";
-import Link from "next/link";
 import { Toaster } from "react-hot-toast";
-import ProductCartAction from "./ProductCartAction";
 import { useCardFilters } from "../../hooks/useCardFilters";
-import { FavoriteButton } from "./FavoriteButton";
 import { useState } from "react";
+import CatalogProductCard from "./CatalogProductCard";
 import type { ProductResponse } from "./productFilters";
 
 type CartProductsProps = {
@@ -36,79 +34,22 @@ export default function CartProducts({
           <div key={categoryName} className="flex flex-col gap-5">
 
             <h2 className="text-[28px] font-bold">{categoryName}</h2>
-            <div className={`flex flex-wrap gap-[50px] transition-all duration-300 ease-in-out ${isTransitioning ? "translate-y-2 opacity-0" : "translate-y-0 opacity-100"}`}>
+            <div className={`grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:gap-6 xl:grid-cols-3 2xl:grid-cols-4 ${isTransitioning ? "translate-y-2 opacity-0" : "translate-y-0 opacity-100"}`}>
               {products.map((product) => {
-                const productName = product.name ?? "Вкусная пицца";
-                const price = product.items?.[0]?.price ?? 449;
-                const ingredients = product.ingredients
-                  ?.map((ingredient) => ingredient.name)
-                  .filter(Boolean)
-                  .join(", ");
-
-                const productItemId = product.items?.[0]?.id;
-
                 return (
-                  <div
-                    key={product.id ?? productName}
-                    className="max-w-[285px] w-full"
-                  >
-                      <div className="flex flex-col">
-                        <div className="relative flex h-[260px] w-[285px] items-center justify-center overflow-hidden rounded-[15px] bg-[#FFF7EE]">
-                          <div className="relative flex h-[210px] w-[210px] items-center justify-center">
-                            <Link href={`/product/${product.id}`} className="flex h-[190px] w-[190px] items-center justify-center">
-                            {product.imageUrl ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={product.imageUrl}
-                                alt={productName}
-                                className="h-full w-full rounded-[30px] object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full items-center justify-center text-sm text-[#B1B1B1]">
-                                Нет изображения
-                              </div>
-                            )}
-                            </Link>
-                          </div>
-                          {product.id && (
-                            <div className="absolute right-2 top-2">
-                              <FavoriteButton
-                                productId={product.id}
-                                initialFavorite={favoriteIds.has(product.id)}
-                                onFavoriteChange={(isFavorite) => {
-                                  setFavoriteIds((current) => {
-                                    const next = new Set(current);
-                                    if (isFavorite) next.add(product.id);
-                                    else next.delete(product.id);
-                                    return next;
-                                  });
-                                }}
-                              />
-                            </div>
-                          )}
-                        </div>
-
-                        <Link href={`/product/${product.id}`}>
-                          <h1 className="mt-[15px] mb-[7px] text-[22px] font-bold truncate">
-                            {productName}
-                          </h1>
-
-                          <p className="max-w-full h-[60px] break-words text-[14px] text-[#B1B1B1]">
-                            {ingredients || "Описание появится после загрузки данных"}
-                          </p>
-                        </Link>
-
-                        <div className="mt-3 flex items-center justify-between">
-                          <p className="text-[20px]">
-                            от <span className="text-[20px] font-bold">{price} ₴</span>
-                          </p>
-                          <ProductCartAction
-                            productId={product.id}
-                            productItemId={productItemId}
-                          />
-                        </div>
-                      </div>
-                  </div>
+                  <CatalogProductCard
+                    key={product.id ?? product.name}
+                    product={product}
+                    isFavorite={favoriteIds.has(product.id)}
+                    onFavoriteChange={(isFavorite) => {
+                      setFavoriteIds((current) => {
+                        const next = new Set(current);
+                        if (isFavorite) next.add(product.id);
+                        else next.delete(product.id);
+                        return next;
+                      });
+                    }}
+                  />
                 );
               })}
             </div>
@@ -146,13 +87,13 @@ export default function CartProducts({
               setCurrentPage(selected);
             }}
             forcePage={currentPage}
-            containerClassName="flex items-center justify-center gap-2"
-            pageClassName="h-[45px] w-[45px] rounded-[15px] border border-[#F0F0F0] text-[#EDEDED] transition-all duration-300 ease-in-out cursor-pointer hover:border-[#FE5F00] hover:text-[#FE5F00]"
+            containerClassName="flex max-w-full flex-wrap items-center justify-center gap-1 sm:gap-2"
+            pageClassName="h-9 w-9 cursor-pointer rounded-[15px] border border-[#F0F0F0] text-[#EDEDED] transition-all duration-300 ease-in-out hover:border-[#FE5F00] hover:text-[#FE5F00] sm:h-[45px] sm:w-[45px]"
             pageLinkClassName="flex h-full w-full items-center justify-center text-sm font-semibold text-[#888888] transition-colors duration-300 ease-in-out cursor-pointer"
             activeClassName="bg-[#FE5F00]"
             activeLinkClassName="text-white"
-            previousClassName="flex h-[45px] w-[45px] items-center justify-center rounded-[15px] border border-[#F0F0F0] text-[#EDEDED] transition-all duration-300 ease-in-out cursor-pointer hover:border-[#FE5F00] hover:text-[#FE5F00]"
-            nextClassName="flex h-[45px] w-[45px] items-center justify-center rounded-[15px] border border-[#F0F0F0] text-[#EDEDED] transition-all duration-300 ease-in-out cursor-pointer hover:border-[#FE5F00] hover:text-[#FE5F00]"
+            previousClassName="flex h-9 w-9 cursor-pointer items-center justify-center rounded-[15px] border border-[#F0F0F0] text-[#EDEDED] transition-all duration-300 ease-in-out hover:border-[#FE5F00] hover:text-[#FE5F00] sm:h-[45px] sm:w-[45px]"
+            nextClassName="flex h-9 w-9 cursor-pointer items-center justify-center rounded-[15px] border border-[#F0F0F0] text-[#EDEDED] transition-all duration-300 ease-in-out hover:border-[#FE5F00] hover:text-[#FE5F00] sm:h-[45px] sm:w-[45px]"
             disabledClassName="cursor-not-allowed opacity-50"
             breakClassName="flex h-[45px] w-[45px] items-center justify-center text-sm text-[#B1B1B1]"
           />

@@ -9,7 +9,7 @@ type Props = {
   cart?: CartDto | null;
   clearCart?: () => Promise<boolean> | void;
   removeItem?: (cartItemId: number) => Promise<boolean> | void;
-  updateItem?: (dto: UpdateCartItemDto) => Promise<any> | void;
+  updateItem?: (dto: UpdateCartItemDto) => Promise<unknown> | void;
 };
 
 export function CheckoutCart({ cart, clearCart, removeItem, updateItem }: Props) {
@@ -20,12 +20,12 @@ export function CheckoutCart({ cart, clearCart, removeItem, updateItem }: Props)
   const effectiveUpdate = updateItem ?? fallback.updateItem;
   return (
     <>
-      <div className="h-[340px] w-full max-w-[750px] rounded-[30px] bg-white px-[30px] py-[30px]">
-        <div className="flex w-full items-center justify-between ">
+      <div className="h-auto w-full min-w-0 rounded-2xl bg-white p-4 sm:rounded-[30px] sm:p-6 lg:max-w-[750px] lg:p-[30px]">
+        <div className="flex w-full flex-wrap items-center justify-between gap-3">
           <Title text="1. Корзина" className="font-bold" size="md" />
 
           <button
-            className="flex items-center justify-center gap-[10px] text-[#A1A1A1]"
+            className="flex items-center justify-center gap-2 text-sm text-[#A1A1A1] sm:text-base"
             onClick={() => {
               void effectiveClear?.();
             }}
@@ -35,7 +35,7 @@ export function CheckoutCart({ cart, clearCart, removeItem, updateItem }: Props)
           </button>
         </div>
 
-        <div className="h-[230px] overflow-y-auto ">
+        <div className="max-h-[360px] overflow-y-auto sm:max-h-[420px]">
           {effectiveCart?.items?.map((item) => (
             <CheckoutCard
               key={item.id}

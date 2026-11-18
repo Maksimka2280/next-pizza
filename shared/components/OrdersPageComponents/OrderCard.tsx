@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import type { OrderDto } from "../../types/cart.dto";
+import type { OrderHistoryDto } from "../../types/cart.dto";
 import { CheckoutCard } from "../CheckOutComponents/CheckoutCard";
 
 const statusLabels: Record<string, string> = {
@@ -15,7 +15,7 @@ const statusStyles: Record<string, string> = {
 };
 
 interface OrderCardProps {
-  order: OrderDto;
+  order: OrderHistoryDto;
   isExpanded: boolean;
   onToggle: (orderId: number) => void;
 }

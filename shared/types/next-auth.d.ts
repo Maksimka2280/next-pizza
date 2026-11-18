@@ -7,12 +7,18 @@ declare module 'next-auth' {
       name?: string | null;
       email?: string | null;
       image?: string | null;
+      role: 'USER' | 'ADMIN';
     };
+  }
+
+  interface User {
+    role: 'USER' | 'ADMIN';
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT {
     id?: string;
+    role?: 'USER' | 'ADMIN';
   }
 }

@@ -71,21 +71,21 @@ export const Checkout = () => {
 
   return (
     <FormProvider {...methods}>
-      <main className="flex justify-center py-[50px]">
+      <main className="flex justify-center px-3 py-6 sm:px-5 sm:py-10 lg:px-8 lg:py-[50px]">
         <div className="w-full max-w-[1440px]">
-          <div className="flex items-center gap-[12px] pb-[45px]">
-            <span className="block h-[40px] w-[7px] rounded-full bg-[#FE5F00]" />
+          <div className="flex items-center gap-3 pb-6 sm:pb-8 lg:pb-[45px]">
+            <span className="block h-8 w-[6px] shrink-0 rounded-full bg-[#FE5F00] sm:h-[40px] sm:w-[7px]" />
             <Title text="Оформление заказа" size="lg" className="font-black" />
           </div>
 
-          <div className="mt-[50px] flex flex-wrap w-full ">
-            <div className="flex flex-col flex-1 gap-[40px]">
+          <div className="mt-6 grid w-full grid-cols-1 items-start gap-6 lg:mt-[50px] lg:grid-cols-[minmax(0,1fr)_minmax(360px,640px)] lg:gap-8">
+            <div className="flex min-w-0 flex-col gap-6 sm:gap-8 lg:gap-[40px]">
               <CheckoutCart cart={cart} clearCart={clearCart} removeItem={removeItem} updateItem={updateItem} />
               <CheckoutPersonalInfoForm />
               <CheckoutAddressForm />
             </div>
 
-            <div className="max-w-[640px] w-full shrink-0">
+            <div className="w-full min-w-0">
               <CheckoutPayment sum={total} validateOrder={validateOrder} onSubmit={submitOrder} />
             </div>
           </div>

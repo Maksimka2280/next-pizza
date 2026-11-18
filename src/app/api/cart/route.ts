@@ -2,11 +2,18 @@ import { NextResponse } from 'next/server';
 import { prisma } from '../../../../prisma/prisma-client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
+import { z } from 'zod';
 
 export const runtime = 'nodejs';
 
 const GUEST_CART_COOKIE = 'guest_cart_token';
 const GUEST_CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+const cartIdSchema = z.coerce.number().int().positive().max(2_147_483_647);
+const addCartItemSchema = z.object({
+  productItemId: cartIdSchema,
+  quantity: z.coerce.number().int().positive().max(2_147_483_647).default(1),
+  ingredients: z.array(cartIdSchema).max(50).default([]),
+});
 
 function getGuestCartToken(req: Request) {
   const cookie = req.headers
@@ -39,46 +46,28 @@ export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     const sessionUserId = session?.user?.id;
-    const body = await req.json();
-    const {
-      productItemId,
-      quantity = 1,
-      ingredients = [],
-    } = body;
-
-    const productId = Number(productItemId);
-    const itemQuantity = Number(quantity);
-
-    if (!Number.isSafeInteger(productId) || productId <= 0) {
-      return NextResponse.json(
-        { error: 'Invalid productItemId' },
-        { status: 400 },
-      );
+    const body: unknown = await req.json().catch(() => null);
+    const parsedBody = addCartItemSchema.safeParse(body);
+    if (!parsedBody.success) {
+      return NextResponse.json({ error: 'Invalid cart item details' }, { status: 400 });
     }
+    const { productItemId: productId, quantity: itemQuantity, ingredients } = parsedBody.data;
+    const ingredientIds = [...new Set(ingredients)];
 
-    if (!Number.isSafeInteger(itemQuantity) || itemQuantity <= 0) {
-      return NextResponse.json(
-        { error: 'Invalid quantity' },
-        { status: 400 },
-      );
+    const productItem = await prisma.productItem.findUnique({
+      where: { id: productId },
+      select: {
+        id: true,
+        product: { select: { ingredients: { select: { id: true } } } },
+      },
+    });
+    if (!productItem) {
+      return NextResponse.json({ error: 'Product option not found' }, { status: 404 });
     }
-
-    if (
-      !Array.isArray(ingredients) ||
-      !ingredients.every(
-        (id: unknown) =>
-          (typeof id === 'number' || typeof id === 'string') &&
-          Number.isSafeInteger(Number(id)) &&
-          Number(id) > 0,
-      )
-    ) {
-      return NextResponse.json(
-        { error: 'Invalid ingredients' },
-        { status: 400 },
-      );
+    const availableIngredientIds = new Set(productItem.product.ingredients.map(({ id }) => id));
+    if (ingredientIds.some((id) => !availableIngredientIds.has(id))) {
+      return NextResponse.json({ error: 'Invalid ingredients for this product' }, { status: 400 });
     }
-
-    const ingredientIds = [...new Set(ingredients.map(Number))];
 
     let userId: number | null = null;
 

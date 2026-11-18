@@ -1,5 +1,14 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../../../../prisma/prisma-client";
+
+const orderHistorySelect = {
+  id: true,
+  items: true,
+  totalAmount: true,
+  status: true,
+  createdAt: true,
+} satisfies Prisma.OrderSelect;
 
 export async function GET(
   req: Request,
@@ -11,6 +20,7 @@ export async function GET(
     const orders = await prisma.order.findMany({
       where: { token },
       orderBy: { createdAt: "desc" },
+      select: orderHistorySelect,
     });
 
     if (orders.length === 0) {

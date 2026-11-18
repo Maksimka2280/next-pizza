@@ -49,6 +49,8 @@
 
 body {
   font-family: 'Nunito';
+  min-width: 320px;
+  overflow-x: clip;
 }
 
 .profile-layout-header {

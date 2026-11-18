@@ -19,17 +19,9 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!focused) {
-      setProducts([]);
-      return;
-    }
+    if (!focused || !searchQuery.trim()) return;
 
     const timeoutId = window.setTimeout(async () => {
-      if (!searchQuery.trim()) {
-        setProducts([]);
-        return;
-      }
-
       try {
         const data = await Api.products.search(searchQuery);
         const filtered = data.filter((product: Product) =>
@@ -37,7 +29,7 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
         );
         setProducts(filtered);
       } catch (error) {
-        console.log(error);
+        console.error("Не удалось выполнить поиск товаров:", error);
       }
     }, 250);
 
@@ -50,6 +42,7 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
         setFocused(false);
+        setProducts([]);
       }
     };
 
@@ -76,7 +69,10 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
           placeholder="Найти пиццу..."
           onFocus={() => setFocused(true)}
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(event) => {
+            setSearchQuery(event.target.value);
+            if (!event.target.value.trim()) setProducts([]);
+          }}
         />
 
         {products.length > 0 && (

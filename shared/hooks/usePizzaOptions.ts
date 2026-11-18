@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { ProductItem } from '@prisma/client';
 import { getVariantLabel, pizzaTypes, type PizzaSize, type PizzaType } from '../constants/Pizza';
 
@@ -49,7 +49,7 @@ export const usePizzaOptions = (items: ProductItem[]) => {
   const defaultType = (availableTypes[0] ?? 1) as PizzaType;
 
   const [size, setSize] = useState<PizzaSize>(defaultSize);
-  const [type, setType] = useState<PizzaType>(defaultType);
+  const [type, setSelectedType] = useState<PizzaType>(defaultType);
   const [selectedIngredients, setSelectedIngredients] = useState<Set<number>>(new Set());
 
   const currentItemId = useMemo<number | null>(() => {
@@ -86,21 +86,22 @@ export const usePizzaOptions = (items: ProductItem[]) => {
       : false,
   }));
 
-  useEffect(() => {
-    if (!availableTypes.length) {
-      return;
+  const setType = useCallback((nextType: PizzaType) => {
+    setSelectedType(nextType);
+    const currentSizeIsAvailable = items.some(
+      (item) => item.size === size && item.pizzaType === nextType,
+    );
+    if (currentSizeIsAvailable) return;
+
+    const firstAvailableSize = availableSizes.find(({ value }) =>
+      items.some(
+        (item) => item.size === Number(value) && item.pizzaType === nextType,
+      ),
+    );
+    if (firstAvailableSize) {
+      setSize(Number(firstAvailableSize.value) as PizzaSize);
     }
-
-    const currentSize = availablePizzaSizes.find((item) => Number(item.value) === size);
-
-    if (currentSize?.disabled) {
-      const firstAvailableSize = availablePizzaSizes.find((item) => !item.disabled);
-
-      if (firstAvailableSize) {
-        setSize(Number(firstAvailableSize.value) as PizzaSize);
-      }
-    }
-  }, [type, availablePizzaSizes, availableTypes.length, size]);
+  }, [availableSizes, items, size]);
 
   return {
     size,
