@@ -84,41 +84,55 @@ export function MobileHeaderMenu({
                         type="button"
                         aria-label="Закрыть меню"
                         onClick={() => setIsOpen(false)}
-                        className="fixed inset-0 z-[60] cursor-default bg-black/20"
+                        className="fixed inset-0 z-[60] cursor-default bg-black/45 backdrop-blur-[2px]"
                     />
                     <nav
                         id={menuId}
                         aria-label="Основное меню"
                         style={menuPosition}
-                        className="fixed z-[70] w-[min(290px,calc(100vw-24px))] rounded-2xl border border-[#F1E7DF] bg-white p-3 shadow-[0_16px_40px_rgba(40,25,15,0.18)]"
+                        className="fixed z-[70] w-[min(290px,calc(100vw-24px))] overflow-hidden rounded-2xl border border-[#F1E7DF] bg-white p-2 shadow-[0_20px_60px_rgba(40,25,15,0.24)] dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
                     >
-                        <Link
-                            href="/"
-                            onClick={() => setIsOpen(false)}
-                            className="flex min-h-12 items-center gap-3 rounded-xl px-3 font-semibold text-[#242424] transition hover:bg-[#FFF4EC] hover:text-[#FE5F00]"
-                        >
-                            <Home size={18} />
-                            Каталог товаров
-                        </Link>
-                        {isAuthenticated ? (
+                        <div className="flex items-center justify-between px-3 pb-2 pt-1">
+                            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#9A8F86] dark:text-zinc-500">
+                                Навигация
+                            </span>
+                        </div>
+
+                        <div className="space-y-1">
                             <Link
-                                href="/profile"
+                                href="/"
                                 onClick={() => setIsOpen(false)}
-                                className="flex min-h-12 items-center gap-3 rounded-xl px-3 font-semibold text-[#242424] transition hover:bg-[#FFF4EC] hover:text-[#FE5F00]"
+                                className="group flex min-h-14 items-center gap-3 rounded-xl px-2 text-[15px] font-bold text-[#292929] transition-colors hover:bg-[#FFF4EC] hover:text-[#FE5F00] dark:text-zinc-100 dark:hover:bg-zinc-800"
                             >
-                                <UserRound size={18} />
-                                Личный кабинет
+                                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#FFF0E7] text-[#FE5F00] transition-colors group-hover:bg-white dark:bg-[#4A2C1D] dark:group-hover:bg-zinc-700">
+                                    <Home size={19} />
+                                </span>
+                                Каталог товаров
                             </Link>
-                        ) : (
-                            <button
-                                type="button"
-                                onClick={handleLogin}
-                                className="flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-left font-semibold text-[#242424] transition hover:bg-[#FFF4EC] hover:text-[#FE5F00]"
-                            >
-                                <UserRound size={18} />
-                                Войти или создать аккаунт
-                            </button>
-                        )}
+                            {isAuthenticated ? (
+                                <Link
+                                    href="/profile"
+                                    onClick={() => setIsOpen(false)}
+                                    className="group flex min-h-14 items-center gap-3 rounded-xl px-2 text-[15px] font-bold text-[#292929] transition-colors hover:bg-[#FFF4EC] hover:text-[#FE5F00] dark:text-zinc-100 dark:hover:bg-zinc-800"
+                                >
+                                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#FFF0E7] text-[#FE5F00] transition-colors group-hover:bg-white dark:bg-[#4A2C1D] dark:group-hover:bg-zinc-700">
+                                        <UserRound size={19} />
+                                    </span>
+                                    Личный кабинет
+                                </Link>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={handleLogin}
+                                    className="group flex min-h-14 w-full items-center gap-3 rounded-xl px-2 text-left text-[15px] font-bold text-[#292929] transition-colors hover:bg-[#FFF4EC] hover:text-[#FE5F00] dark:text-zinc-100 dark:hover:bg-zinc-800"
+                                >
+                                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#FFF0E7] text-[#FE5F00] transition-colors group-hover:bg-white dark:bg-[#4A2C1D] dark:group-hover:bg-zinc-700">
+                                        <UserRound size={19} />
+                                    </span>
+                                    Войти или создать аккаунт
+                                </button>
+                            )}
+                        </div>
                     </nav>
                     </>,
                     document.body,
