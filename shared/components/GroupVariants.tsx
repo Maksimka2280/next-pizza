@@ -19,7 +19,7 @@ interface Props {
 
 export const GroupVariants: React.FC<Props> = ({ items, onClick, className, value }) => {
   return (
-    <div className={cn(className, 'flex justify-between bg-[#ECECEC] rounded-3xl p-1 select-none')}>
+    <div className={cn(className, 'flex justify-between rounded-3xl bg-[#ECECEC] p-1 select-none dark:bg-zinc-800')}>
       {items.map((item) => (
         <button
           key={item.name}
@@ -27,7 +27,7 @@ export const GroupVariants: React.FC<Props> = ({ items, onClick, className, valu
           className={cn(
             'flex items-center justify-center cursor-pointer h-[30px] px-5 flex-1 rounded-3xl transition-all duration-400 text-sm',
             {
-              'bg-white shadow': item.value === value,
+              'bg-[#FE5F00] text-white shadow': item.value === value,
               'text-gray-500 opacity-50 pointer-events-none': item.disabled,
             },
           )}>

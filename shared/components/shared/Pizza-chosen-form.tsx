@@ -10,8 +10,7 @@ import { cn } from '../../lib/utils';
 import { getPizzaDetails } from '../../lib/getPizzaDetails';
 import { usePizzaOptions } from '../../hooks/usePizzaOptions';
 import { useCart } from '../../hooks/useCart';
-import { LoaderCircle, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { LoaderCircle } from 'lucide-react';
 import { FavoriteButton } from '../Products/FavoriteButton';
 import { IngredientGrid } from './IngredientGrid';
 import { PizzaVariantSelectors } from './PizzaVariantSelectors';
@@ -56,7 +55,6 @@ export const ChoosePizzaForm: React.FC<Props> = ({
   } = usePizzaOptions(items)
   const { addOrIncrement } = useCart();
   const [adding, setAdding] = useState(false);
-  const router = useRouter();
   const { totalPrice, textDetaills } = getPizzaDetails(
     type,
     size,
@@ -135,16 +133,6 @@ export const ChoosePizzaForm: React.FC<Props> = ({
         </Button>
 
         <Toaster position="top-center" />
-      </div>
-      <div className="pointer-events-none absolute inset-0 z-50">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          aria-label="Закрыть окно"
-          className="pointer-events-auto absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full text-[#7C7C7C] transition hover:text-black sm:right-3 sm:top-3"
-        >
-          <X size={20} />
-        </button>
       </div>
     </div>
   );

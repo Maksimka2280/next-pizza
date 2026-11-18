@@ -51,7 +51,7 @@ export default function MainFilters({
         type="button"
         aria-expanded={mobileOpen}
         onClick={() => setMobileOpen((open) => !open)}
-        className="flex min-h-12 w-full items-center justify-between rounded-xl border border-[#F1E7DF] bg-white px-4 text-left shadow-sm transition hover:border-[#FE5F00] lg:hidden"
+        className="flex min-h-12 w-full items-center justify-between rounded-xl border border-[#F1E7DF] bg-[#FFFCFA] px-4 text-left shadow-sm transition hover:border-[#FE5F00] dark:border-zinc-700 dark:bg-[#18181b] lg:hidden"
       >
         <span className="flex items-center gap-2 font-bold">
           <SlidersHorizontal className="size-4 text-[#FE5F00]" />
@@ -59,7 +59,7 @@ export default function MainFilters({
         </span>
         <ChevronDown className={`size-4 text-[#8A786C] transition-transform ${mobileOpen ? "rotate-180" : ""}`} />
       </button>
-      <div className={`${mobileOpen ? "block" : "hidden"} mt-4 rounded-2xl border border-[#F1E7DF] bg-white p-4 lg:mt-0 lg:block lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0`}>
+      <div className={`${mobileOpen ? "block" : "hidden"} mt-4 rounded-2xl border border-[#F1E7DF] bg-[#FFFCFA] p-4 dark:border-zinc-700 dark:bg-[#18181b] lg:mt-0 lg:block lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:dark:border-0 lg:dark:bg-transparent`}>
       <h1 className="text-[22px] font-[700]">Фильтрация</h1>
       <div className="flex flex-col gap-2 mt-[25px]">
         <label className="flex items-center gap-2 cursor-pointer">
@@ -77,7 +77,7 @@ export default function MainFilters({
           <span>Новинки</span>
         </label>
       </div>
-      <div className="w-full bg-[#EDEDED] h-[1px] my-[25px]"></div>
+      <div className="w-full bg-[#EDEDED] h-[1px] my-[25px] dark:bg-zinc-700"></div>
       <h2 className="text-[16px] font-[700]">Цена от и до:</h2>
       <div className="flex flex-col gap-4 pt-[15px]">
         <div className="flex gap-[15px]">
@@ -97,7 +97,7 @@ export default function MainFilters({
           />
         </div>
       </div>
-      <div className="w-full bg-[#EDEDED] h-[1px] my-[25px]"></div>
+      <div className="w-full bg-[#EDEDED] h-[1px] my-[25px] dark:bg-zinc-700"></div>
       <div className="flex flex-col gap-4 mt-[25px]">
         <CheckboxFiltersGroup
           title="Ингредиенты"

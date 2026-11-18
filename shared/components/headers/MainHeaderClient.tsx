@@ -100,7 +100,7 @@ export default function MainHeaderClient({
                         <Button
                             variant="outline"
                             aria-label="Открыть корзину"
-                            className="h-10 w-10 rounded-xl border-[#F0D8C8] p-0 text-[#FE5F00] sm:h-[50px] sm:w-[50px] sm:rounded-[15px]"
+                            className="h-10 w-10 rounded-xl border-[#FE5F00] p-0 text-[#FE5F00] sm:h-[50px] sm:w-[50px] sm:rounded-[15px]"
                             onClick={openCart}
                         >
                             <ShoppingCart strokeWidth={3} />
