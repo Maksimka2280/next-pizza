@@ -1,1 +1,1 @@
-This is a pizza ordering website developed with Next.js, TypeScript, Prisma, SCSS, Tailwind, lucide-react, schdcn
+A full-stack pizza ordering platform built with Next.js and TypeScript, featuring a product catalog, shopping cart, secure checkout, user accounts, and admin product management.
